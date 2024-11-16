@@ -5,6 +5,7 @@ import sys
 from commands import TextCommand as TexCom
 import buttons
 from constants import *
+from states import MouseWheelState
 
 
 def load_and_scale_image(image_path):
@@ -24,7 +25,7 @@ def main(image_folder, output_folder):
     pygame.display.set_caption('Image Classifier')
 
     add_tag_button = buttons.Button("Добавить кнопку", TexCom('ADD_BUTTON'), (800, 50), (300, 60),
-                                    BUTTON_COLOR_DICT1, fixed=False)
+                                    BUTTON_COLOR_DICT2, fixed=False)
     tags_buttons = buttons.load_button_positions('tags_buttons.json')
     all_buttons = [add_tag_button] + tags_buttons
 
@@ -36,9 +37,15 @@ def main(image_folder, output_folder):
     all_done = False
     running = True
     while running:
+        mouse_wheel_state = MouseWheelState.INACTIVE
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:
+                    mouse_wheel_state = MouseWheelState.UP
+                elif event.button == 5:
+                    mouse_wheel_state = MouseWheelState.DOWN
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
                     running = False
@@ -53,7 +60,7 @@ def main(image_folder, output_folder):
         mouse_pressed = pygame.mouse.get_pressed()
         commands_pool = []
         for b in all_buttons:
-            comm = b.handle_event(mouse_pos, mouse_pressed)
+            comm = b.handle_event(mouse_pos, mouse_pressed, mouse_wheel_state=mouse_wheel_state)
             if comm is not None:
                 commands_pool.append(comm)
 
@@ -70,4 +77,4 @@ def main(image_folder, output_folder):
 
 
 if __name__ == '__main__':
-    main('C:\\Users\\Игорь\\1', 'path/to/output_folder')
+    main('C:\\Users\\Игорь\\2', 'path/to/output_folder')

@@ -1,10 +1,18 @@
 import pygame
-from button_states import ButtonState
+from states import ButtonState, MouseWheelState
 from abc import ABC
 from commands import Command
 import json
 import os
 from constants import *
+
+
+def sign(n):
+    if n > 0:
+        return 1
+    elif n < 0:
+        return -1
+    return 0
 
 
 class Button(ABC):
@@ -29,10 +37,14 @@ class Button(ABC):
 
         self.radius = radius
         self.colors = colors  # Словарь с ключами: ButtonState.NORMAL, ButtonState.HOVER, ButtonState.ACTIVE
+        self.sprites = {}
+        self.create_all_sprites()
+
+    def create_all_sprites(self):
         self.sprites = {
-            ButtonState.NORMAL: self.create_sprite(colors[ButtonState.NORMAL]),
-            ButtonState.HOVER: self.create_sprite(colors[ButtonState.HOVER]),
-            ButtonState.ACTIVE: self.create_sprite(colors[ButtonState.ACTIVE])
+            ButtonState.NORMAL: self.create_sprite(self.colors[ButtonState.NORMAL]),
+            ButtonState.HOVER: self.create_sprite(self.colors[ButtonState.HOVER]),
+            ButtonState.ACTIVE: self.create_sprite(self.colors[ButtonState.ACTIVE])
         }
 
     def create_sprite(self, color):
@@ -46,17 +58,27 @@ class Button(ABC):
     def draw(self, screen):
         screen.blit(self.sprites[self.current_state], self.rect)
 
-    def handle_event(self, mouse_position, mouse_pressed, can_be_dragged=True) -> None | Command:
+    def handle_event(self, mouse_position,
+                     mouse_pressed,
+                     can_be_dragged=True,
+                     mouse_wheel_state: MouseWheelState | None = None) -> None | Command:
         unpressed = False
         if self.rect.collidepoint(mouse_position):
             if mouse_pressed[0]:  # LMB
                 self.current_state = ButtonState.ACTIVE
             elif mouse_pressed[2] and can_be_dragged:  # RMB
                 self.handle_dragging(mouse_position)
+                print('check size changing')
+                print(self.dragging)
+                print(mouse_wheel_state is not None)
+                print(mouse_wheel_state != MouseWheelState.INACTIVE)
+                if (self.dragging and
+                        mouse_wheel_state is not None and
+                        mouse_wheel_state != MouseWheelState.INACTIVE):
+                    self.handle_size_changing(mouse_position, mouse_wheel_state)
             else:
                 if self.current_state == ButtonState.ACTIVE:
                     unpressed = True
-                    print(f"Button '{self.text}' clicked (unpressed)")
                 self.current_state = ButtonState.HOVER
                 self.dragging = False
         else:
@@ -72,12 +94,24 @@ class Button(ABC):
             self.dragging_start_mouse = mouse_position
             self.dragging_start_top_left = self.rect.topleft
         else:
+            last_position = self.rect.topleft
             offset_x = mouse_position[0] - self.dragging_start_mouse[0]
             offset_y = mouse_position[1] - self.dragging_start_mouse[1]
             self.rect.x = self.dragging_start_top_left[0] + offset_x
             self.rect.y = self.dragging_start_top_left[1] + offset_y
-            if not SCREEN_RECT.contains(self.rect.inflate(-10, -10)):
-                self.rect.topleft = self.dragging_start_top_left
+            if not SCREEN_RECT.contains(self.rect.inflate(*BUTTON_SCREEN_COLLISION_DEFLATION)):
+                self.dragging = False
+                self.rect.topleft = last_position
+
+    def handle_size_changing(self, mouse_position, mouse_wheel_state):
+        value = mouse_wheel_state.value
+        if mouse_position[0] < self.rect.centerx:
+            self.size = self.size[0] + value, self.size[1]
+        else:
+            self.size = self.size[0], self.size[1] + value
+        self.create_all_sprites()
+        self.rect.size = self.size
+        print('recreate sprites')
 
 
 def load_button_positions(file_path):
