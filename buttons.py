@@ -1,24 +1,19 @@
 import pygame
 from states import ButtonState, MouseWheelState
 from abc import ABC
-from commands import Command
+from commands import TextCommand
 import json
 import os
 from constants import *
-
-
-def sign(n):
-    if n > 0:
-        return 1
-    elif n < 0:
-        return -1
-    return 0
+from fonts import fonts_dict
 
 
 class Button(ABC):
-    def __init__(self, text, command: Command, position, size, colors, font=None, radius=10, fixed=True):
+    def __init__(self, text, command: TextCommand, position, size,
+                 colors=BUTTON_COLOR_DICT2,
+                 font_key=None,
+                 radius=7,):
         self.position = position
-        self.fixed = fixed
         self.dragging = False
         self.dragging_start_mouse = None
         self.dragging_start_top_left = None
@@ -29,9 +24,9 @@ class Button(ABC):
 
         self.command = command
 
-        if font is None:
-            font = pygame.font.SysFont('Tahoma', 30)
-        self.font = font
+        self.font_key = font_key
+        assert font_key in fonts_dict
+        self.font = fonts_dict[font_key]
 
         self.current_state = ButtonState.NORMAL
 
@@ -39,6 +34,13 @@ class Button(ABC):
         self.colors = colors  # Словарь с ключами: ButtonState.NORMAL, ButtonState.HOVER, ButtonState.ACTIVE
         self.sprites = {}
         self.create_all_sprites()
+
+    @classmethod
+    def from_dict(cls, kwargs):
+        return Button(kwargs['text'],
+                      TextCommand(kwargs['command']),
+                      kwargs['position'],
+                      kwargs['size'])
 
     def create_all_sprites(self):
         self.sprites = {
@@ -61,21 +63,18 @@ class Button(ABC):
     def handle_event(self, mouse_position,
                      mouse_pressed,
                      can_be_dragged=True,
-                     mouse_wheel_state: MouseWheelState | None = None) -> None | Command:
+                     mouse_wheel_state: MouseWheelState | None = None,
+                     ctrl_alt_shift_array: tuple[bool, bool, bool] = (False, False, False)) -> None | TextCommand:
         unpressed = False
         if self.rect.collidepoint(mouse_position):
             if mouse_pressed[0]:  # LMB
                 self.current_state = ButtonState.ACTIVE
             elif mouse_pressed[2] and can_be_dragged:  # RMB
                 self.handle_dragging(mouse_position)
-                print('check size changing')
-                print(self.dragging)
-                print(mouse_wheel_state is not None)
-                print(mouse_wheel_state != MouseWheelState.INACTIVE)
                 if (self.dragging and
                         mouse_wheel_state is not None and
                         mouse_wheel_state != MouseWheelState.INACTIVE):
-                    self.handle_size_changing(mouse_position, mouse_wheel_state)
+                    self.handle_size_changing(ctrl_alt_shift_array, mouse_wheel_state)
             else:
                 if self.current_state == ButtonState.ACTIVE:
                     unpressed = True
@@ -89,7 +88,7 @@ class Button(ABC):
             return self.command
 
     def handle_dragging(self, mouse_position):
-        if not self.dragging and not self.fixed:
+        if not self.dragging:
             self.dragging = True
             self.dragging_start_mouse = mouse_position
             self.dragging_start_top_left = self.rect.topleft
@@ -103,25 +102,35 @@ class Button(ABC):
                 self.dragging = False
                 self.rect.topleft = last_position
 
-    def handle_size_changing(self, mouse_position, mouse_wheel_state):
-        value = mouse_wheel_state.value
-        if mouse_position[0] < self.rect.centerx:
-            self.size = self.size[0] + value, self.size[1]
+    def handle_size_changing(self, ctrl_alt_shift_array, mouse_wheel_state):
+        sign = mouse_wheel_state.value
+        if ctrl_alt_shift_array[2]:
+            value = sign * 5
         else:
+            value = sign
+
+        if ctrl_alt_shift_array[0]:
+            self.size = self.size[0] + value, self.size[1]
+        if ctrl_alt_shift_array[1]:
             self.size = self.size[0], self.size[1] + value
+
         self.create_all_sprites()
         self.rect.size = self.size
-        print('recreate sprites')
 
 
-def load_button_positions(file_path):
+def load_button_positions(file_path: str):
     if os.path.exists(file_path):
         with open(file_path, 'r') as file:
             return json.load(file)
     return []
 
 
-def save_button_positions(buttons, file_path):
-    positions = [{'text': button.text, 'position': button.rect.topleft} for button in buttons]
+def save_button_positions(buttons: list[Button], file_path: str):
+    positions = [{'text': button.text,
+                  'command': button.command.to_json(),
+                  'position': button.rect.topleft,
+                  'size': button.rect.size,
+                  'font_key': button.font_key}
+                 for button in buttons]
     with open(file_path, 'w') as file:
         json.dump(positions, file)

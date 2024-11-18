@@ -1,4 +1,5 @@
 import pygame
+pygame.init()
 import os
 import shutil
 import sys
@@ -18,16 +19,30 @@ def load_and_scale_image(image_path):
     return pygame.transform.smoothscale(image, new_size)
 
 
+def get_ctrl_alt_shift_array() -> tuple[bool, bool, bool]:
+    keys = pygame.key.get_pressed()
+    ctrl_pressed = keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]
+    alt_pressed = keys[pygame.K_LALT] or keys[pygame.K_RALT]
+    shift_pressed = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]
+    return ctrl_pressed, alt_pressed, shift_pressed
+
+
 def main(image_folder, output_folder):
     pygame.init()
 
-    screen = pygame.display.set_mode((WIN_SIZE))
+    screen = pygame.display.set_mode(WIN_SIZE)
     pygame.display.set_caption('Image Classifier')
 
-    add_tag_button = buttons.Button("Добавить кнопку", TexCom('ADD_BUTTON'), (800, 50), (300, 60),
-                                    BUTTON_COLOR_DICT2, fixed=False)
-    tags_buttons = buttons.load_button_positions('tags_buttons.json')
-    all_buttons = [add_tag_button] + tags_buttons
+    add_tag_button_list = buttons.load_button_positions('buttons_saves/add_tag_button.json')
+    if len(add_tag_button_list) == 0:
+        add_tag_button = buttons.Button("Добавить кнопку", TexCom('ADD_BUTTON'), (800, 50), (300, 60),
+                                        BUTTON_COLOR_DICT2)
+    else:
+        add_tag_button_dict = add_tag_button_list[0]
+        add_tag_button = buttons.Button.from_dict(add_tag_button_dict)
+
+    # tags_buttons = buttons.load_button_positions('tags_buttons.json')
+    all_buttons = [add_tag_button]  # + tags_buttons
 
     images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]
     image_index = 0
@@ -37,6 +52,7 @@ def main(image_folder, output_folder):
     all_done = False
     running = True
     while running:
+        ctrl_alt_shift_array = get_ctrl_alt_shift_array()
         mouse_wheel_state = MouseWheelState.INACTIVE
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -55,12 +71,17 @@ def main(image_folder, output_folder):
                         image_name = images[image_index]
                         image = load_and_scale_image(os.path.join(image_folder, image_name))
                         all_done = True
+                elif event.key == pygame.K_a:
+                    buttons.save_button_positions([add_tag_button], 'buttons_saves/add_tag_button.json')
+                    print('add tag button saved')
 
         mouse_pos = pygame.mouse.get_pos()
         mouse_pressed = pygame.mouse.get_pressed()
         commands_pool = []
         for b in all_buttons:
-            comm = b.handle_event(mouse_pos, mouse_pressed, mouse_wheel_state=mouse_wheel_state)
+            comm = b.handle_event(mouse_pos, mouse_pressed,
+                                  mouse_wheel_state=mouse_wheel_state,
+                                  ctrl_alt_shift_array=ctrl_alt_shift_array)
             if comm is not None:
                 commands_pool.append(comm)
 
