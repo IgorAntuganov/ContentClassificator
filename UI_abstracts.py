@@ -4,8 +4,8 @@ from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 
 
 class Draggable(ABC):
-    def __init__(self, position, size):
-        self.rect = pygame.Rect(position, size)
+    def __init__(self, rect: pygame.Rect):
+        self.rect = rect
         self.dragging = False
         self.dragging_start_mouse = None
         self.dragging_start_top_left = None
@@ -46,9 +46,9 @@ class Resizable(ABC):
     def handle_size_changing(self, ctrl_alt_shift_array, mouse_wheel_state):
         sign = mouse_wheel_state.value
         if ctrl_alt_shift_array[2]:
-            value = sign * 5
-        else:
             value = sign
+        else:
+            value = sign * 5
 
         curr_size = self.get_size()
         new_width, new_height = curr_size

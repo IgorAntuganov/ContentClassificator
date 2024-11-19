@@ -3,7 +3,7 @@ from states import ButtonState, MouseWheelState
 from commands import TextCommand
 import json
 import os
-from constants import BUTTON_COLOR_DICT2
+from constants import BUTTON_COLOR_DICT2, SMALLER_BUTTON_SPRITE_DEFLATION
 from fonts import fonts_dict
 from UI_abstracts import Draggable, Resizable
 
@@ -25,7 +25,8 @@ class Button(Draggable, Resizable):
                  colors=BUTTON_COLOR_DICT2,
                  font_key=None,
                  radius=7):
-        Draggable.__init__(self, position, size)
+        self.rect = pygame.Rect(position, size)
+        Draggable.__init__(self, self.rect)
         self.text = text
         self.command = command
         self.font_key = font_key
@@ -46,14 +47,22 @@ class Button(Draggable, Resizable):
 
     def create_all_sprites(self):
         self.sprites = {
-            ButtonState.NORMAL: self.create_sprite(self.colors[ButtonState.NORMAL]),
-            ButtonState.HOVER: self.create_sprite(self.colors[ButtonState.HOVER]),
-            ButtonState.ACTIVE: self.create_sprite(self.colors[ButtonState.ACTIVE])
+            ButtonState.NORMAL: self.create_rounded_sprite(self.colors[ButtonState.NORMAL]),
+            ButtonState.HOVER: self.create_smaller_sprite(self.colors[ButtonState.HOVER]),
+            ButtonState.ACTIVE: self.create_rounded_sprite(self.colors[ButtonState.ACTIVE])
         }
 
-    def create_sprite(self, color):
+    def create_rounded_sprite(self, color):
         sprite = pygame.Surface(self.rect.size, pygame.SRCALPHA)
         pygame.draw.rect(sprite, color, sprite.get_rect(), border_radius=self.radius)
+        text_surface = self.font.render(self.text, True, (0, 0, 0))
+        text_rect = text_surface.get_rect(center=sprite.get_rect().center)
+        sprite.blit(text_surface, text_rect)
+        return sprite
+
+    def create_smaller_sprite(self, color):
+        sprite = pygame.Surface(self.rect.size, pygame.SRCALPHA)
+        pygame.draw.rect(sprite, color, sprite.get_rect().inflate(SMALLER_BUTTON_SPRITE_DEFLATION))
         text_surface = self.font.render(self.text, True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=sprite.get_rect().center)
         sprite.blit(text_surface, text_rect)
