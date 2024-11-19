@@ -1,7 +1,7 @@
 import pygame
 pygame.init()
 import os
-import shutil
+# import shutil
 import sys
 from commands import TextCommand as TexCom
 import buttons
@@ -33,16 +33,9 @@ def main(image_folder, output_folder):
     screen = pygame.display.set_mode(WIN_SIZE)
     pygame.display.set_caption('Image Classifier')
 
-    add_tag_button_list = buttons.load_button_positions('buttons_saves/add_tag_button.json')
-    if len(add_tag_button_list) == 0:
-        add_tag_button = buttons.Button("Добавить кнопку", TexCom('ADD_BUTTON'), (800, 50), (300, 60),
-                                        BUTTON_COLOR_DICT2)
-    else:
-        add_tag_button_dict = add_tag_button_list[0]
-        add_tag_button = buttons.Button.from_dict(add_tag_button_dict)
-
-    # tags_buttons = buttons.load_button_positions('tags_buttons.json')
-    all_buttons = [add_tag_button]  # + tags_buttons
+    add_tag_button = buttons.Button("Добавить tag", TexCom('ADD_BUTTON'), (800, 50), (300, 60),
+                                    'buttons_saves/add_tag_button.json')
+    all_buttons = [add_tag_button]
 
     images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]
     image_index = 0
@@ -72,7 +65,7 @@ def main(image_folder, output_folder):
                         image = load_and_scale_image(os.path.join(image_folder, image_name))
                         all_done = True
                 elif event.key == pygame.K_a:
-                    buttons.save_button_positions([add_tag_button], 'buttons_saves/add_tag_button.json')
+                    add_tag_button.save_to_json()
                     print('add tag button saved')
 
         mouse_pos = pygame.mouse.get_pos()

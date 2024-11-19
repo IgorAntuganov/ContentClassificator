@@ -1,6 +1,24 @@
 from abc import ABC, abstractmethod
 import pygame
 from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
+import os
+
+
+class JSONable(ABC):
+    def __init__(self, path_to_json: str):
+        self.path_to_json = path_to_json
+
+    @classmethod
+    def if_file_save_exists(cls, path_to_json: str) -> bool:
+        return os.path.exists(path_to_json)
+
+    @abstractmethod
+    def save_to_json(self):
+        pass
+
+    @abstractmethod
+    def load_adjusted_values_from_json(self) -> list:
+        pass
 
 
 class Draggable(ABC):

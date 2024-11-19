@@ -2,13 +2,13 @@ import pygame
 from states import ButtonState, MouseWheelState
 from commands import TextCommand
 import json
-import os
-from constants import BUTTON_COLOR_DICT2, SMALLER_BUTTON_SPRITE_DEFLATION
+from constants import NORMAL_BUTTON_SPRITE_DEFLATION, ACTIVE_BUTTON_SPRITE_DEFLATION
 from fonts import fonts_dict
-from UI_abstracts import Draggable, Resizable
+from color_schemes import buttons_color_schemes_dict
+from UI_abstracts import JSONable, Draggable, Resizable
 
 
-class Button(Draggable, Resizable):
+class Button(JSONable, Draggable, Resizable):
     def set_size(self, size: tuple[int, int]):
         self.rect.size = size
 
@@ -21,48 +21,45 @@ class Button(Draggable, Resizable):
     def get_rect(self) -> pygame.Rect:
         return self.rect
 
-    def __init__(self, text, command: TextCommand, position, size,
-                 colors=BUTTON_COLOR_DICT2,
+    def __init__(self, text, command: TextCommand, position, size, path_to_json,
+                 colors_key=None,
                  font_key=None,
-                 radius=7):
+                 border_radius=7):
+
+        JSONable.__init__(self, path_to_json)
+        if JSONable.if_file_save_exists(path_to_json):
+            position, size = self.load_adjusted_values_from_json()
+
         self.rect = pygame.Rect(position, size)
         Draggable.__init__(self, self.rect)
+
         self.text = text
         self.command = command
+        self.border_radius = border_radius
+
         self.font_key = font_key
         assert font_key in fonts_dict
         self.font = fonts_dict[font_key]
+        self.colors_key = colors_key
+        assert colors_key in buttons_color_schemes_dict
+        self.colors = buttons_color_schemes_dict[colors_key]
+
         self.current_state = ButtonState.NORMAL
-        self.radius = radius
-        self.colors = colors
         self.sprites = {}
         self.create_all_sprites()
 
-    @classmethod
-    def from_dict(cls, kwargs):
-        return cls(kwargs['text'],
-                   TextCommand(kwargs['command']),
-                   kwargs['position'],
-                   kwargs['size'])
-
     def create_all_sprites(self):
         self.sprites = {
-            ButtonState.NORMAL: self.create_rounded_sprite(self.colors[ButtonState.NORMAL]),
-            ButtonState.HOVER: self.create_smaller_sprite(self.colors[ButtonState.HOVER]),
-            ButtonState.ACTIVE: self.create_rounded_sprite(self.colors[ButtonState.ACTIVE])
+            ButtonState.NORMAL: self.create_sprite(self.colors[ButtonState.NORMAL],
+                                                   deflation=NORMAL_BUTTON_SPRITE_DEFLATION),
+            ButtonState.HOVER: self.create_sprite(self.colors[ButtonState.HOVER]),
+            ButtonState.ACTIVE: self.create_sprite(self.colors[ButtonState.ACTIVE],
+                                                   deflation=ACTIVE_BUTTON_SPRITE_DEFLATION)
         }
 
-    def create_rounded_sprite(self, color):
+    def create_sprite(self, color, deflation=(0, 0)):
         sprite = pygame.Surface(self.rect.size, pygame.SRCALPHA)
-        pygame.draw.rect(sprite, color, sprite.get_rect(), border_radius=self.radius)
-        text_surface = self.font.render(self.text, True, (0, 0, 0))
-        text_rect = text_surface.get_rect(center=sprite.get_rect().center)
-        sprite.blit(text_surface, text_rect)
-        return sprite
-
-    def create_smaller_sprite(self, color):
-        sprite = pygame.Surface(self.rect.size, pygame.SRCALPHA)
-        pygame.draw.rect(sprite, color, sprite.get_rect().inflate(SMALLER_BUTTON_SPRITE_DEFLATION))
+        pygame.draw.rect(sprite, color, sprite.get_rect().inflate(deflation), border_radius=self.border_radius)
         text_surface = self.font.render(self.text, True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=sprite.get_rect().center)
         sprite.blit(text_surface, text_rect)
@@ -98,20 +95,13 @@ class Button(Draggable, Resizable):
         if unpressed:
             return self.command
 
+    def save_to_json(self):
+        adjusted_values = {'position': self.rect.topleft,
+                           'size': self.rect.size}
+        with open(self.path_to_json, 'w') as file:
+            json.dump(adjusted_values, file)
 
-def load_button_positions(file_path: str):
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as file:
-            return json.load(file)
-    return []
-
-
-def save_button_positions(buttons: list[Button], file_path: str):
-    positions = [{'text': button.text,
-                  'command': button.command.to_json(),
-                  'position': button.rect.topleft,
-                  'size': button.rect.size,
-                  'font_key': button.font_key}
-                 for button in buttons]
-    with open(file_path, 'w') as file:
-        json.dump(positions, file)
+    def load_adjusted_values_from_json(self):
+        with open(self.path_to_json, 'r') as file:
+            adjusted_values = json.load(file)
+        return [adjusted_values['position'], adjusted_values['size']]
