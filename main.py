@@ -5,6 +5,7 @@ import os
 import sys
 from commands import TextCommand as TexCom
 import buttons
+import funny_text
 from constants import *
 from states import MouseWheelState
 
@@ -27,15 +28,19 @@ def get_ctrl_alt_shift_array() -> tuple[bool, bool, bool]:
     return ctrl_pressed, alt_pressed, shift_pressed
 
 
-def main(image_folder, output_folder):
+def main(image_folder):
     pygame.init()
 
     screen = pygame.display.set_mode(WIN_SIZE)
     pygame.display.set_caption('Image Classifier')
 
-    add_tag_button = buttons.Button("Добавить tag", TexCom('ADD_BUTTON'), (800, 50), (300, 60),
-                                    'buttons_saves/add_tag_button.json')
+    add_tag_button = buttons.Button("virus research lab",
+                                    TexCom('ADD_BUTTON'),
+                                    'buttons_saves/add_tag_button.json',
+                                    font_key=1)
     all_buttons = [add_tag_button]
+    text_element = funny_text.SimpleText('Experimental Text', 'buttons_saves/text_element.json', font_key=1)
+    all_elements = [add_tag_button, text_element]
 
     images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]
     image_index = 0
@@ -65,16 +70,17 @@ def main(image_folder, output_folder):
                         image = load_and_scale_image(os.path.join(image_folder, image_name))
                         all_done = True
                 elif event.key == pygame.K_a:
-                    add_tag_button.save_to_json()
-                    print('add tag button saved')
+                    for el in all_elements:
+                        el.save_to_json()
+                    print('elements saved')
 
         mouse_pos = pygame.mouse.get_pos()
         mouse_pressed = pygame.mouse.get_pressed()
         commands_pool = []
-        for b in all_buttons:
-            comm = b.handle_event(mouse_pos, mouse_pressed,
-                                  mouse_wheel_state=mouse_wheel_state,
-                                  ctrl_alt_shift_array=ctrl_alt_shift_array)
+        for el in all_elements:
+            comm = el.handle_event(mouse_pos, mouse_pressed,
+                                   mouse_wheel_state=mouse_wheel_state,
+                                   ctrl_alt_shift_array=ctrl_alt_shift_array)
             if comm is not None:
                 commands_pool.append(comm)
 
@@ -82,7 +88,8 @@ def main(image_folder, output_folder):
         if image_index < len(images):
             screen.blit(image, (0, 0))
 
-        add_tag_button.draw(screen)
+        for el in all_elements:
+            el.draw(screen)
 
         pygame.display.flip()
 
@@ -91,4 +98,4 @@ def main(image_folder, output_folder):
 
 
 if __name__ == '__main__':
-    main('C:\\Users\\Игорь\\2', 'path/to/output_folder')
+    main('C:\\Users\\Игорь\\2')

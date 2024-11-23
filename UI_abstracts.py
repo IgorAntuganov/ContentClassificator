@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 import pygame
-from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 import os
+import json
+from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
+from states import MouseWheelState
 
 
 class JSONable(ABC):
@@ -13,12 +15,22 @@ class JSONable(ABC):
         return os.path.exists(path_to_json)
 
     @abstractmethod
-    def save_to_json(self):
+    def get_dict_for_json(self) -> dict:
         pass
 
     @abstractmethod
-    def load_adjusted_values_from_json(self) -> list:
+    def get_list_of_adjusted_values(self) -> list:
         pass
+
+    def save_to_json(self):
+        adjusted_values = self.get_dict_for_json()
+        with open(self.path_to_json, 'w') as file:
+            json.dump(adjusted_values, file)
+
+    def load_adjusted_values_from_json(self) -> dict:
+        with open(self.path_to_json, 'r') as file:
+            adjusted_values_dict = json.load(file)
+        return adjusted_values_dict
 
 
 class Draggable(ABC):
@@ -42,6 +54,13 @@ class Draggable(ABC):
             if not SCREEN_RECT.contains(self.rect.inflate(*BUTTON_SCREEN_COLLISION_DEFLATION)):
                 self.dragging = False
                 self.rect.topleft = last_position
+
+    @abstractmethod
+    def handle_event(self, mouse_position,
+                     mouse_pressed,
+                     mouse_wheel_state: MouseWheelState | None = None,
+                     ctrl_alt_shift_array: tuple[bool, bool, bool] = (False, False, False)):
+        pass
 
 
 class Resizable(ABC):
@@ -77,3 +96,9 @@ class Resizable(ABC):
 
         self.set_size((new_width, new_height))
         self.recreate_sprites_after_resizing()
+
+
+class Drawable(ABC):
+    @abstractmethod
+    def draw(self, screen: pygame.Surface):
+        pass
