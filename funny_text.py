@@ -35,11 +35,11 @@ class SimpleText(JSONable, Draggable, Drawable):
             self.handle_dragging(mouse_position)
 
     def get_dict_for_json(self) -> dict:
-        return {'position': self.rect.topleft}
+        return {'position': self.rect.center}
 
     def get_list_of_adjusted_values(self) -> list:
         adjusted_dict = self.load_adjusted_values_from_json()
-        return [adjusted_dict['position']]
+        return adjusted_dict['position']
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprite, self.rect)
