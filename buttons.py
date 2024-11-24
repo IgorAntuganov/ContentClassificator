@@ -83,7 +83,7 @@ class Button(JSONable, Draggable, Resizable, Drawable):
             self.current_state = ButtonState.ACTIVE
         elif mouse_pressed[2]:  # RMB
             self.handle_dragging(mouse_position)
-            if (mouse_wheel_state is not None and mouse_wheel_state != MouseWheelState.INACTIVE):
+            if (mouse_wheel_state is not None) and (mouse_wheel_state != MouseWheelState.INACTIVE):
                 self.handle_size_changing(ctrl_alt_shift_array, mouse_wheel_state)
         else:
             if self.current_state == ButtonState.ACTIVE:

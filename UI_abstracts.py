@@ -33,7 +33,16 @@ class JSONable(ABC):
         return adjusted_values_dict
 
 
-class Draggable(ABC):
+class EventHandler(ABC):
+    @abstractmethod
+    def handle_event(self, mouse_position,
+                     mouse_pressed,
+                     mouse_wheel_state: MouseWheelState | None = None,
+                     ctrl_alt_shift_array: tuple[bool, bool, bool] = (False, False, False)):
+        pass
+
+
+class Draggable(EventHandler, ABC):
     def __init__(self, rect: pygame.Rect):
         self.rect = rect
         self.dragging = False
@@ -55,15 +64,8 @@ class Draggable(ABC):
                 self.dragging = False
                 self.rect.topleft = last_position
 
-    @abstractmethod
-    def handle_event(self, mouse_position,
-                     mouse_pressed,
-                     mouse_wheel_state: MouseWheelState | None = None,
-                     ctrl_alt_shift_array: tuple[bool, bool, bool] = (False, False, False)):
-        pass
 
-
-class Resizable(ABC):
+class Resizable(EventHandler, ABC):
     @abstractmethod
     def get_rect(self) -> pygame.Rect:
         pass
