@@ -6,9 +6,15 @@ from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from states import MouseWheelState
 
 
-class JSONable(ABC):
-    def __init__(self, path_to_json: str):
+class JSONadjustable(ABC):
+    def __init__(self, path_to_json: str, **kwargs):
         self.path_to_json = path_to_json
+        assert len(kwargs) > 0
+        if self.if_file_save_exists(path_to_json):
+            adjusted_values_dct = self.load_adjusted_values_from_json()
+            kwargs.update(adjusted_values_dct)
+        self.corrected_values = kwargs
+        print(self.corrected_values)
 
     @classmethod
     def if_file_save_exists(cls, path_to_json: str) -> bool:
@@ -19,7 +25,7 @@ class JSONable(ABC):
         pass
 
     @abstractmethod
-    def get_list_of_adjusted_values(self) -> list:
+    def get_saved_values(self):
         pass
 
     def save_to_json(self):

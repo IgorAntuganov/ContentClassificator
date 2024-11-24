@@ -1,10 +1,10 @@
 import pygame
 from fonts import fonts_dict
-from UI_abstracts import JSONable, Draggable, Drawable
+from UI_abstracts import JSONadjustable, Draggable, Drawable
 from states import MouseWheelState
 
 
-class SimpleText(JSONable, Draggable, Drawable):
+class SimpleText(JSONadjustable, Draggable, Drawable):
     @classmethod
     def create_sprite(cls, font, text, color) -> pygame.Surface:
         text_surface = font.render(text, True, color)
@@ -14,9 +14,8 @@ class SimpleText(JSONable, Draggable, Drawable):
                  font_key=None,
                  color: tuple[int, int, int] = (200, 200, 200),
                  position=(250, 50)):
-        JSONable.__init__(self, path_to_json=path_to_json)
-        if JSONable.if_file_save_exists(path_to_json):
-            position = self.get_list_of_adjusted_values()
+        JSONadjustable.__init__(self, path_to_json, position=position)
+        position = self.corrected_values['position']
 
         assert font_key in fonts_dict
         font = fonts_dict[font_key]
@@ -37,7 +36,7 @@ class SimpleText(JSONable, Draggable, Drawable):
     def get_dict_for_json(self) -> dict:
         return {'position': self.rect.center}
 
-    def get_list_of_adjusted_values(self) -> list:
+    def get_saved_values(self) -> list:
         adjusted_dict = self.load_adjusted_values_from_json()
         return adjusted_dict['position']
 

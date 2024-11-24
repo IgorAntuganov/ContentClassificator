@@ -4,10 +4,10 @@ from commands import TextCommand
 from constants import NORMAL_BUTTON_SPRITE_DEFLATION, ACTIVE_BUTTON_SPRITE_DEFLATION
 from fonts import fonts_dict
 from color_schemes import buttons_color_schemes_dict
-from UI_abstracts import JSONable, Draggable, Resizable, Drawable
+from UI_abstracts import JSONadjustable, Draggable, Resizable, Drawable
 
 
-class Button(JSONable, Draggable, Resizable, Drawable):
+class Button(JSONadjustable, Draggable, Resizable, Drawable):
     def set_size(self, size: tuple[int, int]):
         self.rect.size = size
 
@@ -27,9 +27,9 @@ class Button(JSONable, Draggable, Resizable, Drawable):
                  font_key=None,
                  border_radius=7):
 
-        JSONable.__init__(self, path_to_json)
-        if JSONable.if_file_save_exists(path_to_json):
-            position, size = self.get_list_of_adjusted_values()
+        JSONadjustable.__init__(self, path_to_json, position=position, size=size)
+        position = self.corrected_values['position']
+        size = self.corrected_values['size']
 
         self.rect = pygame.Rect(position, size)
         Draggable.__init__(self, self.rect)
@@ -99,6 +99,6 @@ class Button(JSONable, Draggable, Resizable, Drawable):
                            'size': self.rect.size}
         return adjusted_values
 
-    def get_list_of_adjusted_values(self):
+    def get_saved_values(self):
         adjusted_dict = self.load_adjusted_values_from_json()
         return [adjusted_dict['position'], adjusted_dict['size']]
