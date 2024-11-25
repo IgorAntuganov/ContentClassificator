@@ -2,7 +2,7 @@ import random
 import pygame
 pygame.init()
 import time
-import string
+# import string
 
 font = pygame.font.Font('fonts_variants/test_font.ttf', 28)
 

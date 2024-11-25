@@ -38,8 +38,8 @@ def main(image_folder):
                                     TexCom('ADD_BUTTON'),
                                     'buttons_saves/add_tag_button.json',
                                     font_key=1)
-    all_buttons = [add_tag_button]
-    text_element = funny_text.SimpleText('Experimental Text', 'buttons_saves/text_element.json', font_key=1)
+    # all_buttons = [add_tag_button]
+    text_element = funny_text.ShadowedText('Experimental Text', 'buttons_saves/text_element.json', font_key=1)
     all_elements = [add_tag_button, text_element]
 
     images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]
@@ -47,7 +47,7 @@ def main(image_folder):
     image_name = images[image_index]
     image = load_and_scale_image(os.path.join(image_folder, image_name))
 
-    all_done = False
+    # all_done = False
     running = True
     while running:
         ctrl_alt_shift_array = get_ctrl_alt_shift_array()
@@ -68,7 +68,7 @@ def main(image_folder):
                         image_index += 1
                         image_name = images[image_index]
                         image = load_and_scale_image(os.path.join(image_folder, image_name))
-                        all_done = True
+                        # all_done = True
                 elif event.key == pygame.K_a:
                     for el in all_elements:
                         el.save_to_json()
