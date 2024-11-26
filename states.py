@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class ButtonState(Enum):
+class TripleButtonState(Enum):
     NORMAL = 1
     HOVER = 2
     ACTIVE = 3

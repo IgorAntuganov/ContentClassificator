@@ -4,7 +4,7 @@ import os
 # import shutil
 import sys
 from commands import TextCommand as TexCom
-import buttons
+import simple_buttons
 import funny_text
 from constants import *
 from states import MouseWheelState
@@ -34,10 +34,10 @@ def main(image_folder):
     screen = pygame.display.set_mode(WIN_SIZE)
     pygame.display.set_caption('Image Classifier')
 
-    add_tag_button = buttons.Button("virus research lab",
-                                    TexCom('ADD_BUTTON'),
-                                    'buttons_saves/add_tag_button.json',
-                                    font_key=1)
+    add_tag_button = simple_buttons.SimpleButton("virus research lab",
+                                                 TexCom('ADD_BUTTON'),
+                                                 'buttons_saves/add_tag_button.json',
+                                                 font_key=1)
     # all_buttons = [add_tag_button]
     text_element = funny_text.HaloText('Experimental  Text', 'buttons_saves/text_element.json', font_key=1)
     all_elements = [add_tag_button, text_element]

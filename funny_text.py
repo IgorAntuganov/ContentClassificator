@@ -1,4 +1,3 @@
-import math
 import pygame
 from fonts import fonts_dict
 from UI_abstracts import JSONadjustable, Draggable, Drawable
@@ -115,18 +114,15 @@ class HaloText(SimpleText):
 
         width, height = text_surface.get_rect().size
         halo_w, halo_h = self.halo_extent
-        max_distance = (halo_w ** 2 + halo_h ** 2) ** .5
         width += halo_w * 2
         height += halo_h * 2
         sprite = pygame.Surface((width, height), pygame.SRCALPHA)
 
+        max_distance = (halo_w ** 2 + halo_h ** 2) ** .5
         for i in range(halo_w*2+1):
             for j in range(halo_h*2+1):
                 distance = ((halo_w-i) ** 2 + (halo_h-j) ** 2) ** .5
                 part = 1-(distance / max_distance)
-
-                # part = math.sin(math.pi*part/2) ** 2
-
                 alpha = int(part * self.halo_power)
                 halo_surface.set_alpha(alpha)
                 sprite.blit(halo_surface, (i, j))
