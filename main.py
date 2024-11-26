@@ -39,7 +39,7 @@ def main(image_folder):
                                     'buttons_saves/add_tag_button.json',
                                     font_key=1)
     # all_buttons = [add_tag_button]
-    text_element = funny_text.ShadowedText('Experimental Text', 'buttons_saves/text_element.json', font_key=1)
+    text_element = funny_text.HaloText('Experimental  Text', 'buttons_saves/text_element.json', font_key=1)
     all_elements = [add_tag_button, text_element]
 
     images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]

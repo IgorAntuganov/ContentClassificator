@@ -1,3 +1,4 @@
+import math
 import pygame
 from fonts import fonts_dict
 from UI_abstracts import JSONadjustable, Draggable, Drawable
@@ -64,4 +65,71 @@ class ShadowedText(SimpleText):
 
         sprite.blit(shadow_surface, (shadow_x, shadow_y))
         sprite.blit(text_surface, (text_x, text_y))
+        return sprite
+
+
+class OutlinedText(SimpleText):
+    def __init__(self, text, path_to_json: str,
+                 font_key=None,
+                 color: tuple[int, int, int] = cnst.STANDARD_UI_BRIGHT,
+                 outline_color: tuple[int, int, int] = cnst.STANDARD_UI_RED,
+                 outline_extent: tuple[int, int] = cnst.OUTLINE_EXTENT,
+                 position=cnst.STANDARD_UI_POSITION):
+        self.outline_color = outline_color
+        self.outline_extent = outline_extent
+        SimpleText.__init__(self, text,  path_to_json, font_key, color, position)
+
+    def create_sprite(self) -> pygame.Surface:
+        text_surface = self.font.render(self.text, True, self.color)
+        outline_surface = self.font.render(self.text, True, self.outline_color)
+
+        width, height = text_surface.get_rect().size
+        halo_w, halo_h = self.outline_extent
+        width += halo_w * 2
+        height += halo_h * 2
+        sprite = pygame.Surface((width, height), pygame.SRCALPHA)
+
+        for i in range(halo_w*2+1):
+            for j in range(halo_h*2+1):
+                sprite.blit(outline_surface, (i, j))
+        sprite.blit(text_surface, (halo_w, halo_h))
+        return sprite
+
+
+class HaloText(SimpleText):
+    def __init__(self, text, path_to_json: str,
+                 font_key=None,
+                 color: tuple[int, int, int] = cnst.STANDARD_UI_BRIGHT,
+                 halo_color: tuple[int, int, int] = cnst.STANDARD_UI_RED,
+                 halo_extent: tuple[int, int] = cnst.HALO_EXTENT,
+                 halo_power: int = cnst.HALO_POWER,
+                 position=cnst.STANDARD_UI_POSITION):
+        self.halo_color = halo_color
+        self.halo_extent = halo_extent
+        self.halo_power = halo_power
+        SimpleText.__init__(self, text,  path_to_json, font_key, color, position)
+
+    def create_sprite(self) -> pygame.Surface:
+        text_surface = self.font.render(self.text, True, self.color)
+        halo_surface = self.font.render(self.text, True, self.halo_color)
+
+        width, height = text_surface.get_rect().size
+        halo_w, halo_h = self.halo_extent
+        max_distance = (halo_w ** 2 + halo_h ** 2) ** .5
+        width += halo_w * 2
+        height += halo_h * 2
+        sprite = pygame.Surface((width, height), pygame.SRCALPHA)
+
+        for i in range(halo_w*2+1):
+            for j in range(halo_h*2+1):
+                distance = ((halo_w-i) ** 2 + (halo_h-j) ** 2) ** .5
+                part = 1-(distance / max_distance)
+
+                # part = math.sin(math.pi*part/2) ** 2
+
+                alpha = int(part * self.halo_power)
+                halo_surface.set_alpha(alpha)
+                sprite.blit(halo_surface, (i, j))
+
+        sprite.blit(text_surface, (halo_w, halo_h))
         return sprite
