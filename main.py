@@ -37,13 +37,17 @@ def main(image_folder):
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
         command=TexCom('ADD_BUTTON'),
-        path_to_json='buttons_saves/add_tag_button.json',
-        font_key=1
+        path_to_json='buttons_saves/add_tag_button.json'
     )
     add_tag_button = simple_buttons.SimpleButton(add_tag_button_config)
 
+    halo_text_config = funny_text.HaloTextConfig(
+        text="Experimental  Text",
+        path_to_json='buttons_saves/text_element.json'
+    )
+    text_element = funny_text.HaloText(halo_text_config)
+
     # all_buttons = [add_tag_button]
-    text_element = funny_text.HaloText('Experimental  Text', 'buttons_saves/text_element.json', font_key=1)
     all_elements = [add_tag_button, text_element]
 
     images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]

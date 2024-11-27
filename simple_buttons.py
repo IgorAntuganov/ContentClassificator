@@ -14,8 +14,8 @@ class ButtonConfig:
     text: str
     command: TextCommand
     path_to_json: str
-    position: tuple = cnst.STANDARD_UI_POSITION
-    size: tuple = cnst.STANDARD_UI_SIZE
+    position: tuple[int, int] = cnst.STANDARD_UI_POSITION
+    size: tuple[int, int] = cnst.STANDARD_UI_SIZE
     colors_key: str | int = None
     font_key: str | int = None
 
@@ -25,16 +25,13 @@ class ABCTripleStateButton(JSONadjustable, Draggable, Resizable, Drawable, ABC):
         self.position = config.position
         self.size = config.size
         JSONadjustable.__init__(self, config.path_to_json, position=config.position, size=config.size)
-
         Draggable.__init__(self, self.position, self.size)
 
         self.text = config.text
         self.command = config.command
 
-        # self.font_key = config.font_key
         assert config.font_key in fonts_dict
         self.font = fonts_dict[config.font_key]
-        # self.colors_key = config.colors_key
         assert config.colors_key in buttons_color_schemes_dict
         self.colors = buttons_color_schemes_dict[config.colors_key]
 
