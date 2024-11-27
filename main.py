@@ -34,10 +34,14 @@ def main(image_folder):
     screen = pygame.display.set_mode(WIN_SIZE)
     pygame.display.set_caption('Image Classifier')
 
-    add_tag_button = simple_buttons.SimpleButton("virus research lab",
-                                                 TexCom('ADD_BUTTON'),
-                                                 'buttons_saves/add_tag_button.json',
-                                                 font_key=1)
+    add_tag_button_config = simple_buttons.ButtonConfig(
+        text="virus research lab",
+        command=TexCom('ADD_BUTTON'),
+        path_to_json='buttons_saves/add_tag_button.json',
+        font_key=1
+    )
+    add_tag_button = simple_buttons.SimpleButton(add_tag_button_config)
+
     # all_buttons = [add_tag_button]
     text_element = funny_text.HaloText('Experimental  Text', 'buttons_saves/text_element.json', font_key=1)
     all_elements = [add_tag_button, text_element]

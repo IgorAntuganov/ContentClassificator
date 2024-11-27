@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import pygame
 from states import TripleButtonState, MouseWheelState
@@ -8,27 +9,34 @@ from color_schemes import buttons_color_schemes_dict
 from UI_abstracts import JSONadjustable, Draggable, Resizable, Drawable
 
 
+@dataclass
+class ButtonConfig:
+    text: str
+    command: TextCommand
+    path_to_json: str
+    position: tuple = cnst.STANDARD_UI_POSITION
+    size: tuple = cnst.STANDARD_UI_SIZE
+    colors_key: str | int = None
+    font_key: str | int = None
+
+
 class ABCTripleStateButton(JSONadjustable, Draggable, Resizable, Drawable, ABC):
-    def __init__(self, text, command: TextCommand, path_to_json,
-                 position=cnst.STANDARD_UI_POSITION,
-                 size=cnst.STANDARD_UI_SIZE,
-                 colors_key=None,
-                 font_key=None):
-        self.position = position
-        self.size = size
-        JSONadjustable.__init__(self, path_to_json, position=position, size=size)
+    def __init__(self, config: ButtonConfig):
+        self.position = config.position
+        self.size = config.size
+        JSONadjustable.__init__(self, config.path_to_json, position=config.position, size=config.size)
 
         Draggable.__init__(self, self.position, self.size)
 
-        self.text = text
-        self.command = command
+        self.text = config.text
+        self.command = config.command
 
-        self.font_key = font_key
-        assert font_key in fonts_dict
-        self.font = fonts_dict[font_key]
-        self.colors_key = colors_key
-        assert colors_key in buttons_color_schemes_dict
-        self.colors = buttons_color_schemes_dict[colors_key]
+        # self.font_key = config.font_key
+        assert config.font_key in fonts_dict
+        self.font = fonts_dict[config.font_key]
+        # self.colors_key = config.colors_key
+        assert config.colors_key in buttons_color_schemes_dict
+        self.colors = buttons_color_schemes_dict[config.colors_key]
 
         self.current_state = TripleButtonState.NORMAL
         self.sprites = self.create_all_sprites()
@@ -71,14 +79,9 @@ class ABCTripleStateButton(JSONadjustable, Draggable, Resizable, Drawable, ABC):
 
 
 class SimpleButton(ABCTripleStateButton):
-    def __init__(self, text, command: TextCommand, path_to_json,
-                 position=cnst.STANDARD_UI_POSITION,
-                 size=cnst.STANDARD_UI_SIZE,
-                 colors_key=None,
-                 font_key=None,
-                 border_radius=7):
+    def __init__(self, config: ButtonConfig, border_radius=7):
         self.border_radius = border_radius
-        ABCTripleStateButton.__init__(self, text, command, path_to_json, position, size, colors_key, font_key)
+        ABCTripleStateButton.__init__(self, config)
 
     def create_all_sprites(self) -> dict[TripleButtonState:pygame.Surface]:
         sprites = {
@@ -107,13 +110,8 @@ class SimpleButton(ABCTripleStateButton):
 
 
 class CoolRectButton(ABCTripleStateButton):
-    def __init__(self, text, command: TextCommand, path_to_json,
-                 position=cnst.STANDARD_UI_POSITION,
-                 size=cnst.STANDARD_UI_SIZE,
-                 colors_key=None,
-                 font_key=None):
-        ABCTripleStateButton.__init__(self, text, command, path_to_json, position,
-                                      size, colors_key, font_key)
+    def __init__(self, config: ButtonConfig):
+        ABCTripleStateButton.__init__(self, config)
 
     def create_all_sprites(self) -> dict[TripleButtonState:pygame.Surface]:
         pass
