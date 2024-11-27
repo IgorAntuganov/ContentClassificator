@@ -8,6 +8,7 @@ import simple_buttons
 import funny_text
 from constants import *
 from states import MouseWheelState
+from UI_abstracts import EventConfig
 
 
 def load_and_scale_image(image_path):
@@ -85,10 +86,12 @@ def main(image_folder):
         mouse_pos = pygame.mouse.get_pos()
         mouse_pressed = pygame.mouse.get_pressed()
         commands_pool = []
-        for el in all_elements:
-            comm = el.handle_event(mouse_pos, mouse_pressed,
+        event_config = EventConfig(mouse_position=mouse_pos,
+                                   mouse_pressed=mouse_pressed,
                                    mouse_wheel_state=mouse_wheel_state,
                                    ctrl_alt_shift_array=ctrl_alt_shift_array)
+        for el in all_elements:
+            comm = el.handle_event(event_config)
             if comm is not None:
                 commands_pool.append(comm)
 
