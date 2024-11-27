@@ -1,10 +1,8 @@
 from dataclasses import dataclass
-from typing import Optional
 import constants as cnst
 import pygame
 from fonts import fonts_dict
-from UI_abstracts import JSONadjustable, Draggable, Drawable
-from states import MouseWheelState
+from UI_abstracts import JSONadjustable, Draggable, OnlyDraggableElement, EventConfig
 
 
 @dataclass
@@ -16,7 +14,7 @@ class TextConfig:
     position: tuple[int, int] = cnst.STANDARD_UI_POSITION
 
 
-class SimpleText(JSONadjustable, Draggable, Drawable):
+class SimpleText(OnlyDraggableElement):
     def __init__(self, config: TextConfig):
         self.position = config.position
         JSONadjustable.__init__(self, config.path_to_json, position=config.position)
@@ -33,13 +31,11 @@ class SimpleText(JSONadjustable, Draggable, Drawable):
         text_surface = self.font.render(self.text, True, self.color)
         return text_surface
 
-    def handle_event(self, mouse_position, mouse_pressed,
-                     mouse_wheel_state: MouseWheelState | None = None,
-                     ctrl_alt_shift_array: tuple[bool, bool, bool] = (False,) * 3):
-        if not self.rect_collidepoint(mouse_position) or not mouse_pressed[2]:  # RMB
+    def handle_event(self, config: EventConfig):
+        if not self.rect_collidepoint(config.mouse_position) or not config.mouse_pressed[2]:  # RMB
             self.dragging = False
         else:
-            self.handle_dragging(mouse_position)
+            self.handle_dragging(config.mouse_position)
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprite, self.get_rect())

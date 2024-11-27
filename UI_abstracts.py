@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 import pygame
 import os
 import json
@@ -86,12 +87,17 @@ class Drawable(ABC):
         pass
 
 
+@dataclass
+class EventConfig:
+    mouse_position: tuple[int, int]
+    mouse_pressed: tuple[bool, bool, bool]
+    mouse_wheel_state: MouseWheelState | None = None
+    ctrl_alt_shift_array: tuple[bool, bool, bool] = (False, False, False)
+
+
 class EventHandler(ABC):
     @abstractmethod
-    def handle_event(self, mouse_position,
-                     mouse_pressed,
-                     mouse_wheel_state: MouseWheelState | None = None,
-                     ctrl_alt_shift_array: tuple[bool, bool, bool] = (False, False, False)):
+    def handle_event(self, event_config: EventConfig):
         pass
 
 
@@ -142,3 +148,15 @@ class Resizable(WithPrivateRect, EventHandler, ABC):
 
         self.set_size((new_width, new_height))
         self.recreate_sprites_after_resizing()
+
+
+class UIElement(ABC):
+    pass
+
+
+class OnlyDraggableElement(UIElement, JSONadjustable, Draggable, Drawable, ABC):
+    pass
+
+
+class DraggableAndResizableElement(UIElement, JSONadjustable, Draggable, Resizable, Drawable, ABC):
+    pass

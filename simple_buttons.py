@@ -6,7 +6,7 @@ from commands import TextCommand
 import constants as cnst
 from fonts import fonts_dict
 from color_schemes import buttons_color_schemes_dict
-from UI_abstracts import JSONadjustable, Draggable, Resizable, Drawable
+from UI_abstracts import JSONadjustable, Draggable, DraggableAndResizableElement, EventConfig
 
 
 @dataclass
@@ -20,7 +20,7 @@ class ButtonConfig:
     font_key: str | int = None
 
 
-class ABCTripleStateButton(JSONadjustable, Draggable, Resizable, Drawable, ABC):
+class ABCTripleStateButton(DraggableAndResizableElement, ABC):
     def __init__(self, config: ButtonConfig):
         self.position = config.position
         self.size = config.size
@@ -48,23 +48,20 @@ class ABCTripleStateButton(JSONadjustable, Draggable, Resizable, Drawable, ABC):
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprites[self.current_state], self.get_rect())
 
-    def handle_event(self, mouse_position,
-                     mouse_pressed,
-                     mouse_wheel_state: MouseWheelState | None = None,
-                     ctrl_alt_shift_array: tuple[bool, bool, bool] = (False, False, False)) -> None | TextCommand:
-
-        if not self.rect_collidepoint(mouse_position):
+    def handle_event(self, config: EventConfig) -> None | TextCommand:
+        if not self.rect_collidepoint(config.mouse_position):
             self.current_state = TripleButtonState.NORMAL
             self.dragging = False
             return
 
         unpressed = False
-        if mouse_pressed[0]:  # LMB
+        if config.mouse_pressed[0]:  # LMB
             self.current_state = TripleButtonState.ACTIVE
-        elif mouse_pressed[2]:  # RMB
-            self.handle_dragging(mouse_position)
-            if (mouse_wheel_state is not None) and (mouse_wheel_state != MouseWheelState.INACTIVE):
-                self.handle_size_changing(ctrl_alt_shift_array, mouse_wheel_state)
+        elif config.mouse_pressed[2]:  # RMB
+            self.handle_dragging(config.mouse_position)
+            if (config.mouse_wheel_state is not None) and \
+                    (config.mouse_wheel_state != MouseWheelState.INACTIVE):
+                self.handle_size_changing(config.ctrl_alt_shift_array, config.mouse_wheel_state)
         else:
             if self.current_state == TripleButtonState.ACTIVE:
                 unpressed = True
