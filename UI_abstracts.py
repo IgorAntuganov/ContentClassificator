@@ -5,7 +5,7 @@ import os
 import json
 from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from states import MouseWheelState
-from commands import Command
+from commands import TextCommand
 
 
 class WithPrivateRect(ABC):
@@ -98,7 +98,7 @@ class MouseConfig:
 
 class MouseHandler(ABC):
     @abstractmethod
-    def handle_mouse(self, mouse_config: MouseConfig) -> list[Command]:
+    def handle_mouse(self, mouse_config: MouseConfig) -> list[TextCommand]:
         pass
 
 

@@ -3,7 +3,7 @@ import constants as cnst
 import pygame
 from fonts import fonts_dict
 from UI_abstracts import JSONadjustable, Draggable, OnlyDraggableElement, MouseConfig
-from commands import Command, TextCommand
+import commands
 
 
 @dataclass
@@ -32,11 +32,19 @@ class SimpleText(OnlyDraggableElement):
         text_surface = self.font.render(self.text, True, self.color)
         return text_surface
 
-    def handle_mouse(self, config: MouseConfig) -> list[Command]:
+    def handle_mouse(self, config: MouseConfig) -> list[commands.TextCommand]:
+        already_dragging = self.dragging
         if not self.rect_collidepoint(config.mouse_position) or not config.mouse_pressed[2]:  # RMB
             self.dragging = False
         else:
             self.handle_dragging(config.mouse_position)
+
+        if self.dragging:
+            if already_dragging:
+                return [commands.KeepFocus]
+            return [commands.StartFocus]
+        if already_dragging:
+            return [commands.EndFocus]
         return []
 
     def draw(self, screen: pygame.Surface):

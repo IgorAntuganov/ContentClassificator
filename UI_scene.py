@@ -1,7 +1,7 @@
 import pygame
 import UI_abstracts
 from states import MouseWheelState
-from commands import Command, TextCommand, ExitCommand
+from commands import TextCommand, ExitCommand
 
 
 class Scene:
@@ -13,7 +13,7 @@ class Scene:
     def add_element(self, element):
         self.elements.append(element)
 
-    def handle_events(self) -> list[Command]:
+    def handle_events(self) -> list[TextCommand]:
         commands_pool = []
 
         mouse_pos = pygame.mouse.get_pos()
@@ -25,7 +25,7 @@ class Scene:
         for event in frame_events:
             mouse_wheel_state = self.update_mouse_wheel_state(mouse_wheel_state, event)
             if event.type == pygame.QUIT:
-                commands_pool.append(ExitCommand())
+                commands_pool.append(ExitCommand)
                 return commands_pool
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import pygame
 from states import TripleButtonState, MouseWheelState
-from commands import TextCommand, Command
+import commands
 import constants as cnst
 from fonts import fonts_dict
 from color_schemes import buttons_color_schemes_dict
@@ -12,7 +12,7 @@ from UI_abstracts import JSONadjustable, Draggable, DraggableAndResizableElement
 @dataclass
 class ButtonConfig:
     text: str
-    command: TextCommand
+    command: commands.TextCommand
     path_to_json: str
     position: tuple[int, int] = cnst.STANDARD_UI_POSITION
     size: tuple[int, int] = cnst.STANDARD_UI_SIZE
@@ -48,16 +48,23 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprites[self.current_state], self.get_rect())
 
-    def handle_mouse(self, config: MouseConfig) -> list[Command]:
+    def handle_mouse(self, config: MouseConfig) -> list[commands.TextCommand]:
+        already_dragging = self.dragging
+
         if not self.rect_collidepoint(config.mouse_position):
             self.current_state = TripleButtonState.NORMAL
             self.dragging = False
+            if already_dragging:
+                return [commands.EndFocus]
             return []
 
         unpressed = False
-        if config.mouse_pressed[0]:  # LMB
+        commands_lst = []
+        # LMB
+        if config.mouse_pressed[0]:
             self.current_state = TripleButtonState.ACTIVE
-        elif config.mouse_pressed[2]:  # RMB
+        # RMB
+        elif config.mouse_pressed[2]:
             self.handle_dragging(config.mouse_position)
             if (config.mouse_wheel_state is not None) and \
                     (config.mouse_wheel_state != MouseWheelState.INACTIVE):
@@ -69,8 +76,16 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
             self.dragging = False
 
         if unpressed:
-            return [self.command]
-        return []
+            commands_lst.append(self.command)
+
+        if self.dragging:
+            if already_dragging:
+                commands_lst.append(commands.KeepFocus)
+            else:
+                commands_lst.append(commands.StartFocus)
+        elif already_dragging:
+            commands_lst.append(commands.EndFocus)
+        return commands_lst
 
 
 class SimpleButton(ABCTripleStateButton):

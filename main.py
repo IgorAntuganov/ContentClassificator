@@ -23,6 +23,7 @@ def load_and_scale_image(image_path):
 def main(image_folder):
     screen = pygame.display.set_mode(WIN_SIZE)
     pygame.display.set_caption('Image Classifier')
+    clock = pygame.time.Clock()
 
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
@@ -58,7 +59,7 @@ def main(image_folder):
                 for el in all_elements:
                     el.save_to_json()
                 print('UI Saved')
-            elif ExitCommand() == command:
+            elif TextCommand('EXIT') == command:
                 running = False
             elif type(command) == TextCommand:
                 command: TextCommand
@@ -72,6 +73,7 @@ def main(image_folder):
             screen.blit(image, (0, 0))
         scene.draw_elements(screen)
         pygame.display.flip()
+        clock.tick(165)
 
     pygame.quit()
     sys.exit()
