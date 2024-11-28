@@ -13,3 +13,11 @@ class TextCommand(Command):
 
     def to_json(self) -> str:
         return self.text
+
+    def __eq__(self, other):
+        return self.text == other.text
+
+
+class ExitCommand(TextCommand):
+    def __init__(self):
+        super().__init__('EXIT')

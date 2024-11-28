@@ -2,11 +2,11 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import pygame
 from states import TripleButtonState, MouseWheelState
-from commands import TextCommand
+from commands import TextCommand, Command
 import constants as cnst
 from fonts import fonts_dict
 from color_schemes import buttons_color_schemes_dict
-from UI_abstracts import JSONadjustable, Draggable, DraggableAndResizableElement, EventConfig
+from UI_abstracts import JSONadjustable, Draggable, DraggableAndResizableElement, MouseConfig
 
 
 @dataclass
@@ -48,11 +48,11 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprites[self.current_state], self.get_rect())
 
-    def handle_event(self, config: EventConfig) -> None | TextCommand:
+    def handle_mouse(self, config: MouseConfig) -> list[Command]:
         if not self.rect_collidepoint(config.mouse_position):
             self.current_state = TripleButtonState.NORMAL
             self.dragging = False
-            return
+            return []
 
         unpressed = False
         if config.mouse_pressed[0]:  # LMB
@@ -69,7 +69,8 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
             self.dragging = False
 
         if unpressed:
-            return self.command
+            return [self.command]
+        return []
 
 
 class SimpleButton(ABCTripleStateButton):

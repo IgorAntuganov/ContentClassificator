@@ -5,6 +5,7 @@ import os
 import json
 from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from states import MouseWheelState
+from commands import Command
 
 
 class WithPrivateRect(ABC):
@@ -88,20 +89,20 @@ class Drawable(ABC):
 
 
 @dataclass
-class EventConfig:
+class MouseConfig:
     mouse_position: tuple[int, int]
     mouse_pressed: tuple[bool, bool, bool]
-    mouse_wheel_state: MouseWheelState | None = None
-    ctrl_alt_shift_array: tuple[bool, bool, bool] = (False, False, False)
+    mouse_wheel_state: MouseWheelState | None  # = None
+    ctrl_alt_shift_array: tuple[bool, bool, bool]  # = (False, False, False)
 
 
-class EventHandler(ABC):
+class MouseHandler(ABC):
     @abstractmethod
-    def handle_event(self, event_config: EventConfig):
+    def handle_mouse(self, mouse_config: MouseConfig) -> list[Command]:
         pass
 
 
-class Draggable(WithPrivateRect, EventHandler, ABC):
+class Draggable(WithPrivateRect, MouseHandler, ABC):
     def __init__(self, position: tuple[int, int], size: tuple[int, int]):
         self.position = position
         WithPrivateRect.__init__(self, position, size)
@@ -127,7 +128,7 @@ class Draggable(WithPrivateRect, EventHandler, ABC):
                 self.set_top_left(last_position)
 
 
-class Resizable(WithPrivateRect, EventHandler, ABC):
+class Resizable(WithPrivateRect, MouseHandler, ABC):
     @abstractmethod
     def recreate_sprites_after_resizing(self):
         pass
@@ -150,7 +151,7 @@ class Resizable(WithPrivateRect, EventHandler, ABC):
         self.recreate_sprites_after_resizing()
 
 
-class UIElement(ABC):
+class UIElement(Drawable, MouseHandler, ABC):
     pass
 
 
@@ -158,5 +159,5 @@ class OnlyDraggableElement(UIElement, JSONadjustable, Draggable, Drawable, ABC):
     pass
 
 
-class DraggableAndResizableElement(UIElement, JSONadjustable, Draggable, Resizable, Drawable, ABC):
+class DraggableAndResizableElement(Resizable, OnlyDraggableElement, ABC):
     pass
