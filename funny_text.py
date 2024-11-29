@@ -34,10 +34,7 @@ class SimpleText(OnlyDraggableElement):
 
     def handle_mouse(self, config: MouseConfig) -> list[commands.TextCommand]:
         already_dragging = self.dragging
-        if not self.rect_collidepoint(config.mouse_position) or not config.mouse_pressed[2]:  # RMB
-            self.dragging = False
-        else:
-            self.handle_dragging(config.mouse_position)
+        self.handle_dragging(config)
 
         if self.dragging:
             if already_dragging:

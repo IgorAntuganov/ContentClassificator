@@ -110,15 +110,17 @@ class Draggable(WithPrivateRect, MouseHandler, ABC):
         self.dragging_start_mouse = None
         self.dragging_start_top_left = None
 
-    def handle_dragging(self, mouse_position):
-        if not self.dragging:
+    def handle_dragging(self, config: MouseConfig):
+        mouse_on_element = self.rect_collidepoint(config.mouse_position)
+        rmb_pressed = config.mouse_pressed[2]
+        if not self.dragging and mouse_on_element and rmb_pressed:
             self.dragging = True
-            self.dragging_start_mouse = mouse_position
+            self.dragging_start_mouse = config.mouse_position
             self.dragging_start_top_left = self.get_rect_topleft()
-        else:
+        elif self.dragging and rmb_pressed:
             last_position = self.get_rect_topleft()
-            offset_x = mouse_position[0] - self.dragging_start_mouse[0]
-            offset_y = mouse_position[1] - self.dragging_start_mouse[1]
+            offset_x = config.mouse_position[0] - self.dragging_start_mouse[0]
+            offset_y = config.mouse_position[1] - self.dragging_start_mouse[1]
             x = self.dragging_start_top_left[0] + offset_x
             y = self.dragging_start_top_left[1] + offset_y
             self.set_top_left((x, y))
@@ -126,6 +128,8 @@ class Draggable(WithPrivateRect, MouseHandler, ABC):
             if not SCREEN_RECT.contains(rect.inflate(*BUTTON_SCREEN_COLLISION_DEFLATION)):
                 self.dragging = False
                 self.set_top_left(last_position)
+        elif self.dragging:
+            self.dragging = False
 
 
 class Resizable(WithPrivateRect, MouseHandler, ABC):

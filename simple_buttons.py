@@ -48,32 +48,28 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprites[self.current_state], self.get_rect())
 
-    def handle_mouse(self, config: MouseConfig) -> list[commands.TextCommand]:
+    def handle_mouse(self, mouse_config: MouseConfig) -> list[commands.TextCommand]:
         already_dragging = self.dragging
+        self.handle_dragging(mouse_config)
 
-        if not self.rect_collidepoint(config.mouse_position):
+        if not self.rect_collidepoint(mouse_config.mouse_position):
             self.current_state = TripleButtonState.NORMAL
-            self.dragging = False
-            if already_dragging:
-                return [commands.EndFocus]
             return []
 
         unpressed = False
         commands_lst = []
         # LMB
-        if config.mouse_pressed[0]:
+        if mouse_config.mouse_pressed[0]:
             self.current_state = TripleButtonState.ACTIVE
         # RMB
-        elif config.mouse_pressed[2]:
-            self.handle_dragging(config.mouse_position)
-            if (config.mouse_wheel_state is not None) and \
-                    (config.mouse_wheel_state != MouseWheelState.INACTIVE):
-                self.handle_size_changing(config.ctrl_alt_shift_array, config.mouse_wheel_state)
+        elif mouse_config.mouse_pressed[2]:
+            if (mouse_config.mouse_wheel_state is not None) and \
+                    (mouse_config.mouse_wheel_state != MouseWheelState.INACTIVE):
+                self.handle_size_changing(mouse_config.ctrl_alt_shift_array, mouse_config.mouse_wheel_state)
         else:
             if self.current_state == TripleButtonState.ACTIVE:
                 unpressed = True
             self.current_state = TripleButtonState.HOVER
-            self.dragging = False
 
         if unpressed:
             commands_lst.append(self.command)

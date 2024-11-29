@@ -59,7 +59,7 @@ def main(image_folder):
                 for el in all_elements:
                     el.save_to_json()
                 print('UI Saved')
-            elif TextCommand('EXIT') == command:
+            elif ExitCommand == command:
                 running = False
             elif type(command) == TextCommand:
                 command: TextCommand
@@ -73,7 +73,7 @@ def main(image_folder):
             screen.blit(image, (0, 0))
         scene.draw_elements(screen)
         pygame.display.flip()
-        clock.tick(165)
+        clock.tick(FPS)
 
     pygame.quit()
     sys.exit()
