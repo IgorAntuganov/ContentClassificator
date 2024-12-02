@@ -68,7 +68,7 @@ def main(image_folder):
                 unhandled_commands.append(command)
         assert len(unhandled_commands) == 0
 
-        screen.fill((0, 0, 0))
+        screen.fill(SCREEN_FILLING_COLOR)
         if image_index < len(images):
             screen.blit(image, (0, 0))
         scene.draw_elements(screen)

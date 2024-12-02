@@ -1,17 +1,14 @@
 import pygame
-import UI_abstracts
+from UI_abstracts import BaseUIElement, MouseConfig
 from states import MouseWheelState
 from commands import TextCommand, ExitCommand
 
 
 class Scene:
-    def __init__(self, name: str, elements: list[UI_abstracts.UIElement]):
+    def __init__(self, name: str, elements: list[BaseUIElement]):
         self.name = name
-        self.elements: list[UI_abstracts.UIElement] = elements
-        self.focused_element: UI_abstracts.UIElement | None = None
-
-    def add_element(self, element):
-        self.elements.append(element)
+        self.elements: list[BaseUIElement] = elements
+        self.focused_element: BaseUIElement | None = None
 
     def handle_events(self) -> list[TextCommand]:
         commands_pool = []
@@ -33,13 +30,7 @@ class Scene:
                 if event.key == pygame.K_d:
                     commands_pool.append(TextCommand('NEXT_IMAGE'))
 
-        event_config = UI_abstracts.MouseConfig(
-            mouse_position=mouse_pos,
-            mouse_pressed=mouse_pressed,
-            mouse_wheel_state=mouse_wheel_state,
-            ctrl_alt_shift_array=ctrl_alt_shift_array
-        )
-
+        event_config = MouseConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array)
         for el in self.elements:
             new_commands = el.handle_mouse(event_config)
             commands_pool += new_commands

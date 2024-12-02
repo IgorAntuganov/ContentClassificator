@@ -1,5 +1,8 @@
+from UI_element import UIElement
+
+
 class TextCommand:
-    def __init__(self, text):
+    def __init__(self, text: str):
         self.text = text
 
     def __eq__(self, other):
@@ -7,6 +10,26 @@ class TextCommand:
 
 
 ExitCommand = TextCommand('EXIT')
+
+
+class CommandWithElement(TextCommand):
+    def __init__(self, text: str):
+        super().__init__(text)
+        self.element_association: None | UIElement = None
+
+    def set_element_association(self, el: UIElement):
+        self.element_association = el
+
+    def clear_element_association(self):
+        self.element_association = None
+
+    def is_element_set(self) -> bool:
+        return self.element_association is not None
+
+    def get_element(self) -> UIElement:
+        assert self.element_association is not None
+        return self.element_association
+
 
 StartFocus = TextCommand('START_FOCUS')
 KeepFocus = TextCommand('KEEP_FOCUS')

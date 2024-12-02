@@ -6,6 +6,7 @@ import json
 from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from states import MouseWheelState
 from commands import TextCommand
+from UI_element import UIElement
 
 
 class WithPrivateRect(ABC):
@@ -82,18 +83,12 @@ class JSONadjustable(ABC):
         return adjusted_values_dict
 
 
-class Drawable(ABC):
-    @abstractmethod
-    def draw(self, screen: pygame.Surface):
-        pass
-
-
 @dataclass
 class MouseConfig:
     mouse_position: tuple[int, int]
     mouse_pressed: tuple[bool, bool, bool]
-    mouse_wheel_state: MouseWheelState | None  # = None
-    ctrl_alt_shift_array: tuple[bool, bool, bool]  # = (False, False, False)
+    mouse_wheel_state: MouseWheelState
+    ctrl_alt_shift_array: tuple[bool, bool, bool]
 
 
 class MouseHandler(ABC):
@@ -102,7 +97,11 @@ class MouseHandler(ABC):
         pass
 
 
-class Draggable(WithPrivateRect, MouseHandler, ABC):
+class BaseUIElement(UIElement, MouseHandler, ABC):
+    pass
+
+
+class Draggable(WithPrivateRect, BaseUIElement, ABC):
     def __init__(self, position: tuple[int, int], size: tuple[int, int]):
         self.position = position
         WithPrivateRect.__init__(self, position, size)
@@ -132,7 +131,7 @@ class Draggable(WithPrivateRect, MouseHandler, ABC):
             self.dragging = False
 
 
-class Resizable(WithPrivateRect, MouseHandler, ABC):
+class Resizable(WithPrivateRect, BaseUIElement, ABC):
     @abstractmethod
     def recreate_sprites_after_resizing(self):
         pass
@@ -155,11 +154,7 @@ class Resizable(WithPrivateRect, MouseHandler, ABC):
         self.recreate_sprites_after_resizing()
 
 
-class UIElement(Drawable, MouseHandler, ABC):
-    pass
-
-
-class OnlyDraggableElement(UIElement, JSONadjustable, Draggable, Drawable, ABC):
+class OnlyDraggableElement(JSONadjustable, Draggable, ABC):
     pass
 
 
