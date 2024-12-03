@@ -1,7 +1,9 @@
+from __future__ import annotations
 from UI_element import UIElement
 
 
-class TextCommand:
+class BaseCommand:
+    """Base command class"""
     def __init__(self, text: str):
         self.text = text
 
@@ -9,16 +11,17 @@ class TextCommand:
         return self.text == other.text
 
 
-ExitCommand = TextCommand('EXIT')
+ExitCommand = BaseCommand('EXIT')
 
 
-class CommandWithElement(TextCommand):
+class CommandWithElement(BaseCommand):
     def __init__(self, text: str):
         super().__init__(text)
         self.element_association: None | UIElement = None
 
-    def set_element_association(self, el: UIElement):
+    def set_element_association(self, el: UIElement) -> CommandWithElement:
         self.element_association = el
+        return self
 
     def clear_element_association(self):
         self.element_association = None
@@ -31,6 +34,6 @@ class CommandWithElement(TextCommand):
         return self.element_association
 
 
-StartFocus = TextCommand('START_FOCUS')
-KeepFocus = TextCommand('KEEP_FOCUS')
-EndFocus = TextCommand('END_FOCUS')
+StartFocus = CommandWithElement('START_FOCUS')
+KeepFocus = CommandWithElement('KEEP_FOCUS')
+EndFocus = CommandWithElement('END_FOCUS')

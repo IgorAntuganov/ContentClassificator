@@ -1,16 +1,23 @@
 import pygame
 from UI_abstracts import BaseUIElement, MouseConfig
 from states import MouseWheelState
-from commands import TextCommand, ExitCommand
+# noinspection PyCompatibility
+from commands import BaseCommand, ExitCommand
 
 
 class Scene:
     def __init__(self, name: str, elements: list[BaseUIElement]):
         self.name = name
         self.elements: list[BaseUIElement] = elements
-        self.focused_element: BaseUIElement | None = None
+        self._focused_element: BaseUIElement | None = None
 
-    def handle_events(self) -> list[TextCommand]:
+    def set_focused_element(self, element: BaseUIElement):
+        self._focused_element = element
+
+    def get_focused_element(self) -> BaseUIElement:
+        return self._focused_element
+
+    def handle_events(self) -> list[BaseCommand]:
         commands_pool = []
 
         mouse_pos = pygame.mouse.get_pos()
@@ -26,9 +33,9 @@ class Scene:
                 return commands_pool
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
-                    commands_pool.append(TextCommand('SAVE_UI'))
+                    commands_pool.append(BaseCommand('SAVE_UI'))
                 if event.key == pygame.K_d:
-                    commands_pool.append(TextCommand('NEXT_IMAGE'))
+                    commands_pool.append(BaseCommand('NEXT_IMAGE'))
 
         event_config = MouseConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array)
         for el in self.elements:

@@ -32,7 +32,7 @@ class SimpleText(OnlyDraggableElement):
         text_surface = self.font.render(self.text, True, self.color)
         return text_surface
 
-    def handle_mouse(self, config: MouseConfig) -> list[commands.TextCommand]:
+    def handle_mouse(self, config: MouseConfig) -> list[commands.BaseCommand]:
         already_dragging = self.dragging
         self.handle_dragging(config)
 

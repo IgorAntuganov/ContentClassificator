@@ -3,7 +3,7 @@ pygame.init()
 import os
 # import shutil
 import sys
-from commands import TextCommand, ExitCommand
+from commands import BaseCommand, ExitCommand
 import simple_buttons
 import funny_text
 from constants import *
@@ -27,7 +27,7 @@ def main(image_folder):
 
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
-        command=TextCommand('ADD_BUTTON'),
+        command=BaseCommand('ADD_BUTTON'),
         path_to_json='buttons_saves/add_tag_button.json'
     )
     add_tag_button = simple_buttons.SimpleButton(add_tag_button_config)
@@ -50,19 +50,19 @@ def main(image_folder):
         commands_pool = scene.handle_events()
         unhandled_commands = []
         for command in commands_pool:
-            if TextCommand('NEXT_IMAGE') == command:
+            if BaseCommand('NEXT_IMAGE') == command:
                 if image_index < len(images)-1:
                     image_index += 1
                     image_name = images[image_index]
                     image = load_and_scale_image(os.path.join(image_folder, image_name))
-            elif TextCommand('SAVE_UI') == command:
+            elif BaseCommand('SAVE_UI') == command:
                 for el in all_elements:
                     el.save_to_json()
                 print('UI Saved')
             elif ExitCommand == command:
                 running = False
-            elif type(command) == TextCommand:
-                command: TextCommand
+            elif type(command) == BaseCommand:
+                command: BaseCommand
                 print('text command', command.text)
             else:
                 unhandled_commands.append(command)

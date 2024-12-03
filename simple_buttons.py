@@ -12,7 +12,7 @@ from UI_abstracts import JSONadjustable, Draggable, DraggableAndResizableElement
 @dataclass
 class ButtonConfig:
     text: str
-    command: commands.TextCommand
+    command: commands.BaseCommand
     path_to_json: str
     position: tuple[int, int] = cnst.STANDARD_UI_POSITION
     size: tuple[int, int] = cnst.STANDARD_UI_SIZE
@@ -48,7 +48,7 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprites[self.current_state], self.get_rect())
 
-    def handle_mouse(self, mouse_config: MouseConfig) -> list[commands.TextCommand]:
+    def handle_mouse(self, mouse_config: MouseConfig) -> list[commands.BaseCommand]:
         already_dragging = self.dragging
         self.handle_dragging(mouse_config)
 
@@ -76,11 +76,13 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
 
         if self.dragging:
             if already_dragging:
-                commands_lst.append(commands.KeepFocus)
+                comm = commands.KeepFocus.set_element_association(self)
             else:
-                commands_lst.append(commands.StartFocus)
+                comm = commands.StartFocus.set_element_association(self)
+            commands_lst.append(comm)
         elif already_dragging:
-            commands_lst.append(commands.EndFocus)
+            comm = commands.EndFocus.set_element_association(self)
+            commands_lst.append(comm)
         return commands_lst
 
 
@@ -93,24 +95,28 @@ class SimpleButton(ABCTripleStateButton):
         sprites = {
             TripleButtonState.NORMAL: self._create_sprite_with_deflation(
                 self.colors[TripleButtonState.NORMAL],
-                deflation=cnst.NORMAL_BUTTON_SPRITE_DEFLATION
+                deflation=cnst.NORMAL_BUTTON_SPRITE_DEFLATION,
+                text_descent=0
             ),
             TripleButtonState.HOVER: self._create_sprite_with_deflation(
                 self.colors[TripleButtonState.HOVER],
-                deflation=(0, 0)
+                deflation=(0, 0),
+                text_descent=0
             ),
             TripleButtonState.ACTIVE: self._create_sprite_with_deflation(
                 self.colors[TripleButtonState.ACTIVE],
-                deflation=cnst.ACTIVE_BUTTON_SPRITE_DEFLATION
+                deflation=cnst.ACTIVE_BUTTON_SPRITE_DEFLATION,
+                text_descent=cnst.ACTIVE_BUTTON_TEXT_DESCENT
             )
         }
         return sprites
 
-    def _create_sprite_with_deflation(self, color, deflation):
+    def _create_sprite_with_deflation(self, color, deflation, text_descent):
         sprite = pygame.Surface(self.get_size(), pygame.SRCALPHA)
         pygame.draw.rect(sprite, color, sprite.get_rect().inflate(deflation), border_radius=self.border_radius)
         text_surface = self.font.render(self.text, True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=sprite.get_rect().center)
+        text_rect.move_ip(0, text_descent)
         sprite.blit(text_surface, text_rect)
         return sprite
 

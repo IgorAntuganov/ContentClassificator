@@ -5,7 +5,7 @@ import os
 import json
 from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from states import MouseWheelState
-from commands import TextCommand
+from commands import BaseCommand
 from UI_element import UIElement
 
 
@@ -93,7 +93,7 @@ class MouseConfig:
 
 class MouseHandler(ABC):
     @abstractmethod
-    def handle_mouse(self, mouse_config: MouseConfig) -> list[TextCommand]:
+    def handle_mouse(self, mouse_config: MouseConfig) -> list[BaseCommand]:
         pass
 
 
