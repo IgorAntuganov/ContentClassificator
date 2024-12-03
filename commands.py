@@ -1,6 +1,7 @@
 # from UI_element import UIElement
 from dataclasses import dataclass, field, make_dataclass
-from typing import Type, Any, Dict
+from typing import Type, Any, ClassVar
+import sys
 
 
 class UIElement:
@@ -18,30 +19,21 @@ class NoArgsConfig(CommandConfig):
 
 
 @dataclass
-class UIElementConfig(CommandConfig):
-    element_type: Type[Any]
-
-
-@dataclass
 class CustomConfig(CommandConfig):
-    args: Dict[str, Type[Any]]
+    args: dict[str, Type[Any]]
 
 
 class CommandClassFabric:
-    command_classes: Dict[str, Type] = {}
+    command_classes: ClassVar[dict[str, type]] = {}
 
     @classmethod
     def create(cls, name: str, config: CommandConfig) -> Type:
-        fields = []
-
         if isinstance(config, NoArgsConfig):
-            pass
-        elif isinstance(config, UIElementConfig):
-            fields.append(('element', config.element_type, field()))
+            fields = []
         elif isinstance(config, CustomConfig):
-            fields.extend((key, value, field()) for key, value in config.args.items())
+            fields = [(key, value, field()) for key, value in config.args.items()]
         else:
-            raise ValueError("Invalid config type")
+            raise ValueError("Invalid config type. Use NoArgsConfig or CustomConfig")
 
         command_class = make_dataclass(name, fields, bases=(CommandConfig,))
         cls.command_classes[name] = command_class
@@ -50,7 +42,6 @@ class CommandClassFabric:
 
     @classmethod
     def verify_command_names(cls):
-        import sys
         current_module = sys.modules[__name__]
         for name, _class in cls.command_classes.items():
             if not hasattr(current_module, name) or getattr(current_module, name) is not _class:
@@ -61,19 +52,11 @@ class CommandClassFabric:
 
 
 NO_ARGS = NoArgsConfig()
-UI_ELEMENT = UIElementConfig(UIElement)
+UI_ELEMENT = CustomConfig({'element': UIElement})
+CREATE_NEW_PROFILE = CustomConfig({"name": str, "datetime": int, "language": str})
 
-
-ExitCommand = CommandClassFabric.create("ExitComman", NO_ARGS)
-SaveUICommand = CommandClassFabric.create("SaveUICommand", NO_ARGS)
+ExitCommand = CommandClassFabric.create("ExitCommand", NO_ARGS)
 StartFocusCommand = CommandClassFabric.create("StartFocusCommand", UI_ELEMENT)
-EndFocusCommand = CommandClassFabric.create("EndFocusCommand", UI_ELEMENT)
-
-
-from datetime import datetime
-CreateNewProfileCommand = CommandClassFabric.create("CreateNewProfileCommand",
-                                                    CustomConfig({"name": str, "date": datetime, "language": str}))
-
 
 exit_command = ExitCommand()
 print(type(exit_command))
@@ -85,5 +68,10 @@ print(type(start_focus_command))
 print(start_focus_command)
 
 
-# verifying command names
+CreateNewProfileCommand = CommandClassFabric.create("CreateNewProfileCommand", CREATE_NEW_PROFILE)
+create_profile_command = CreateNewProfileCommand("John", 1232131248712947, "en")
+print(type(create_profile_command))
+print(create_profile_command)
+
+# verifying command names, must be at the end of python file
 CommandClassFabric.verify_command_names()
