@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABCMeta
+from abc import abstractmethod, ABCMeta, ABC
 from commands import BaseCommand, ExitCommand, UIElementCommand, FocusCommands, StartFocus
 
 
@@ -11,7 +11,6 @@ class CommandHandler(metaclass=ABCMeta):
     def handle(self, command):
         if not isinstance(command, self.command_type):
             raise TypeError(f"Expected command of type {self.command_type}, got {type(command)}")
-        command: BaseCommand  # for PyCharm
         self.handler_func(command)
 
     @abstractmethod

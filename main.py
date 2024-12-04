@@ -3,7 +3,7 @@ pygame.init()
 import os
 # import shutil
 import sys
-from commands import BaseCommand, ExitCommand
+from commands import BaseCommand
 import simple_buttons
 import funny_text
 from constants import *

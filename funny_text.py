@@ -38,10 +38,10 @@ class SimpleText(OnlyDraggableElement):
 
         if self.dragging:
             if already_dragging:
-                return [commands.KeepFocus]
-            return [commands.StartFocus]
+                return [commands.KeepFocus(self)]
+            return [commands.StartFocus(self)]
         if already_dragging:
-            return [commands.EndFocus]
+            return [commands.EndFocus(self)]
         return []
 
     def draw(self, screen: pygame.Surface):
