@@ -1,77 +1,38 @@
-# from UI_element import UIElement
-from dataclasses import dataclass, field, make_dataclass
-from typing import Type, Any, ClassVar
-import sys
+from __future__ import annotations
+from UI_element import UIElement
+from abc import ABCMeta, abstractmethod, ABC
 
 
-class UIElement:
-    pass
+class BaseCommand:
+    """Base command class"""
+    def __init__(self, text: str):
+        self.text = text
+
+    def __hash__(self):
+        return hash(self.__class__)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__)
 
 
-@dataclass
-class CommandConfig:
-    pass
+class UIElementCommand(BaseCommand):
+    created_variants: set[str] = set()
+
+    def __init__(self, element_association: UIElement):
+        text = self.__class__.__name__
+        super().__init__(self.__class__.__name__)
+        self.created_variants.add(text)
+        self._element_association: UIElement = element_association
+
+    def get_element(self) -> UIElement:
+        return self._element_association
 
 
-@dataclass
-class NoArgsConfig(CommandConfig):
-    pass
+# Commands initialization --------------------------------------------
+ExitCommand = BaseCommand('Exit')
 
 
-@dataclass
-class CustomConfig(CommandConfig):
-    args: dict[str, Type[Any]]
-
-
-class CommandClassFabric:
-    command_classes: ClassVar[dict[str, type]] = {}
-
-    @classmethod
-    def create(cls, name: str, config: CommandConfig) -> Type:
-        if isinstance(config, NoArgsConfig):
-            fields = []
-        elif isinstance(config, CustomConfig):
-            fields = [(key, value, field()) for key, value in config.args.items()]
-        else:
-            raise ValueError("Invalid config type. Use NoArgsConfig or CustomConfig")
-
-        command_class = make_dataclass(name, fields, bases=(CommandConfig,))
-        cls.command_classes[name] = command_class
-
-        return command_class
-
-    @classmethod
-    def verify_command_names(cls):
-        current_module = sys.modules[__name__]
-        for name, _class in cls.command_classes.items():
-            if not hasattr(current_module, name) or getattr(current_module, name) is not _class:
-                raise ValueError(f"Command class '{name}' is not correctly assigned to a variable with the same name" +
-                                 '\nCorrect Example:' +
-                                 '\nExitCommand = CommandClassFabric.create("ExitCommand", NO_ARGS)')
-        print("\nAll command names verified successfully")
-
-
-NO_ARGS = NoArgsConfig()
-UI_ELEMENT = CustomConfig({'element': UIElement})
-CREATE_NEW_PROFILE = CustomConfig({"name": str, "datetime": int, "language": str})
-
-ExitCommand = CommandClassFabric.create("ExitCommand", NO_ARGS)
-StartFocusCommand = CommandClassFabric.create("StartFocusCommand", UI_ELEMENT)
-
-exit_command = ExitCommand()
-print(type(exit_command))
-print(exit_command)
-
-button = UIElement()
-start_focus_command = StartFocusCommand(element=button)
-print(type(start_focus_command))
-print(start_focus_command)
-
-
-CreateNewProfileCommand = CommandClassFabric.create("CreateNewProfileCommand", CREATE_NEW_PROFILE)
-create_profile_command = CreateNewProfileCommand("John", 1232131248712947, "en")
-print(type(create_profile_command))
-print(create_profile_command)
-
-# verifying command names, must be at the end of python file
-CommandClassFabric.verify_command_names()
+class FocusCommands(UIElementCommand, ABC): pass
+class StartFocus(FocusCommands): pass
+class KeepFocus(FocusCommands): pass
+class EndFocus(FocusCommands): pass

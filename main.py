@@ -8,6 +8,7 @@ import simple_buttons
 import funny_text
 from constants import *
 import UI_scene
+from command_handler import CHM
 
 
 def load_and_scale_image(image_path):
@@ -48,25 +49,29 @@ def main(image_folder):
     running = True
     while running:
         commands_pool = scene.handle_events()
-        unhandled_commands = []
         for command in commands_pool:
-            if BaseCommand('NEXT_IMAGE') == command:
-                if image_index < len(images)-1:
-                    image_index += 1
-                    image_name = images[image_index]
-                    image = load_and_scale_image(os.path.join(image_folder, image_name))
-            elif BaseCommand('SAVE_UI') == command:
-                for el in all_elements:
-                    el.save_to_json()
-                print('UI Saved')
-            elif ExitCommand == command:
-                running = False
-            elif type(command) == BaseCommand:
-                command: BaseCommand
-                print('text command', command.text)
-            else:
-                unhandled_commands.append(command)
-        assert len(unhandled_commands) == 0
+            print(command)
+            CHM.handle_command(command)
+
+        # unhandled_commands = []
+        # for command in commands_pool:
+        #     if BaseCommand('NEXT_IMAGE') == command:
+        #         if image_index < len(images)-1:
+        #             image_index += 1
+        #             image_name = images[image_index]
+        #             image = load_and_scale_image(os.path.join(image_folder, image_name))
+        #     elif BaseCommand('SAVE_UI') == command:
+        #         for el in all_elements:
+        #             el.save_to_json()
+        #         print('UI Saved')
+        #     elif ExitCommand == command:
+        #         running = False
+        #     elif type(command) == BaseCommand:
+        #         command: BaseCommand
+        #         print('text command', command.text)
+        #     else:
+        #         unhandled_commands.append(command)
+        # assert len(unhandled_commands) == 0
 
         screen.fill(SCREEN_FILLING_COLOR)
         if image_index < len(images):

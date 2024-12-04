@@ -76,12 +76,12 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
 
         if self.dragging:
             if already_dragging:
-                comm = commands.KeepFocus.set_element_association(self)
+                comm = commands.KeepFocus(self)
             else:
-                comm = commands.StartFocus.set_element_association(self)
+                comm = commands.StartFocus(self)
             commands_lst.append(comm)
         elif already_dragging:
-            comm = commands.EndFocus.set_element_association(self)
+            comm = commands.EndFocus(self)
             commands_lst.append(comm)
         return commands_lst
 
