@@ -1,7 +1,6 @@
 import pygame
 from UI_abstracts import BaseUIElement, MouseConfig
 from states import MouseWheelState
-# noinspection PyCompatibility
 from commands import BaseCommand, ExitCommand
 
 
@@ -29,13 +28,14 @@ class Scene:
         for event in frame_events:
             mouse_wheel_state = self.update_mouse_wheel_state(mouse_wheel_state, event)
             if event.type == pygame.QUIT:
-                commands_pool.append(ExitCommand)
+                commands_pool.append(ExitCommand())
                 return commands_pool
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_s:
-                    commands_pool.append(BaseCommand('SAVE_UI'))
-                if event.key == pygame.K_d:
-                    commands_pool.append(BaseCommand('NEXT_IMAGE'))
+                # if event.key == pygame.K_s:
+                #     commands_pool.append(BaseCommand('SAVE_UI'))
+                # if event.key == pygame.K_d:
+                #     commands_pool.append(BaseCommand('NEXT_IMAGE'))
+                pass
 
         event_config = MouseConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array)
         for el in self.elements:

@@ -1,38 +1,50 @@
 from __future__ import annotations
 from UI_element import UIElement
-from abc import ABC
+from abc import ABC, abstractmethod
 
 
-class BaseCommand:
+class BaseCommand(ABC):
     """Base command class"""
-    def __init__(self, text: str):
-        self.text = text
+    @property
+    @abstractmethod
+    def text(self):
+        pass
+
+    def __init__(self):
+        pass
 
     def __hash__(self):
-        return hash(self.__class__)
+        return hash(self.text)
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)
 
 
 class UIElementCommand(BaseCommand):
-    created_variants: set[str] = set()
+    @property
+    def text(self):
+        return self.__class__.__name__
 
     def __init__(self, element_association: UIElement):
-        text = self.__class__.__name__
-        super().__init__(self.__class__.__name__)
-        self.created_variants.add(text)
+        super().__init__()
         self._element_association: UIElement = element_association
 
     def get_element(self) -> UIElement:
         return self._element_association
 
 
+class CommandFamily:
+    pass
+
+
 # Commands initialization --------------------------------------------
-ExitCommand = BaseCommand('Exit')
+class ExitCommand(BaseCommand):
+    text = 'Exit'
+class TestCommand(BaseCommand):
+    text = 'Test'
 
 
-class FocusCommands(UIElementCommand, ABC): pass
-class StartFocus(FocusCommands): pass
-class KeepFocus(FocusCommands): pass
-class EndFocus(FocusCommands): pass
+class FocusCommandFamily(CommandFamily, UIElementCommand, ABC): pass
+class StartFocus(FocusCommandFamily): pass
+class KeepFocus(FocusCommandFamily): pass
+class EndFocus(FocusCommandFamily): pass

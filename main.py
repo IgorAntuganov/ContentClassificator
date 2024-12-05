@@ -3,12 +3,12 @@ pygame.init()
 import os
 # import shutil
 import sys
-from commands import BaseCommand
+import commands
 import simple_buttons
 import funny_text
 from constants import *
 import UI_scene
-from command_handler import CHM
+from command_manager import CHM
 
 
 def load_and_scale_image(image_path):
@@ -28,7 +28,7 @@ def main(image_folder):
 
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
-        command=BaseCommand('ADD_BUTTON'),
+        command=commands.TestCommand(),
         path_to_json='buttons_saves/add_tag_button.json'
     )
     add_tag_button = simple_buttons.SimpleButton(add_tag_button_config)
@@ -49,9 +49,7 @@ def main(image_folder):
     running = True
     while running:
         commands_pool = scene.handle_events()
-        for command in commands_pool:
-            print(command)
-            CHM.handle_command(command)
+        CHM.handle_commands(commands_pool)
 
         # unhandled_commands = []
         # for command in commands_pool:
