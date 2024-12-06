@@ -45,6 +45,7 @@ def main(image_folder):
     image = load_and_scale_image(os.path.join(image_folder, image_name))
 
     scene = UI_scene.Scene('Main', all_elements)
+    CHM.set_scene(scene)
 
     running = True
     while running:

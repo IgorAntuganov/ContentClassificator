@@ -1,12 +1,17 @@
 from abc import ABC
 import command_handlers as ch
 import commands
+import UI_scene
 
 
 class CommandHandlerManager:
-    def __init__(self):
+    def __init__(self, scene: UI_scene.Scene | None = None):
+        self.scene: UI_scene.Scene | None = scene
         self.handlers: dict[type: list[ch.CommandHandler]] = {}
         self.family_handlers: dict[type: list[ch.CommandHandler]] = {}
+
+    def set_scene(self, scene: UI_scene.Scene):
+        self.scene = scene
 
     def register(self, handler: ch.CommandHandler):
         com_type = handler.command_type
@@ -33,14 +38,18 @@ class CommandHandlerManager:
             self.handlers[child_class].append(family_handler)
 
     def handle_command(self, command):
+        if self.scene is None:
+            raise AssertionError('CommandHandlerManager scene is not defined. Use set_scene()')
         handlers = self.handlers.get(type(command))
         if not handlers:
             raise ValueError(f"No handler registered for command type {type(command)}"
                              f"\nRegistered commands: {list(self.handlers.keys())}")
         for handler in handlers:
-            handler.handle(command)
+            handler.handle(command, self.scene)
 
     def handle_commands(self, commands_pool):
+        if self.scene is None:
+            raise AssertionError('CommandHandlerManager scene is not defined. Use set_scene()')
         for command in commands_pool:
             self.handle_command(command)
 
