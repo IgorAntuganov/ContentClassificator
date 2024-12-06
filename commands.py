@@ -1,5 +1,5 @@
 from __future__ import annotations
-from UI_element import UIElement
+from UI_element import MetaUIElement
 from abc import ABC, abstractmethod
 
 
@@ -25,11 +25,11 @@ class UIElementCommand(BaseCommand):
     def text(self):
         return self.__class__.__name__
 
-    def __init__(self, element_association: UIElement):
+    def __init__(self, element_association: MetaUIElement):
         super().__init__()
-        self._element_association: UIElement = element_association
+        self._element_association: MetaUIElement = element_association
 
-    def get_element(self) -> UIElement:
+    def get_element(self) -> MetaUIElement:
         return self._element_association
 
 

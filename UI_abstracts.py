@@ -6,7 +6,7 @@ import json
 from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from states import MouseWheelState
 from commands import BaseCommand
-from UI_element import UIElement
+from UI_element import MetaUIElement
 
 
 class WithPrivateRect(ABC):
@@ -97,7 +97,7 @@ class MouseHandler(ABC):
         pass
 
 
-class BaseUIElement(UIElement, MouseHandler, ABC):
+class BaseUIElement(MetaUIElement, MouseHandler, ABC):
     pass
 
 

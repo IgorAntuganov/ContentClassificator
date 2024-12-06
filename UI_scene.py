@@ -1,20 +1,24 @@
 import pygame
-from UI_abstracts import BaseUIElement, MouseConfig
+from UI_abstracts import MouseConfig
+from UI_element import MetaUIElement
 from states import MouseWheelState
 from commands import BaseCommand, ExitCommand
 
 
 class Scene:
-    def __init__(self, name: str, elements: list[BaseUIElement]):
+    def __init__(self, name: str, elements: list[MetaUIElement]):
         self.name = name
-        self.elements: list[BaseUIElement] = elements
-        self._focused_element: BaseUIElement | None = None
+        self.elements: list[MetaUIElement] = elements
+        self._focused_element: MetaUIElement | None = None
 
-    def set_focused_element(self, element: BaseUIElement):
+    def set_focused_element(self, element: MetaUIElement):
         self._focused_element = element
 
-    def get_focused_element(self) -> BaseUIElement:
+    def get_focused_element(self) -> MetaUIElement:
         return self._focused_element
+
+    def clear_focused_element(self):
+        self._focused_element = None
 
     def handle_events(self) -> list[BaseCommand]:
         commands_pool = []

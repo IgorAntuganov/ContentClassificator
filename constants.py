@@ -1,5 +1,11 @@
 import pygame
 
+DEBUG_PRINTING = True
+if DEBUG_PRINTING:
+    def debug_print(*args): print(*args)
+else:
+    def debug_print(*args): len(args)
+
 FPS = 30
 WIN_SIZE = 1200, 800
 SCREEN_RECT = pygame.Rect((0, 0), WIN_SIZE)
