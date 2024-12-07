@@ -57,4 +57,5 @@ class CommandHandlerManager:
 CHM = CommandHandlerManager()
 CHM.register(ch.ExitHandler())
 CHM.register(ch.TestCommandHandler())
+CHM.register(ch.TestCommandHandler2())
 CHM.register_family(ch.FocusHandler())

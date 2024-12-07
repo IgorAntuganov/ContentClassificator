@@ -31,6 +31,16 @@ class ExitHandler(CommandHandler):  # Handlers classes ----------------
         print('Exit Command')
         exit()
 
+class TestCommandHandler(CommandHandler):
+    command_type = commands.TestCommand
+    def handler_func(self, command, scene):
+        print('get TestCommand')
+
+class TestCommandHandler2(CommandHandler):
+    command_type = commands.TestCommand2
+    def handler_func(self, command, scene):
+        print('get TestCommand (2!!)')
+
 
 class FocusHandler(CommandFamilyHandler):
     command_type = commands.FocusCommandFamily
@@ -66,9 +76,3 @@ class FocusHandler(CommandFamilyHandler):
             raise strange_error
 
         debug_print('focused element:', scene.get_focused_element())
-
-
-class TestCommandHandler(CommandHandler):
-    command_type = commands.TestCommand
-    def handler_func(self, command, scene):
-        print('get TestCommand')

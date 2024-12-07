@@ -31,13 +31,22 @@ def main(image_folder):
         command=commands.TestCommand(),
         path_to_json='buttons_saves/add_tag_button.json'
     )
-    add_tag_button = simple_buttons.SimpleButton(add_tag_button_config)
+    test_button_1 = simple_buttons.SimpleButton(add_tag_button_config)
+
+    add_tag_button_config = simple_buttons.ButtonConfig(
+        text="..AbraCadabra..",
+        command=commands.TestCommand2(),
+        path_to_json='buttons_saves/test_2_button.json'
+    )
+    test_button_2 = simple_buttons.SimpleButton(add_tag_button_config)
+
     halo_text_config = funny_text.HaloTextConfig(
         text="Experimental  Text",
         path_to_json='buttons_saves/text_element.json'
     )
     text_element = funny_text.HaloText(halo_text_config)
-    all_elements = [add_tag_button, text_element]
+
+    all_elements = [test_button_1, text_element, test_button_2]
 
     images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]
     image_index = 0

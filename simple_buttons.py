@@ -48,12 +48,19 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprites[self.current_state], self.get_rect())
 
+    def is_inactive(self, mouse_config: MouseConfig) -> bool:
+        return not self.dragging and \
+               self.current_state is not TripleButtonState.ACTIVE and \
+               not self.rect_collidepoint(mouse_config.mouse_position)
+
     def handle_mouse(self, mouse_config: MouseConfig) -> list[commands.BaseCommand]:
-        already_dragging = self.dragging
+        was_dragging = self.dragging
         self.handle_dragging(mouse_config)
 
-        if not self.rect_collidepoint(mouse_config.mouse_position):
+        if self.is_inactive(mouse_config):
             self.current_state = TripleButtonState.NORMAL
+            if was_dragging:
+                return [commands.EndFocus(self)]
             return []
 
         unpressed = False
@@ -67,20 +74,23 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
                     (mouse_config.mouse_wheel_state != MouseWheelState.INACTIVE):
                 self.handle_size_changing(mouse_config.ctrl_alt_shift_array, mouse_config.mouse_wheel_state)
         else:
-            if self.current_state == TripleButtonState.ACTIVE:
+            if self.current_state == TripleButtonState.ACTIVE and self.rect_collidepoint(mouse_config.mouse_position):
                 unpressed = True
-            self.current_state = TripleButtonState.HOVER
+            if self.rect_collidepoint(mouse_config.mouse_position):
+                self.current_state = TripleButtonState.HOVER
+            else:
+                self.current_state = TripleButtonState.NORMAL
 
         if unpressed:
             commands_lst.append(self.command)
 
         if self.dragging:
-            if already_dragging:
+            if was_dragging:
                 comm = commands.KeepFocus(self)
             else:
                 comm = commands.StartFocus(self)
             commands_lst.append(comm)
-        elif already_dragging:
+        elif was_dragging and not self.dragging:
             comm = commands.EndFocus(self)
             commands_lst.append(comm)
         return commands_lst

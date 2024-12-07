@@ -42,6 +42,8 @@ class ExitCommand(BaseCommand):
     text = 'Exit'
 class TestCommand(BaseCommand):
     text = 'Test'
+class TestCommand2(BaseCommand):
+    text = 'Test_2'
 
 
 class FocusCommandFamily(CommandFamily, UIElementCommand, ABC): pass

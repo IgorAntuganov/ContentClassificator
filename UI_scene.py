@@ -42,9 +42,12 @@ class Scene:
                 pass
 
         event_config = MouseConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array)
-        for el in self.elements:
-            new_commands = el.handle_mouse(event_config)
-            commands_pool += new_commands
+        if self._focused_element is None:
+            for el in self.elements:
+                new_commands = el.handle_mouse(event_config)
+                commands_pool += new_commands
+        else:
+            commands_pool = self._focused_element.handle_mouse(event_config)
 
         return commands_pool
 
