@@ -1,6 +1,6 @@
 from abc import ABC
 import commands
-from constants import debug_print
+from constants import debug_print_1
 from scene_manager_protocols import SceneProtocol, CommandHandlerProtocol, CommandHandlerFamilyProtocol
 
 
@@ -15,7 +15,7 @@ class CommandHandlerManager:
 
     def register(self, handler: CommandHandlerProtocol):
         com_type = handler.command_type
-        debug_print('registering', com_type)
+        debug_print_1('registering', com_type)
 
         if com_type not in self.handlers:
             self.handlers[com_type] = []
@@ -29,10 +29,10 @@ class CommandHandlerManager:
         if not issubclass(com_family_type, commands.CommandFamily):
             raise TypeError(f"Family handler must be CommandFamilyHandler subclass. "
                             f"Wrong handler: {com_family_type}")
-        debug_print('registering family', com_family_type)
+        debug_print_1('registering family', com_family_type)
 
         for child_class in com_family_type.__subclasses__():
-            debug_print('registering family member', child_class)
+            debug_print_1('registering family member', child_class)
             if child_class not in self.handlers:
                 self.handlers[child_class] = []
             self.handlers[child_class].append(family_handler)

@@ -1,8 +1,9 @@
 import pygame
-from UI_abstracts import MouseConfig
+
+import UI_abstracts
 from UI_element import MetaUIElement
 from states import MouseWheelState
-from commands import BaseCommand, ExitCommand
+from commands import BaseCommand, ExitCommand, SaveUICommand
 from scene_manager_protocols import ManagerProtocol
 
 
@@ -41,13 +42,13 @@ class Scene:
                 not_scene_commands.append(ExitCommand())
                 return not_scene_commands
             if event.type == pygame.KEYDOWN:
-                # if event.key == pygame.K_s:
-                #     not_scene_commands.append(BaseCommand('SAVE_UI'))
+                if event.key == pygame.K_s:
+                    self.scene_manager.handle_command(SaveUICommand())
                 # if event.key == pygame.K_d:
                 #     not_scene_commands.append(BaseCommand('NEXT_IMAGE'))
                 pass
 
-        event_config = MouseConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array)
+        event_config = UI_abstracts.MouseConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array)
 
         if self._focused_element is not None:
             element_commands = self._focused_element.handle_mouse(event_config)
@@ -87,3 +88,8 @@ class Scene:
     def draw_elements(self, screen: pygame.Surface):
         for el in self.elements:
             el.draw(screen)
+
+    def save_elements(self):
+        for el in self.elements:
+            assert isinstance(el, UI_abstracts.JSONadjustable)
+            el.save_to_json()

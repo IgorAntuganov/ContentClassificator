@@ -1,12 +1,6 @@
 import pygame
 
-DEBUG_PRINTING = True
-if DEBUG_PRINTING:
-    def debug_print(*args): print(*args)
-else:
-    def debug_print(*args): len(args)
-
-FPS = 24
+FPS = 165
 WIN_SIZE = 1200, 800
 SCREEN_RECT = pygame.Rect((0, 0), WIN_SIZE)
 MAX_IMAGE_WIDTH = 800
@@ -29,3 +23,17 @@ STANDARD_UI_BRIGHT = (220, 220, 220)
 STANDARD_UI_DARK = (50, 50, 50)
 STANDARD_UI_RED = (230, 20, 20)
 SCREEN_FILLING_COLOR = (40, 40, 40)
+
+
+FOCUS_DEBUG_PRINTING = False
+if FOCUS_DEBUG_PRINTING:
+    def debug_print(*args): print(*args)
+else:
+    def debug_print(*args): len(args)
+
+RECENT_DEBUG_PRINTING = True
+if FOCUS_DEBUG_PRINTING:
+    def debug_print_1(*args): print(*args)
+else:
+    def debug_print_1(*args):
+        len(args)

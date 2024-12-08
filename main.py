@@ -10,6 +10,7 @@ from constants import *
 import UI_scene
 from command_manager import CommandHandlerManager
 import command_handlers as ch
+from UI_element import MetaUIElement
 
 
 def load_and_scale_image(image_path):
@@ -22,11 +23,8 @@ def load_and_scale_image(image_path):
     return pygame.transform.smoothscale(image, new_size)
 
 
-def main(image_folder):
-    screen = pygame.display.set_mode(WIN_SIZE)
-    pygame.display.set_caption('Image Classifier')
-    clock = pygame.time.Clock()
-
+# noinspection PyPep8Naming
+def create_test_UI_elements() -> list[MetaUIElement]:
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
         command=commands.TestCommand(),
@@ -47,21 +45,32 @@ def main(image_folder):
     )
     text_element = funny_text.HaloText(halo_text_config)
 
-    all_elements = [test_button_1, text_element, test_button_2]
+    return [test_button_1, text_element, test_button_2]
+
+
+def main(image_folder):
+    screen = pygame.display.set_mode(WIN_SIZE)
+    pygame.display.set_caption('Image Classifier')
+    clock = pygame.time.Clock()
+
+    all_elements = create_test_UI_elements()
 
     images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]
     image_index = 0
     image_name = images[image_index]
     image = load_and_scale_image(os.path.join(image_folder, image_name))
 
+    # noinspection PyPep8Naming
     CHManager = CommandHandlerManager()
     CHManager.register(ch.TestCommandHandler())
     CHManager.register(ch.TestCommandHandler2())
     CHManager.register_family(ch.FocusHandler())
+    CHManager.register(ch.SaveUIHandler())
 
     scene = UI_scene.Scene('Main', all_elements, CHManager)
     CHManager.set_scene(scene)
 
+    # noinspection PyPep8Naming
     Out_CHManager = CommandHandlerManager()
     Out_CHManager.register(ch.ExitHandler())
     empty_scene = UI_scene.Scene('Empty', [], Out_CHManager)
@@ -70,6 +79,8 @@ def main(image_folder):
     running = True
     while running:
         not_scene_commands = scene.handle_events()
+        if len(not_scene_commands) > 0:
+            print('NOT SCENE COMMANDS (FOR EMPTY SCENE): ', not_scene_commands)
         Out_CHManager.handle_commands(not_scene_commands)
 
         # unhandled_commands = []

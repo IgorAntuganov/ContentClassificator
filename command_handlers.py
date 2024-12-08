@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABC
 import commands
 from scene_manager_protocols import SceneProtocol
-from constants import debug_print
+from constants import debug_print_1
 
 
 class CommandHandler(ABC):
@@ -41,12 +41,18 @@ class TestCommandHandler2(CommandHandler):
     def handler_func(self, command, scene):
         print('get TestCommand (2!!)')
 
+class SaveUIHandler(CommandHandler):
+    command_type = commands.SaveUICommand
+    def handler_func(self, command, scene):
+        scene.save_elements()
+        print('UI saved')
+
 
 class FocusHandler(CommandFamilyHandler):
     command_type = commands.FocusCommandFamily
     def handler_func(self, command, scene):
         command: commands.FocusCommandFamily
-        debug_print('Focus?', command.text, command.get_element(), scene)
+        debug_print_1('Focus?', command.text, command.get_element(), scene)
         element = command.get_element()
         now_focus = scene.get_focused_element()
 
@@ -76,4 +82,4 @@ class FocusHandler(CommandFamilyHandler):
         else:
             raise strange_error
 
-        debug_print('focused element:', scene.get_focused_element())
+        debug_print_1('focused element:', scene.get_focused_element())

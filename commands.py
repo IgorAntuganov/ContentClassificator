@@ -44,6 +44,8 @@ class TestCommand(BaseCommand):
     text = 'Test'
 class TestCommand2(BaseCommand):
     text = 'Test_2'
+class SaveUICommand(BaseCommand):
+    text = 'Save_UI'
 
 
 class FocusCommandFamily(CommandFamily, UIElementCommand, ABC): pass

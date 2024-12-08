@@ -75,6 +75,7 @@ class JSONadjustable(ABC):
     def save_to_json(self):
         adjusted_values = self.get_dict_for_json()
         with open(self.path_to_json, 'w') as file:
+            print('dumping', adjusted_values, self.path_to_json)
             json.dump(adjusted_values, file)
 
     def load_adjusted_values_from_json(self) -> dict:

@@ -81,3 +81,6 @@ class SceneProtocol(Protocol):
 
     def draw_elements(self, screen: pygame.Surface):
         pass
+
+    def save_elements(self):
+        pass
