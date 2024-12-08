@@ -13,17 +13,24 @@ class CommandHandlerProtocol(Protocol):
     def command_type(self):
         pass
 
-    @abstractmethod
     def handle(self, command: BaseCommand, scene: SceneProtocol):
         pass
 
-    @abstractmethod
     def handler_func(self, command: BaseCommand, scene: SceneProtocol):
         pass
 
 
-class CommandHandlerFamilyProtocol(CommandHandlerProtocol, Protocol):
-    pass
+class CommandHandlerFamilyProtocol(Protocol):
+    @property
+    @abstractmethod
+    def command_type(self):
+        pass
+
+    def handle(self, command: BaseCommand, scene: SceneProtocol):
+        pass
+
+    def handler_func(self, command: BaseCommand, scene: SceneProtocol):
+        pass
 
 
 class ManagerProtocol(Protocol):
@@ -50,7 +57,7 @@ class ManagerProtocol(Protocol):
 
 
 class SceneProtocol(Protocol):
-    name = 'Protocol scene'
+    name: str = 'Protocol scene'
 
     def set_focused_element(self, element: MetaUIElement):
         pass

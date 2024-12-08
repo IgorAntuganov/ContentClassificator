@@ -1,10 +1,10 @@
 from abc import abstractmethod, ABC
 import commands
-from scene_manager_protocols import CommandHandlerProtocol, SceneProtocol, CommandHandlerFamilyProtocol
+from scene_manager_protocols import SceneProtocol
 from constants import debug_print
 
 
-class CommandHandler(CommandHandlerProtocol, ABC):
+class CommandHandler(ABC):
     @property
     @abstractmethod
     def command_type(self):
@@ -20,14 +20,14 @@ class CommandHandler(CommandHandlerProtocol, ABC):
         pass
 
 
-class CommandFamilyHandler(CommandHandlerFamilyProtocol, CommandHandler, ABC):
+class CommandFamilyHandler(CommandHandler, ABC):
     pass
 
 
 # To do: auto register to manager
 class ExitHandler(CommandHandler):  # Handlers classes ----------------
     command_type = commands.ExitCommand
-    def handler_func(self, command: commands.ExitCommand, scene: SceneProtocol):
+    def handler_func(self, command, scene):
         print('Exit Command')
         exit()
 
@@ -44,7 +44,8 @@ class TestCommandHandler2(CommandHandler):
 
 class FocusHandler(CommandFamilyHandler):
     command_type = commands.FocusCommandFamily
-    def handler_func(self, command: commands.FocusCommandFamily, scene: SceneProtocol):
+    def handler_func(self, command, scene):
+        command: commands.FocusCommandFamily
         debug_print('Focus?', command.text, command.get_element(), scene)
         element = command.get_element()
         now_focus = scene.get_focused_element()

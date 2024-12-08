@@ -1,10 +1,10 @@
 from abc import ABC
 import commands
 from constants import debug_print
-from scene_manager_protocols import SceneProtocol, ManagerProtocol, CommandHandlerProtocol, CommandHandlerFamilyProtocol
+from scene_manager_protocols import SceneProtocol, CommandHandlerProtocol, CommandHandlerFamilyProtocol
 
 
-class CommandHandlerManager(ManagerProtocol):
+class CommandHandlerManager:
     def __init__(self, scene: SceneProtocol | None = None):
         self.scene: SceneProtocol | None = scene
         self.handlers: dict[type, list[CommandHandlerProtocol]] = {}

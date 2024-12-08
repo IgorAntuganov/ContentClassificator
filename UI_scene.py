@@ -3,10 +3,10 @@ from UI_abstracts import MouseConfig
 from UI_element import MetaUIElement
 from states import MouseWheelState
 from commands import BaseCommand, ExitCommand
-from scene_manager_protocols import ManagerProtocol, SceneProtocol
+from scene_manager_protocols import ManagerProtocol
 
 
-class Scene(SceneProtocol):
+class Scene:
     def __init__(self, name: str, elements: list[MetaUIElement], scene_manager: ManagerProtocol):
         self.name = name
         self.elements: list[MetaUIElement] = elements
