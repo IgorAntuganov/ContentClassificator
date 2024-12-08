@@ -34,7 +34,7 @@ def main(image_folder):
     test_button_1 = simple_buttons.SimpleButton(add_tag_button_config)
 
     add_tag_button_config = simple_buttons.ButtonConfig(
-        text="..AbraCadabra..",
+        text="..АббРа__чистота..",
         command=commands.TestCommand2(),
         path_to_json='buttons_saves/test_2_button.json'
     )
