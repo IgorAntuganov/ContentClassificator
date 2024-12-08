@@ -8,8 +8,8 @@ from scene_manager_protocols import SceneProtocol
 class CommandHandlerManager:
     def __init__(self, scene: SceneProtocol | None = None):
         self.scene: SceneProtocol | None = scene
-        self.handlers: dict[type: list[ch.CommandHandler]] = {}
-        self.family_handlers: dict[type: list[ch.CommandHandler]] = {}
+        self.handlers: dict[type, list[ch.CommandHandler]] = {}
+        self.family_handlers: dict[type, list[ch.CommandHandler]] = {}
 
     def set_scene(self, scene: SceneProtocol):
         self.scene = scene

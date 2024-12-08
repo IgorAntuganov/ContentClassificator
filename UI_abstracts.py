@@ -117,8 +117,7 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
             self.dragging_start_mouse = config.mouse_position
             self.dragging_start_top_left = self.get_rect_topleft()
         elif self.dragging and rmb_pressed:
-            if self.dragging_start_mouse is None or self.dragging_start_top_left is None:
-                raise AssertionError
+            assert self.dragging_start_mouse is not None and self.dragging_start_top_left is not None
             last_position = self.get_rect_topleft()
             offset_x = config.mouse_position[0] - self.dragging_start_mouse[0]
             offset_y = config.mouse_position[1] - self.dragging_start_mouse[1]
