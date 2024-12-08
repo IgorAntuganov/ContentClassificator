@@ -1,0 +1,4 @@
+pygame~=2.6.1
+moviepy~=2.1.1
+mypy~=1.13.0
+mypy-extensions~=1.0.0

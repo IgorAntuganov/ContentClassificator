@@ -16,8 +16,8 @@ class ButtonConfig:
     path_to_json: str
     position: tuple[int, int] = cnst.STANDARD_UI_POSITION
     size: tuple[int, int] = cnst.STANDARD_UI_SIZE
-    colors_key: str | int = None
-    font_key: str | int = None
+    colors_key: str | int | None = None
+    font_key: str | int | None = None
 
 
 class ABCTripleStateButton(DraggableAndResizableElement, ABC):
@@ -42,7 +42,7 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
         self.sprites = self.create_all_sprites()
 
     @abstractmethod
-    def create_all_sprites(self) -> dict[TripleButtonState:pygame.Surface]:
+    def create_all_sprites(self) -> dict[TripleButtonState, pygame.Surface]:
         pass
 
     def draw(self, screen: pygame.Surface):
@@ -85,6 +85,7 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
             commands_lst.append(self.command)
 
         if self.dragging:
+            comm: commands.FocusCommandFamily
             if was_dragging:
                 comm = commands.KeepFocus(self)
             else:
@@ -101,7 +102,7 @@ class SimpleButton(ABCTripleStateButton):
         self.border_radius = border_radius
         ABCTripleStateButton.__init__(self, config)
 
-    def create_all_sprites(self) -> dict[TripleButtonState:pygame.Surface]:
+    def create_all_sprites(self) -> dict[TripleButtonState, pygame.Surface]:
         sprites = {
             TripleButtonState.NORMAL: self._create_sprite_with_deflation(
                 self.colors[TripleButtonState.NORMAL],
@@ -131,9 +132,9 @@ class SimpleButton(ABCTripleStateButton):
         return sprite
 
 
-class CoolRectButton(ABCTripleStateButton):
+class CoolRectButton(ABCTripleStateButton, ABC):
     def __init__(self, config: ButtonConfig):
         ABCTripleStateButton.__init__(self, config)
 
-    def create_all_sprites(self) -> dict[TripleButtonState:pygame.Surface]:
-        pass
+    def create_all_sprites(self) -> dict[TripleButtonState, pygame.Surface]:
+        return {}

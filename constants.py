@@ -6,7 +6,7 @@ if DEBUG_PRINTING:
 else:
     def debug_print(*args): len(args)
 
-FPS = 12
+FPS = 24
 WIN_SIZE = 1200, 800
 SCREEN_RECT = pygame.Rect((0, 0), WIN_SIZE)
 MAX_IMAGE_WIDTH = 800

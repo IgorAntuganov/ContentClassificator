@@ -11,6 +11,7 @@ BUTTON_COLOR_DICT2 = {
     TripleButtonState.ACTIVE: (216, 191, 216)
 }
 
-buttons_color_schemes_dict: dict[str | None: dict] = {
-    None: BUTTON_COLOR_DICT2
+buttons_color_schemes_dict: dict[str | int | None, dict] = {
+    None: BUTTON_COLOR_DICT2,
+    1: BUTTON_COLOR_DICT1
 }

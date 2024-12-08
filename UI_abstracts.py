@@ -26,7 +26,7 @@ class WithPrivateRect(ABC):
         return self.__rect
 
     def get_rect_topleft(self) -> tuple[int, int]:
-        return tuple(self.__rect.topleft)
+        return self.__rect.topleft
 
     def get_size(self) -> tuple[int, int]:
         return self.__rect.size
@@ -106,8 +106,8 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
         self.position = position
         WithPrivateRect.__init__(self, position, size)
         self.dragging = False
-        self.dragging_start_mouse = None
-        self.dragging_start_top_left = None
+        self.dragging_start_mouse: None | tuple[int, int] = None
+        self.dragging_start_top_left: None | tuple[int, int] = None
 
     def handle_dragging(self, config: MouseConfig):
         mouse_on_element = self.rect_collidepoint(config.mouse_position)
@@ -117,6 +117,8 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
             self.dragging_start_mouse = config.mouse_position
             self.dragging_start_top_left = self.get_rect_topleft()
         elif self.dragging and rmb_pressed:
+            if self.dragging_start_mouse is None or self.dragging_start_top_left is None:
+                raise AssertionError
             last_position = self.get_rect_topleft()
             offset_x = config.mouse_position[0] - self.dragging_start_mouse[0]
             offset_y = config.mouse_position[1] - self.dragging_start_mouse[1]

@@ -53,7 +53,7 @@ def main(image_folder):
     image_name = images[image_index]
     image = load_and_scale_image(os.path.join(image_folder, image_name))
 
-    scene = UI_scene.Scene('Main', all_elements)
+    scene = UI_scene.Scene('Main', all_elements, 1)
     CHM.set_scene(scene)
 
     running = True

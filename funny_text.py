@@ -10,7 +10,7 @@ import commands
 class TextConfig:
     text: str
     path_to_json: str
-    font_key: str | int = None
+    font_key: str | int | None = None
     color: tuple[int, int, int] = cnst.STANDARD_UI_BRIGHT
     position: tuple[int, int] = cnst.STANDARD_UI_POSITION
 
