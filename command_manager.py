@@ -1,20 +1,19 @@
 from abc import ABC
-import command_handlers as ch
 import commands
 from constants import debug_print
-from scene_manager_protocols import SceneProtocol
+from scene_manager_protocols import SceneProtocol, ManagerProtocol, CommandHandlerProtocol, CommandHandlerFamilyProtocol
 
 
-class CommandHandlerManager:
+class CommandHandlerManager(ManagerProtocol):
     def __init__(self, scene: SceneProtocol | None = None):
         self.scene: SceneProtocol | None = scene
-        self.handlers: dict[type, list[ch.CommandHandler]] = {}
-        self.family_handlers: dict[type, list[ch.CommandHandler]] = {}
+        self.handlers: dict[type, list[CommandHandlerProtocol]] = {}
+        self.family_handlers: dict[type, list[CommandHandlerProtocol]] = {}
 
     def set_scene(self, scene: SceneProtocol):
         self.scene = scene
 
-    def register(self, handler: ch.CommandHandler):
+    def register(self, handler: CommandHandlerProtocol):
         com_type = handler.command_type
         debug_print('registering', com_type)
 
@@ -22,7 +21,7 @@ class CommandHandlerManager:
             self.handlers[com_type] = []
         self.handlers[com_type].append(handler)
 
-    def register_family(self, family_handler: ch.CommandFamilyHandler):
+    def register_family(self, family_handler: CommandHandlerFamilyProtocol):
         com_family_type = family_handler.command_type
         if not issubclass(com_family_type, ABC):
             raise TypeError(f"Family handler must be ABC subclass. "
@@ -39,6 +38,7 @@ class CommandHandlerManager:
             self.handlers[child_class].append(family_handler)
 
     def handle_command(self, command):
+        assert self.scene is not None
         if self.scene is None:
             raise AssertionError('CommandHandlerManager scene is not defined. Use set_scene()')
         handlers = self.handlers.get(type(command))
@@ -54,9 +54,16 @@ class CommandHandlerManager:
         for command in commands_pool:
             self.handle_command(command)
 
+    def filter_handleable(self, commands_lst: list[commands.BaseCommand]) -> list[commands.BaseCommand]:
+        filtered = []
+        for comm in commands_lst:
+            if type(comm) in self.handlers:
+                filtered.append(comm)
+        return filtered
 
-CHM = CommandHandlerManager()
-CHM.register(ch.ExitHandler())
-CHM.register(ch.TestCommandHandler())
-CHM.register(ch.TestCommandHandler2())
-CHM.register_family(ch.FocusHandler())
+    def filter_non_handleable(self, commands_lst: list[commands.BaseCommand]) -> list[commands.BaseCommand]:
+        filtered = []
+        for comm in commands_lst:
+            if type(comm) not in self.handlers:
+                filtered.append(comm)
+        return filtered

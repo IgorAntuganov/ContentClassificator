@@ -8,7 +8,8 @@ import simple_buttons
 import funny_text
 from constants import *
 import UI_scene
-from command_manager import CHM
+from command_manager import CommandHandlerManager
+import command_handlers as ch
 
 
 def load_and_scale_image(image_path):
@@ -53,13 +54,23 @@ def main(image_folder):
     image_name = images[image_index]
     image = load_and_scale_image(os.path.join(image_folder, image_name))
 
-    scene = UI_scene.Scene('Main', all_elements, 1)
-    CHM.set_scene(scene)
+    CHManager = CommandHandlerManager()
+    CHManager.register(ch.TestCommandHandler())
+    CHManager.register(ch.TestCommandHandler2())
+    CHManager.register_family(ch.FocusHandler())
+
+    scene = UI_scene.Scene('Main', all_elements, CHManager)
+    CHManager.set_scene(scene)
+
+    Out_CHManager = CommandHandlerManager()
+    Out_CHManager.register(ch.ExitHandler())
+    empty_scene = UI_scene.Scene('Empty', [], Out_CHManager)
+    Out_CHManager.set_scene(empty_scene)
 
     running = True
     while running:
-        commands_pool = scene.handle_events()
-        CHM.handle_commands(commands_pool)
+        not_scene_commands = scene.handle_events()
+        Out_CHManager.handle_commands(not_scene_commands)
 
         # unhandled_commands = []
         # for command in commands_pool:

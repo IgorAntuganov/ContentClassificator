@@ -27,7 +27,7 @@ class Scene(SceneProtocol):
         self._focused_element = None
 
     def handle_events(self) -> list[BaseCommand]:
-        commands_pool: list[BaseCommand] = []
+        not_scene_commands: list[BaseCommand] = []
 
         mouse_pos = pygame.mouse.get_pos()
         mouse_pressed = pygame.mouse.get_pressed()
@@ -38,24 +38,34 @@ class Scene(SceneProtocol):
         for event in frame_events:
             mouse_wheel_state = self.update_mouse_wheel_state(mouse_wheel_state, event)
             if event.type == pygame.QUIT:
-                commands_pool.append(ExitCommand())
-                return commands_pool
+                not_scene_commands.append(ExitCommand())
+                return not_scene_commands
             if event.type == pygame.KEYDOWN:
                 # if event.key == pygame.K_s:
-                #     commands_pool.append(BaseCommand('SAVE_UI'))
+                #     not_scene_commands.append(BaseCommand('SAVE_UI'))
                 # if event.key == pygame.K_d:
-                #     commands_pool.append(BaseCommand('NEXT_IMAGE'))
+                #     not_scene_commands.append(BaseCommand('NEXT_IMAGE'))
                 pass
 
         event_config = MouseConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array)
-        if self._focused_element is None:
-            for el in self.elements:
-                new_commands = el.handle_mouse(event_config)
-                commands_pool += new_commands
-        else:
-            commands_pool = self._focused_element.handle_mouse(event_config)
 
-        return commands_pool
+        if self._focused_element is not None:
+            element_commands = self._focused_element.handle_mouse(event_config)
+            not_scene_commands += self.scene_manager.filter_non_handleable(element_commands)
+            scene_commands = self.scene_manager.filter_handleable(element_commands)
+            self.scene_manager.handle_commands(scene_commands)
+
+        element_index = 0
+        while self._focused_element is None and element_index < len(self.elements):
+            ind = len(self.elements) - element_index - 1
+            el = self.elements[ind]
+            element_commands = el.handle_mouse(event_config)
+            not_scene_commands += self.scene_manager.filter_non_handleable(element_commands)
+            scene_commands = self.scene_manager.filter_handleable(element_commands)
+            self.scene_manager.handle_commands(scene_commands)
+            element_index += 1
+
+        return not_scene_commands
 
     @staticmethod
     def get_ctrl_alt_shift_array() -> tuple[bool, bool, bool]:

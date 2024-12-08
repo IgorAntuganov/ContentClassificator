@@ -1,33 +1,33 @@
 from abc import abstractmethod, ABC
 import commands
-import UI_scene
+from scene_manager_protocols import CommandHandlerProtocol, SceneProtocol, CommandHandlerFamilyProtocol
 from constants import debug_print
 
 
-class CommandHandler(ABC):
+class CommandHandler(CommandHandlerProtocol, ABC):
     @property
     @abstractmethod
     def command_type(self):
         pass
 
-    def handle(self, command: commands.BaseCommand, scene: UI_scene.Scene):
+    def handle(self, command: commands.BaseCommand, scene: SceneProtocol):
         if not isinstance(command, self.command_type):
             raise TypeError(f"Expected command of type {self.command_type}, got {type(command)}")
         self.handler_func(command, scene)
 
     @abstractmethod
-    def handler_func(self, command: commands.BaseCommand, scene: UI_scene.Scene):
+    def handler_func(self, command: commands.BaseCommand, scene: SceneProtocol):
         pass
 
 
-class CommandFamilyHandler(CommandHandler, ABC):
+class CommandFamilyHandler(CommandHandlerFamilyProtocol, CommandHandler, ABC):
     pass
 
 
 # To do: auto register to manager
 class ExitHandler(CommandHandler):  # Handlers classes ----------------
     command_type = commands.ExitCommand
-    def handler_func(self, command: commands.ExitCommand, scene: UI_scene.Scene):
+    def handler_func(self, command: commands.ExitCommand, scene: SceneProtocol):
         print('Exit Command')
         exit()
 
@@ -44,7 +44,7 @@ class TestCommandHandler2(CommandHandler):
 
 class FocusHandler(CommandFamilyHandler):
     command_type = commands.FocusCommandFamily
-    def handler_func(self, command: commands.FocusCommandFamily, scene: UI_scene.Scene):
+    def handler_func(self, command: commands.FocusCommandFamily, scene: SceneProtocol):
         debug_print('Focus?', command.text, command.get_element(), scene)
         element = command.get_element()
         now_focus = scene.get_focused_element()

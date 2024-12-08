@@ -1,14 +1,57 @@
+from __future__ import annotations
 import pygame
 from typing import Protocol
+from abc import abstractmethod
 from UI_abstracts import MouseWheelState
 from commands import BaseCommand
 from UI_element import MetaUIElement
 
-class ManagerProtocol(Protocol):
+
+class CommandHandlerProtocol(Protocol):
+    @property
+    @abstractmethod
+    def command_type(self):
+        pass
+
+    @abstractmethod
+    def handle(self, command: BaseCommand, scene: SceneProtocol):
+        pass
+
+    @abstractmethod
+    def handler_func(self, command: BaseCommand, scene: SceneProtocol):
+        pass
+
+
+class CommandHandlerFamilyProtocol(CommandHandlerProtocol, Protocol):
     pass
 
 
+class ManagerProtocol(Protocol):
+    def set_scene(self, scene: SceneProtocol):
+        pass
+
+    def register(self, handler: CommandHandlerProtocol):
+        pass
+
+    def register_family(self, family_handler: CommandHandlerFamilyProtocol):
+        pass
+
+    def handle_command(self, command):
+        pass
+
+    def handle_commands(self, commands_pool):
+        pass
+
+    def filter_handleable(self, commands_lst: list[BaseCommand]) -> list[BaseCommand]:
+        pass
+
+    def filter_non_handleable(self, commands_lst: list[BaseCommand]) -> list[BaseCommand]:
+        pass
+
+
 class SceneProtocol(Protocol):
+    name = 'Protocol scene'
+
     def set_focused_element(self, element: MetaUIElement):
         pass
 
