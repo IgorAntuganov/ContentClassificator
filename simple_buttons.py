@@ -124,7 +124,15 @@ class SimpleButton(ABCTripleStateButton):
 
     def _create_sprite_with_deflation(self, color, deflation, text_descent):
         sprite = pygame.Surface(self.get_size(), pygame.SRCALPHA)
-        pygame.draw.rect(sprite, color, sprite.get_rect().inflate(deflation), border_radius=self.border_radius)
+
+        rect = sprite.get_rect().inflate(deflation)
+        rect.move_ip(0, -deflation[1]//2)
+        smaller_rect = rect.inflate(cnst.BUTTON_OUTLINE_CREATING_DEFLATION)
+        multi = cnst.OUTLINE_DARKENING_COEFFICIENT
+        darker_color = list(map(lambda x: max(0, min(255, x*multi)), color))
+        pygame.draw.rect(sprite, darker_color, rect, border_radius=self.border_radius)
+        pygame.draw.rect(sprite, color, smaller_rect, border_radius=self.border_radius)
+
         text_surface = self.font.render(self.text, True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=sprite.get_rect().center)
         text_rect.move_ip(0, text_descent)
