@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import pygame
-from states import TripleButtonState, MouseWheelState
+from states import TripleButtonState, MouseWheelState, DraggingState
 import commands
 import constants as cnst
 from fonts import fonts_dict
@@ -49,32 +49,34 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
         screen.blit(self.sprites[self.current_state], self.get_rect())
 
     def is_inactive(self, mouse_config: MouseConfig) -> bool:
-        return not self.dragging and \
-               self.current_state is not TripleButtonState.ACTIVE and \
+        return self.dragging == DraggingState.OFFED and \
+               self.current_state is not TripleButtonState.PRESSED and \
                not self.rect_collidepoint(mouse_config.mouse_position)
 
+    def handle_inactive(self) -> list[commands.BaseCommand]:
+        self.current_state = TripleButtonState.NORMAL
+        if self.dragging == DraggingState.ENDING:
+            return [commands.EndFocus(self)]
+        return []
+
     def handle_mouse(self, mouse_config: MouseConfig) -> list[commands.BaseCommand]:
-        was_dragging = self.dragging
         self.handle_dragging(mouse_config)
 
         if self.is_inactive(mouse_config):
-            self.current_state = TripleButtonState.NORMAL
-            if was_dragging:
-                return [commands.EndFocus(self)]
-            return []
+            return self.handle_inactive()
 
         unpressed = False
         commands_lst = []
         # LMB
         if mouse_config.mouse_pressed[0]:
-            self.current_state = TripleButtonState.ACTIVE
+            self.current_state = TripleButtonState.PRESSED
         # RMB
         elif mouse_config.mouse_pressed[2]:
             if (mouse_config.mouse_wheel_state is not None) and \
                     (mouse_config.mouse_wheel_state != MouseWheelState.INACTIVE):
                 self.handle_size_changing(mouse_config.ctrl_alt_shift_array, mouse_config.mouse_wheel_state)
         else:
-            if self.current_state == TripleButtonState.ACTIVE and self.rect_collidepoint(mouse_config.mouse_position):
+            if self.current_state == TripleButtonState.PRESSED and self.rect_collidepoint(mouse_config.mouse_position):
                 unpressed = True
             if self.rect_collidepoint(mouse_config.mouse_position):
                 self.current_state = TripleButtonState.HOVER
@@ -84,16 +86,12 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
         if unpressed:
             commands_lst.append(self.command)
 
-        if self.dragging:
-            comm: commands.FocusCommandFamily
-            if was_dragging:
-                comm = commands.KeepFocus(self)
-            else:
-                comm = commands.StartFocus(self)
-            commands_lst.append(comm)
-        elif was_dragging and not self.dragging:
-            comm = commands.EndFocus(self)
-            commands_lst.append(comm)
+        if self.dragging == DraggingState.STARTING:
+            commands_lst.append(commands.StartFocus(self))
+        elif self.dragging == DraggingState.KEEPING:
+            commands_lst.append(commands.KeepFocus(self))
+        elif self.dragging == DraggingState.ENDING:
+            commands_lst.append(commands.EndFocus(self))
         return commands_lst
 
 
@@ -114,8 +112,8 @@ class SimpleButton(ABCTripleStateButton):
                 deflation=(0, 0),
                 text_descent=0
             ),
-            TripleButtonState.ACTIVE: self._create_sprite_with_deflation(
-                self.colors[TripleButtonState.ACTIVE],
+            TripleButtonState.PRESSED: self._create_sprite_with_deflation(
+                self.colors[TripleButtonState.PRESSED],
                 deflation=cnst.ACTIVE_BUTTON_SPRITE_DEFLATION,
                 text_descent=cnst.ACTIVE_BUTTON_TEXT_DESCENT
             )

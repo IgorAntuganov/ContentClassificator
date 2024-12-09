@@ -4,7 +4,7 @@ import pygame
 import os
 import json
 from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
-from states import MouseWheelState
+from states import MouseWheelState, DraggingState
 from commands import BaseCommand
 from UI_element import MetaUIElement
 
@@ -106,18 +106,22 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
     def __init__(self, position: tuple[int, int], size: tuple[int, int]):
         self.position = position
         WithPrivateRect.__init__(self, position, size)
-        self.dragging = False
-        self.dragging_start_mouse: None | tuple[int, int] = None
+        self.dragging:                DraggingState = DraggingState.OFFED
+        self.dragging_start_mouse:    None | tuple[int, int] = None
         self.dragging_start_top_left: None | tuple[int, int] = None
 
     def handle_dragging(self, config: MouseConfig):
         mouse_on_element = self.rect_collidepoint(config.mouse_position)
         rmb_pressed = config.mouse_pressed[2]
-        if not self.dragging and mouse_on_element and rmb_pressed:
-            self.dragging = True
+
+        if mouse_on_element and rmb_pressed and self.dragging == DraggingState.OFFED:
+            self.dragging = DraggingState.STARTING
             self.dragging_start_mouse = config.mouse_position
             self.dragging_start_top_left = self.get_rect_topleft()
-        elif self.dragging and rmb_pressed:
+
+        elif self.dragging in (DraggingState.STARTING, DraggingState.KEEPING) and rmb_pressed:
+            if self.dragging == DraggingState.STARTING:
+                self.dragging = DraggingState.KEEPING
             assert self.dragging_start_mouse is not None and self.dragging_start_top_left is not None
             last_position = self.get_rect_topleft()
             offset_x = config.mouse_position[0] - self.dragging_start_mouse[0]
@@ -127,11 +131,13 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
             self.set_top_left((x, y))
             rect = self.get_rect()
             if not SCREEN_RECT.contains(rect.inflate(*BUTTON_SCREEN_COLLISION_DEFLATION)):
-                self.dragging = False
+                self.dragging = DraggingState.ENDING
                 self.set_top_left(last_position)
-        elif self.dragging:
-            self.dragging = False
 
+        elif self.dragging in (DraggingState.STARTING, DraggingState.KEEPING):
+            self.dragging = DraggingState.ENDING
+        elif self.dragging == DraggingState.ENDING:
+            self.dragging = DraggingState.OFFED
 
 class Resizable(WithPrivateRect, BaseUIElement, ABC):
     @abstractmethod

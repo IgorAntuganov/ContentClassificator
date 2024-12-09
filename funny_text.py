@@ -4,6 +4,7 @@ import pygame
 from fonts import fonts_dict
 from UI_abstracts import JSONadjustable, Draggable, OnlyDraggableElement, MouseConfig
 import commands
+from states import DraggingState
 
 
 @dataclass
@@ -33,16 +34,17 @@ class SimpleText(OnlyDraggableElement):
         return text_surface
 
     def handle_mouse(self, config: MouseConfig) -> list[commands.BaseCommand]:
-        already_dragging = self.dragging
         self.handle_dragging(config)
 
-        if self.dragging:
-            if already_dragging:
-                return [commands.KeepFocus(self)]
+        if self.dragging == DraggingState.STARTING:
             return [commands.StartFocus(self)]
-        if already_dragging:
+        if self.dragging == DraggingState.KEEPING:
+            return [commands.KeepFocus(self)]
+        if self.dragging == DraggingState.ENDING:
             return [commands.EndFocus(self)]
-        return []
+        if self.dragging == DraggingState.OFFED:
+            return []
+        raise AssertionError
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprite, self.get_rect())
