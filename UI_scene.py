@@ -28,6 +28,19 @@ class Scene:
     def clear_focused_element(self):
         self._focused_element = None
 
+    def set_hovered_element(self, element: MetaUIElement):
+        if element not in self.elements:
+            raise AssertionError(f'Trying to hover element, that not in scene.elements. Element: {element}')
+        self._hovered_element = element
+        self.elements.remove(element)
+        self.elements.append(element)
+
+    def get_hovered_element(self) -> MetaUIElement | None:
+        return self._hovered_element
+
+    def clear_hovered_element(self):
+        self._hovered_element = None
+
     def handle_events(self) -> list[BaseCommand]:
         not_scene_commands: list[BaseCommand] = []
 

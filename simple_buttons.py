@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import pygame
 from states import TripleButtonState, MouseWheelState, DraggingState
-from commands.command_classes import BaseCommand, EndFocus
+from commands.command_classes import BaseCommand, EndDragging, DraggingCommandFamily
 import constants as cnst
 from fonts import fonts_dict
 from color_schemes import buttons_color_schemes_dict
@@ -56,12 +56,12 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
     def handle_inactive(self) -> list[BaseCommand]:
         self.current_state = TripleButtonState.NORMAL
         if self.dragging == DraggingState.ENDING:
-            return [EndFocus(self)]
+            return [EndDragging(self)]
         return []
 
     def handle_mouse(self, mouse_config: MouseConfig) -> list[BaseCommand]:
-        commands_lst: list[BaseCommand]
-        commands_lst = self.handle_dragging(mouse_config)
+        commands_lst: list[BaseCommand] = []
+        commands_lst.extend(self.handle_dragging(mouse_config))
 
         if self.is_inactive(mouse_config):
             return self.handle_inactive()

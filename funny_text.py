@@ -33,7 +33,9 @@ class SimpleText(OnlyDraggableElement):
         return text_surface
 
     def handle_mouse(self, config: MouseConfig) -> list[BaseCommand]:
-        return self.handle_dragging(config)
+        commands_lst: list[BaseCommand] = []
+        commands_lst.extend(self.handle_dragging(config))
+        return commands_lst
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprite, self.get_rect())

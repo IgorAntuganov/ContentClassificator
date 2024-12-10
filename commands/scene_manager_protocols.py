@@ -68,6 +68,15 @@ class SceneProtocol(Protocol):
     def clear_focused_element(self):
         pass
 
+    def set_hovered_element(self, element: MetaUIElement):
+        pass
+
+    def get_hovered_element(self) -> MetaUIElement | None:
+        pass
+
+    def clear_hovered_element(self):
+        pass
+
     def handle_events(self) -> list[BaseCommand]:
         pass
 

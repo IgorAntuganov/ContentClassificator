@@ -48,7 +48,14 @@ class SaveUICommand(BaseCommand):
     text = 'Save_UI'
 
 
-class FocusCommandFamily(CommandFamily, UIElementCommand, ABC): pass
-class StartFocus(FocusCommandFamily): pass
-class KeepFocus(FocusCommandFamily): pass
-class EndFocus(FocusCommandFamily): pass
+class DraggingCommandFamily(CommandFamily, UIElementCommand, ABC): pass
+class StartDragging(DraggingCommandFamily): pass
+class KeepDragging(DraggingCommandFamily): pass
+class EndDragging(DraggingCommandFamily): pass
+
+
+class HoverCommandFamily(CommandFamily, UIElementCommand, ABC): pass
+class StartHover(HoverCommandFamily): pass
+class KeepHover(HoverCommandFamily): pass
+class EndHover(HoverCommandFamily): pass
+

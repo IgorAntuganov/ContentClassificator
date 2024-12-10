@@ -3,9 +3,11 @@ from dataclasses import dataclass
 import pygame
 import os
 import json
+
+import commands.command_classes
 from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from states import MouseWheelState, DraggingState
-from commands.command_classes import BaseCommand, FocusCommandFamily, StartFocus, KeepFocus, EndFocus
+from commands.command_classes import BaseCommand, DraggingCommandFamily, StartDragging, KeepDragging, EndDragging
 from UI_element import MetaUIElement
 
 
@@ -110,7 +112,7 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
         self.dragging_start_mouse:    None | tuple[int, int] = None
         self.dragging_start_top_left: None | tuple[int, int] = None
 
-    def handle_dragging(self, config: MouseConfig) -> list[FocusCommandFamily]:
+    def handle_dragging(self, config: MouseConfig) -> list[DraggingCommandFamily]:
         mouse_on_element = self.rect_collidepoint(config.mouse_position)
         rmb_pressed = config.mouse_pressed[2]
 
@@ -139,13 +141,14 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
         elif self.dragging == DraggingState.ENDING:
             self.dragging = DraggingState.OFFED
 
+        commands_lst: list[commands.command_classes.DraggingCommandFamily]
         commands_lst = []
         if self.dragging == DraggingState.STARTING:
-            commands_lst.append(StartFocus(self))
+            commands_lst.append(StartDragging(self))
         elif self.dragging == DraggingState.KEEPING:
-            commands_lst.append(KeepFocus(self))
+            commands_lst.append(KeepDragging(self))
         elif self.dragging == DraggingState.ENDING:
-            commands_lst.append(EndFocus(self))
+            commands_lst.append(EndDragging(self))
         return commands_lst
 
 class Resizable(WithPrivateRect, BaseUIElement, ABC):
