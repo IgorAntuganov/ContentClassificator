@@ -3,8 +3,8 @@ import pygame
 import UI_abstracts
 from UI_element import MetaUIElement
 from states import MouseWheelState
-from commands import BaseCommand, ExitCommand, SaveUICommand
-from scene_manager_protocols import ManagerProtocol
+from commands.command_classes import BaseCommand, ExitCommand, SaveUICommand
+from commands.scene_manager_protocols import ManagerProtocol
 
 
 class Scene:
@@ -13,6 +13,7 @@ class Scene:
         self.elements: list[MetaUIElement] = elements
         self.scene_manager = scene_manager
         self._focused_element: MetaUIElement | None = None
+        self._hovered_element: MetaUIElement | None = None
 
     def set_focused_element(self, element: MetaUIElement):
         if element not in self.elements:
@@ -44,9 +45,6 @@ class Scene:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
                     self.scene_manager.handle_command(SaveUICommand())
-                # if event.key == pygame.K_d:
-                #     not_scene_commands.append(BaseCommand('NEXT_IMAGE'))
-                pass
 
         event_config = UI_abstracts.MouseConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array)
 

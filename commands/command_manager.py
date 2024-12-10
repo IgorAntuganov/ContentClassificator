@@ -1,7 +1,7 @@
 from abc import ABC
-import commands
 from constants import debug_print_1
-from scene_manager_protocols import SceneProtocol, CommandHandlerProtocol, CommandHandlerFamilyProtocol
+from commands.scene_manager_protocols import SceneProtocol, CommandHandlerProtocol, CommandHandlerFamilyProtocol
+from commands.command_classes import CommandFamily, BaseCommand
 
 
 class CommandHandlerManager:
@@ -26,7 +26,7 @@ class CommandHandlerManager:
         if not issubclass(com_family_type, ABC):
             raise TypeError(f"Family handler must be ABC subclass. "
                             f"Wrong handler: {com_family_type}")
-        if not issubclass(com_family_type, commands.CommandFamily):
+        if not issubclass(com_family_type, CommandFamily):
             raise TypeError(f"Family handler must be CommandFamilyHandler subclass. "
                             f"Wrong handler: {com_family_type}")
         debug_print_1('registering family', com_family_type)
@@ -54,14 +54,14 @@ class CommandHandlerManager:
         for command in commands_pool:
             self.handle_command(command)
 
-    def filter_handleable(self, commands_lst: list[commands.BaseCommand]) -> list[commands.BaseCommand]:
+    def filter_handleable(self, commands_lst: list[BaseCommand]) -> list[BaseCommand]:
         filtered = []
         for comm in commands_lst:
             if type(comm) in self.handlers:
                 filtered.append(comm)
         return filtered
 
-    def filter_non_handleable(self, commands_lst: list[commands.BaseCommand]) -> list[commands.BaseCommand]:
+    def filter_non_handleable(self, commands_lst: list[BaseCommand]) -> list[BaseCommand]:
         filtered = []
         for comm in commands_lst:
             if type(comm) not in self.handlers:

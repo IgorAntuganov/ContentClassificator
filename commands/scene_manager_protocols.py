@@ -3,7 +3,7 @@ import pygame
 from typing import Protocol
 from abc import abstractmethod
 from UI_abstracts import MouseWheelState
-from commands import BaseCommand
+from commands.command_classes import BaseCommand
 from UI_element import MetaUIElement
 
 

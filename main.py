@@ -3,13 +3,13 @@ pygame.init()
 import os
 # import shutil
 import sys
-import commands
 import simple_buttons
 import funny_text
 from constants import *
 import UI_scene
-from command_manager import CommandHandlerManager
-import command_handlers as ch
+from commands.command_manager import CommandHandlerManager
+import commands.command_handlers as ch
+from commands.command_classes import TestCommand, TestCommand2
 from UI_element import MetaUIElement
 
 
@@ -27,14 +27,14 @@ def load_and_scale_image(image_path):
 def create_test_UI_elements() -> list[MetaUIElement]:
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
-        command=commands.TestCommand(),
+        command=TestCommand(),
         path_to_json='buttons_saves/add_tag_button.json'
     )
     test_button_1 = simple_buttons.SimpleButton(add_tag_button_config)
 
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="..АббРа__чистота..",
-        command=commands.TestCommand2(),
+        command=TestCommand2(),
         path_to_json='buttons_saves/test_2_button.json'
     )
     test_button_2 = simple_buttons.SimpleButton(add_tag_button_config)

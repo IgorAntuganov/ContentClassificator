@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import pygame
 from states import TripleButtonState, MouseWheelState, DraggingState
-import commands
+from commands.command_classes import BaseCommand, EndFocus
 import constants as cnst
 from fonts import fonts_dict
 from color_schemes import buttons_color_schemes_dict
@@ -12,7 +12,7 @@ from UI_abstracts import JSONadjustable, Draggable, DraggableAndResizableElement
 @dataclass
 class ButtonConfig:
     text: str
-    command: commands.BaseCommand
+    command: BaseCommand
     path_to_json: str
     position: tuple[int, int] = cnst.STANDARD_UI_POSITION
     size: tuple[int, int] = cnst.STANDARD_UI_SIZE
@@ -53,14 +53,14 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
                self.current_state is not TripleButtonState.PRESSED and \
                not self.rect_collidepoint(mouse_config.mouse_position)
 
-    def handle_inactive(self) -> list[commands.BaseCommand]:
+    def handle_inactive(self) -> list[BaseCommand]:
         self.current_state = TripleButtonState.NORMAL
         if self.dragging == DraggingState.ENDING:
-            return [commands.EndFocus(self)]
+            return [EndFocus(self)]
         return []
 
-    def handle_mouse(self, mouse_config: MouseConfig) -> list[commands.BaseCommand]:
-        commands_lst: list[commands.BaseCommand]
+    def handle_mouse(self, mouse_config: MouseConfig) -> list[BaseCommand]:
+        commands_lst: list[BaseCommand]
         commands_lst = self.handle_dragging(mouse_config)
 
         if self.is_inactive(mouse_config):
@@ -90,7 +90,7 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
 
 
 class SimpleButton(ABCTripleStateButton):
-    def __init__(self, config: ButtonConfig, border_radius=7):
+    def __init__(self, config: ButtonConfig, border_radius=cnst.SimpleButton_BORDER_RADIUS):
         self.border_radius = border_radius
         ABCTripleStateButton.__init__(self, config)
 

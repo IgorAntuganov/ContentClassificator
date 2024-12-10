@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
-import commands
-from scene_manager_protocols import SceneProtocol
+import commands.command_classes as com_classes
+from commands.scene_manager_protocols import SceneProtocol
 from constants import debug_print_1
 
 
@@ -10,13 +10,13 @@ class CommandHandler(ABC):
     def command_type(self):
         pass
 
-    def handle(self, command: commands.BaseCommand, scene: SceneProtocol):
+    def handle(self, command: com_classes.BaseCommand, scene: SceneProtocol):
         if not isinstance(command, self.command_type):
             raise TypeError(f"Expected command of type {self.command_type}, got {type(command)}")
         self.handler_func(command, scene)
 
     @abstractmethod
-    def handler_func(self, command: commands.BaseCommand, scene: SceneProtocol):
+    def handler_func(self, command: com_classes.BaseCommand, scene: SceneProtocol):
         pass
 
 
@@ -26,32 +26,32 @@ class CommandFamilyHandler(CommandHandler, ABC):
 
 # To do: auto register to manager
 class ExitHandler(CommandHandler):  # Handlers classes ----------------
-    command_type = commands.ExitCommand
+    command_type = com_classes.ExitCommand
     def handler_func(self, command, scene):
         print('Exit Command')
         exit()
 
 class TestCommandHandler(CommandHandler):
-    command_type = commands.TestCommand
+    command_type = com_classes.TestCommand
     def handler_func(self, command, scene):
         print('get TestCommand')
 
 class TestCommandHandler2(CommandHandler):
-    command_type = commands.TestCommand2
+    command_type = com_classes.TestCommand2
     def handler_func(self, command, scene):
         print('get TestCommand (2!!)')
 
 class SaveUIHandler(CommandHandler):
-    command_type = commands.SaveUICommand
+    command_type = com_classes.SaveUICommand
     def handler_func(self, command, scene):
         scene.save_elements()
         print('UI saved')
 
 
 class FocusHandler(CommandFamilyHandler):
-    command_type = commands.FocusCommandFamily
+    command_type = com_classes.FocusCommandFamily
     def handler_func(self, command, scene):
-        command: commands.FocusCommandFamily
+        command: com_classes.FocusCommandFamily
         debug_print_1('Focus?', command.text, command.get_element(), scene)
         element = command.get_element()
         now_focus = scene.get_focused_element()
@@ -66,16 +66,16 @@ class FocusHandler(CommandFamilyHandler):
                                      f'an element that is currently defined:' + error_info)
         strange_error = TypeError('IDK, strange command in FocusHandler:', command)
 
-        if isinstance(command, commands.StartFocus):
+        if isinstance(command, com_classes.StartFocus):
             if now_focus is not None:
                 raise new_element_error
             scene.set_focused_element(element)
-        elif isinstance(command, commands.KeepFocus):
+        elif isinstance(command, com_classes.KeepFocus):
             if now_focus is None:
                 raise keep_focus_none_error
             if now_focus is not element:
                 raise keep_focus_another_error
-        elif isinstance(command, commands.EndFocus):
+        elif isinstance(command, com_classes.EndFocus):
             if now_focus is not element:
                 raise end_focus_error
             scene.clear_focused_element()
