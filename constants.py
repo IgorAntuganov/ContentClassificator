@@ -35,7 +35,7 @@ else:
     def debug_print(*args): len(args)
 
 RECENT_DEBUG_PRINTING = True
-if FOCUS_DEBUG_PRINTING:
+if RECENT_DEBUG_PRINTING:
     def debug_print_1(*args): print(*args)
 else:
     def debug_print_1(*args):

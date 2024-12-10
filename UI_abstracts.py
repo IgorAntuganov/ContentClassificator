@@ -3,6 +3,8 @@ from dataclasses import dataclass
 import pygame
 import os
 import json
+
+import commands
 from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from states import MouseWheelState, DraggingState
 from commands import BaseCommand
@@ -110,7 +112,7 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
         self.dragging_start_mouse:    None | tuple[int, int] = None
         self.dragging_start_top_left: None | tuple[int, int] = None
 
-    def handle_dragging(self, config: MouseConfig):
+    def handle_dragging(self, config: MouseConfig) -> list[commands.FocusCommandFamily]:
         mouse_on_element = self.rect_collidepoint(config.mouse_position)
         rmb_pressed = config.mouse_pressed[2]
 
@@ -138,6 +140,15 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
             self.dragging = DraggingState.ENDING
         elif self.dragging == DraggingState.ENDING:
             self.dragging = DraggingState.OFFED
+
+        commands_lst = []
+        if self.dragging == DraggingState.STARTING:
+            commands_lst.append(commands.StartFocus(self))
+        elif self.dragging == DraggingState.KEEPING:
+            commands_lst.append(commands.KeepFocus(self))
+        elif self.dragging == DraggingState.ENDING:
+            commands_lst.append(commands.EndFocus(self))
+        return commands_lst
 
 class Resizable(WithPrivateRect, BaseUIElement, ABC):
     @abstractmethod

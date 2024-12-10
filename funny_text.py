@@ -34,17 +34,7 @@ class SimpleText(OnlyDraggableElement):
         return text_surface
 
     def handle_mouse(self, config: MouseConfig) -> list[commands.BaseCommand]:
-        self.handle_dragging(config)
-
-        if self.dragging == DraggingState.STARTING:
-            return [commands.StartFocus(self)]
-        if self.dragging == DraggingState.KEEPING:
-            return [commands.KeepFocus(self)]
-        if self.dragging == DraggingState.ENDING:
-            return [commands.EndFocus(self)]
-        if self.dragging == DraggingState.OFFED:
-            return []
-        raise AssertionError
+        return self.handle_dragging(config)
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprite, self.get_rect())

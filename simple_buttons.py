@@ -60,13 +60,13 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
         return []
 
     def handle_mouse(self, mouse_config: MouseConfig) -> list[commands.BaseCommand]:
-        self.handle_dragging(mouse_config)
+        commands_lst: list[commands.BaseCommand]
+        commands_lst = self.handle_dragging(mouse_config)
 
         if self.is_inactive(mouse_config):
             return self.handle_inactive()
 
         unpressed = False
-        commands_lst = []
         # LMB
         if mouse_config.mouse_pressed[0]:
             self.current_state = TripleButtonState.PRESSED
@@ -86,12 +86,6 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
         if unpressed:
             commands_lst.append(self.command)
 
-        if self.dragging == DraggingState.STARTING:
-            commands_lst.append(commands.StartFocus(self))
-        elif self.dragging == DraggingState.KEEPING:
-            commands_lst.append(commands.KeepFocus(self))
-        elif self.dragging == DraggingState.ENDING:
-            commands_lst.append(commands.EndFocus(self))
         return commands_lst
 
 
