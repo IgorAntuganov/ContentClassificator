@@ -1,16 +1,16 @@
-from enum import Enum
+from enum import Enum, auto
 
 class TripleButtonState(Enum):
-    NORMAL = 1
-    HOVER = 2
-    PRESSED = 3
-    PRESSED_OUTSIDE = 4
+    NORMAL = auto()
+    HOVER = auto()
+    PRESSED = auto()
+    PRESSED_OUTSIDE = auto()
 
 class DraggingState(Enum):
-    STARTING = 1
-    KEEPING = 2
-    ENDING = 3
-    OFFED = 4
+    STARTING = auto()
+    KEEPING = auto()
+    ENDING = auto()
+    OFFED = auto()
 
 class MouseWheelState(Enum):
     UP = 1
@@ -18,7 +18,7 @@ class MouseWheelState(Enum):
     DOWN = -1
 
 class CtrlAltState(Enum):
-    INACTIVE = 0
-    CTRL = 1
-    ALT = 2
-    CTRL_ALT = 3
+    INACTIVE = auto()
+    CTRL = auto()
+    ALT = auto()
+    CTRL_ALT = auto()
