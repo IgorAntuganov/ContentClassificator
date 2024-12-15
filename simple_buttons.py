@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import pygame
 from states import TripleButtonState, MouseWheelState, DraggingState
-from commands.command_classes import BaseCommand, EndDragging, DraggingCommandFamily
+from commands.command_classes import BaseCommand, EndDragging
 import constants as cnst
 from fonts import fonts_dict
 from color_schemes import buttons_color_schemes_dict
@@ -61,7 +61,8 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
 
     def handle_mouse(self, mouse_config: MouseConfig) -> list[BaseCommand]:
         commands_lst: list[BaseCommand] = []
-        commands_lst.extend(self.handle_dragging(mouse_config))
+        dragging_commands = self.handle_dragging(mouse_config)
+        commands_lst.extend(dragging_commands)
 
         if self.is_inactive(mouse_config):
             return self.handle_inactive()
@@ -122,6 +123,7 @@ class SimpleButton(ABCTripleStateButton):
         smaller_rect = rect.inflate(cnst.BUTTON_OUTLINE_CREATING_DEFLATION)
         multi = cnst.OUTLINE_DARKENING_COEFFICIENT
         darker_color = list(map(lambda x: max(0, min(255, x*multi)), color))
+
         pygame.draw.rect(sprite, darker_color, rect, border_radius=self.border_radius)
         pygame.draw.rect(sprite, color, smaller_rect, border_radius=self.border_radius)
 
@@ -133,6 +135,7 @@ class SimpleButton(ABCTripleStateButton):
 
 
 class CoolRectButton(ABCTripleStateButton, ABC):
+    # Not Implemented
     def __init__(self, config: ButtonConfig):
         ABCTripleStateButton.__init__(self, config)
 
