@@ -6,6 +6,7 @@ import json
 import os
 
 PROGRESS_FILE = "kerning_progress.json"
+FONT_PATH = 'test_font.ttf'
 
 def load_progress():
     if os.path.exists(PROGRESS_FILE):
@@ -26,9 +27,9 @@ WHITE = (215, 215, 215)
 BLACK = (35, 35, 35)
 DIM = (174, 174, 174)
 
-large_font = pygame.font.Font('test_font.ttf', 200)
-small_font = pygame.font.Font('test_font.ttf', 36)
-tiny_font = pygame.font.Font('test_font.ttf', 18)
+large_font = pygame.font.Font(FONT_PATH, 200)
+small_font = pygame.font.Font(FONT_PATH, 36)
+tiny_font = pygame.font.Font(FONT_PATH, 18)
 
 chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ~!?#@$%&\'\"^_`*+,-./:;<=>(){|}[\\]"
 
