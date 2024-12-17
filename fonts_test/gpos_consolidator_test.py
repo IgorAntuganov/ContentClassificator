@@ -91,7 +91,7 @@ class Consolidator:
         gpos = self.font['GPOS'].table
         all_pairs = {}
 
-        # Извлекаем все пары
+        # Extracting all pairs
         for lookup in gpos.LookupList.Lookup:
             for subtable in lookup.SubTable:
                 if subtable.LookupType == 2 and subtable.Format == 1:
@@ -164,7 +164,6 @@ class Consolidator:
                         subtable.PairSet = new_pair_set
 
     def consolidate_kerning_lookups(self):
-        return
         gpos = self.font['GPOS'].table
 
         # Find all kerning lookups
