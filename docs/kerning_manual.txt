@@ -1,2 +1,70 @@
-HOW TO ADD NEW KERNING PAIRS TO FONT:
-1)
+Instruction (for me not to forget):
+
+HOW to add new kerning pairs to font:
+1) Run kerning_visualization.py, watch all kerning pairs you interested in
+
+2) Save pairs with Space key in kerning_pairs.txt
+
+3) Open last version of font in FontForge
+
+4) Go to "Element"/"Элемент" -> "Font Info"/"Информация о шрифте" -> "Lookups"/"Справки"
+
+5) On the GPOS tab you should see table ""'kern' Horizontal Kerning lookup 0"
+    with many subtables "'kern' Horizontal Kerning lookup 0 per glyph data ..."
+
+    My Rule: each subtable contain kerning pairs starts with same character.
+    Right now index 0 for char "A", 11 for char "L", and you should keep following this state of things
+        If you find right subtable:
+        5.1) double-click on it or on "Change data?"/"Изменить данные" and go to step 8
+
+6) If you don't find right subtable create new one:
+    Click on "Add Subtable?"/"Добавить субтаблицу", name subtable same way as existing subtables
+    Example: 'kern' Horizontal Kerning lookup 0 per glyph data 11
+
+7) In window "Kerning format"/"Формат кернинга" choose one glyph for first part
+    And with pressed shift choose many glyphs for second part
+    Example|Rule: for english letter choose glyphs from 32 to 126 - english alphabet, digits and spec symbols
+
+8) In window "Lookup subtable?"/"Субтаблица справки" you will see 3 columns:
+    first glyph | second glyph | Δx_adv#1
+    8.1) First of all open kerning_pairs.txt
+    8.2) Go through pairs in txt and mark them with "=" if pair in subtable
+
+         If pair in subtable but not in txt:
+         8.2.1) add pair to txt if "+" mark
+
+         If pair in txt but not in table:
+         8.2.2) - go to last row
+                - click on <New>
+                - add first glyph and second glyph
+                - mark pair in txt with "="
+
+9) Now adjust x_advance value
+    FontForge automatically guess x offset for pair, but values too different from each other
+    My Rule:
+        - offset -30:
+            -- cases where too much of empty space, but letters easily touching each other
+            -- Examples: TY  AY  Mf  Mt  Ma  Fl
+        - offset -57:
+            -- previous cases, but not standard second glyph
+            -- Examples: D,  D.
+        - offset -87:
+            -- if previous 2 cases isn't good enough: still too much empty space
+            -- Examples: Iv
+        - offset -114:
+            --
+            -- Examples:
+        - offset -144:
+            --
+        - offset -228:
+            --
+            -- Examples:
+        - offset -341:
+            --
+            -- Examples:
+
+10) Save subtable with "OK" button and Lookup with same button
+    You will view font overview and only here changes saved
+    But saved only in program, not on disk
+
+11) To save font on disk click on "File?"/"Файл" -> "Create Font?"/"Создать шрифты..."

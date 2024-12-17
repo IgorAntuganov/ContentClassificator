@@ -5,8 +5,8 @@ import random
 import json
 import os
 
-PROGRESS_FILE = "kerning_progress.json"
 FONT_PATH = 'test_font.ttf'
+PROGRESS_FILE = "kerning_progress.json"
 
 def load_progress():
     if os.path.exists(PROGRESS_FILE):
