@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import pygame
 from states import TripleButtonState, MouseWheelState, DraggingState
-from commands.command_classes import BaseCommand, EndDragging
+from commands.command_classes import BaseCommand
+from commands.dragging_family import EndDragging
 import constants as cnst
 from fonts import fonts_dict
 from color_schemes import buttons_color_schemes_dict

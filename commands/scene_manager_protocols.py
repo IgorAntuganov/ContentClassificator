@@ -2,7 +2,7 @@ from __future__ import annotations
 import pygame
 from typing import Protocol
 from abc import abstractmethod
-from UI_abstracts import MouseWheelState
+from states import MouseWheelState
 from commands.command_classes import BaseCommand
 from UI_element import MetaUIElement
 
@@ -59,13 +59,13 @@ class ManagerProtocol(Protocol):
 class SceneProtocol(Protocol):
     name: str = 'Protocol scene'
 
-    def set_focused_element(self, element: MetaUIElement):
+    def set_dragging_element(self, element: MetaUIElement):
         pass
 
-    def get_focused_element(self) -> MetaUIElement | None:
+    def get_dragging_element(self) -> MetaUIElement | None:
         pass
 
-    def clear_focused_element(self):
+    def clear_dragging_element(self):
         pass
 
     def set_hovered_element(self, element: MetaUIElement):

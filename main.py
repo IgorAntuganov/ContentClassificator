@@ -8,7 +8,8 @@ import funny_text
 from constants import *
 import UI_scene
 from commands.command_manager import CommandHandlerManager
-import commands.command_handlers as ch
+import commands.trivial_handlers as triv_hand
+import commands.dragging_family as drag_family
 from commands.command_classes import TestCommand, TestCommand2
 from UI_element import MetaUIElement
 
@@ -70,17 +71,17 @@ def main(image_folder):
 
     # noinspection PyPep8Naming
     CHManager = CommandHandlerManager()
-    CHManager.register(ch.TestCommandHandler())
-    CHManager.register(ch.TestCommandHandler2())
-    CHManager.register_family(ch.FocusHandler())
-    CHManager.register(ch.SaveUIHandler())
+    CHManager.register(triv_hand.TestCommandHandler())
+    CHManager.register(triv_hand.TestCommandHandler2())
+    CHManager.register_family(drag_family.DraggingHandler())
+    CHManager.register(triv_hand.SaveUIHandler())
 
     scene = UI_scene.Scene('Main', all_elements, CHManager)
     CHManager.set_scene(scene)
 
     # noinspection PyPep8Naming
     Out_CHManager = CommandHandlerManager()
-    Out_CHManager.register(ch.ExitHandler())
+    Out_CHManager.register(triv_hand.ExitHandler())
     empty_scene = UI_scene.Scene('Empty', [], Out_CHManager)
     Out_CHManager.set_scene(empty_scene)
 

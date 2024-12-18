@@ -4,10 +4,10 @@ import pygame
 import os
 import json
 
-import commands.command_classes
 from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from states import MouseWheelState, DraggingState
-from commands.command_classes import BaseCommand, DraggingCommandFamily, StartDragging, KeepDragging, EndDragging
+from commands.command_classes import BaseCommand
+from commands.dragging_family import DraggingCommandFamily, StartDragging, KeepDragging, EndDragging
 from UI_element import MetaUIElement
 
 
@@ -141,7 +141,7 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
         elif self.dragging == DraggingState.ENDING:
             self.dragging = DraggingState.OFFED
 
-        commands_lst: list[commands.command_classes.DraggingCommandFamily]
+        commands_lst: list[DraggingCommandFamily]
         commands_lst = []
         if self.dragging == DraggingState.STARTING:
             commands_lst.append(StartDragging(self))

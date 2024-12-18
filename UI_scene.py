@@ -15,17 +15,17 @@ class Scene:
         self._focused_element: MetaUIElement | None = None
         self._hovered_element: MetaUIElement | None = None
 
-    def set_focused_element(self, element: MetaUIElement):
+    def set_dragging_element(self, element: MetaUIElement):
         if element not in self.elements:
             raise AssertionError(f'Trying to focus element, that not in scene.elements. Element: {element}')
         self._focused_element = element
         self.elements.remove(element)
         self.elements.append(element)
 
-    def get_focused_element(self) -> MetaUIElement | None:
+    def get_dragging_element(self) -> MetaUIElement | None:
         return self._focused_element
 
-    def clear_focused_element(self):
+    def clear_dragging_element(self):
         self._focused_element = None
 
     def set_hovered_element(self, element: MetaUIElement):
