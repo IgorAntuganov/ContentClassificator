@@ -5,7 +5,7 @@ import random
 import json
 import os
 
-FONT_PATH = 'test_font.ttf'
+FONT_PATH = 'kerned_AtoP.ttf'
 PROGRESS_FILE = "kerning_progress.json"
 
 def load_progress():

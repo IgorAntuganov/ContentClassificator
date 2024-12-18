@@ -186,6 +186,6 @@ class Consolidator:
 
 
 if __name__ == '__main__':
-    manager = Consolidator('test_font.ttf', 'consolidated_font.ttf')
+    manager = Consolidator('kerned_AtoS.ttf', 'consolidated_font.ttf')
     manager.consolidate_font_kerning()
     manager.save_font()

@@ -1,19 +1,18 @@
 Instruction (for me not to forget):
 
 HOW to add new kerning pairs to font:
-1) Run kerning_visualization.py, watch all kerning pairs you interested in
 
-2) Save pairs with Space key in kerning_pairs.txt
+1) Run kerning_visualization.py, watch all kerning pairs you're interested in
+2) Save pairs with the Space key in kerning_pairs.txt
 
-3) Open last version of font in FontForge
-
+3) Open the last version of the font in FontForge
 4) Go to "Element"/"Элемент" -> "Font Info"/"Информация о шрифте" -> "Lookups"/"Справки"
 
 5) On the GPOS tab you should see table ""'kern' Horizontal Kerning lookup 0"
     with many subtables "'kern' Horizontal Kerning lookup 0 per glyph data ..."
 
-    My Rule: each subtable contain kerning pairs starts with same character.
-    Right now index 0 for char "A", 11 for char "L", and you should keep following this state of things
+    Rule: each subtable contain kerning pairs starts with same character.
+    Right now index 0 for char "A", 11 for char "L", and you should maintain this structure.
         If you find right subtable:
         5.1) double-click on it or on "Change data?"/"Изменить данные" and go to step 8
 
@@ -22,49 +21,68 @@ HOW to add new kerning pairs to font:
     Example: 'kern' Horizontal Kerning lookup 0 per glyph data 11
 
 7) In window "Kerning format"/"Формат кернинга" choose one glyph for first part
-    And with pressed shift choose many glyphs for second part
-    Example|Rule: for english letter choose glyphs from 32 to 126 - english alphabet, digits and spec symbols
+    And with pressed Shift choose many glyphs for second part
+    Example|Rule: for English letter choose glyphs from 32 to 126 - English alphabet, digits and spec symbols
 
 8) In window "Lookup subtable?"/"Субтаблица справки" you will see 3 columns:
     first glyph | second glyph | Δx_adv#1
-    8.1) First of all open kerning_pairs.txt
+    8.1) First, open kerning_pairs.txt
     8.2) Go through pairs in txt and mark them with "=" if pair in subtable
 
          If pair in subtable but not in txt:
-         8.2.1) add pair to txt if "+" mark
+         8.2.1) Add pair to txt if "+" mark
 
          If pair in txt but not in table:
-         8.2.2) - go to last row
-                - click on <New>
-                - add first glyph and second glyph
-                - mark pair in txt with "="
+         8.2.2) - Go to last row
+                - Click on <New>
+                - Add first glyph and second glyph
+                - Mark pair in txt with "="
 
 9) Now adjust x_advance value
-    FontForge automatically guess x offset for pair, but values too different from each other
-    My Rule:
+    FontForge automatically guesses x offset for pairs, but values are too different from each other
+    Rule:
         - offset -30:
-            -- cases where too much of empty space, but letters easily touching each other
+            -- Cases where there's too much empty space, but letters easily touch each other
             -- Examples: TY  AY  Mf  Mt  Ma  Fl
         - offset -57:
-            -- previous cases, but not standard second glyph
-            -- Examples: D,  D.
+            -- Previous cases, but not standard second glyph
+            -- Examples: D. C+
         - offset -87:
-            -- if previous 2 cases isn't good enough: still too much empty space
-            -- Examples: Iv
+            -- If previous 2 cases aren't good enough: still too much empty space
+            -- Examples: Iv  D,
         - offset -114:
-            --
-            -- Examples:
+            -- Case where you want to bring glyphs for entire "pixel"
+            -- Examples: al  Ef
         - offset -144:
-            --
+            -- Variant for previous case, slightly closer
+            -- Examples: Lv  LV
         - offset -228:
-            --
-            -- Examples:
+            -- Bringing glyphs for 2 "pixels"
+            -- Examples: LY  L7
         - offset -341:
-            --
-            -- Examples:
+            -- Bringing glyphs for 2 "pixels"
+            -- Examples: PJ  FJ
+        - offset +30:
+            -- for some rare cases
 
-10) Save subtable with "OK" button and Lookup with same button
-    You will view font overview and only here changes saved
-    But saved only in program, not on disk
+10) Save the subtable with the "OK" button and the Lookup with the same button
+    You will view the font overview, and only here are changes saved
+    But they're saved only in program, not on disk
 
 11) To save font on disk click on "File?"/"Файл" -> "Create Font?"/"Создать шрифты..."
+    You may see a warning about self-intersections; I ignore it for now
+
+12) *Optional
+    Now in font many kern subtables. You can merge them to one with gpos_consolidator_test.py:
+    - Define the path to the font with many subtables and the path/name for the new one
+    !! AFTER YOU MUST GO TO FONTFORGE TO CORRECT RESULTING FONT (step 13) !!
+
+13) *Required for previous step
+    To correct font with one subtable:
+    - Open it in FontForge
+    - Then go to "Element"/"Элемент" -> "Font Info"/"Информация о шрифте" -> "Lookups"/"Справки"
+    - On the GPOS tab, delete the table "Pairwise Positioning (kerning) lookup 0 subtable"
+    - There should be only one remaining table "'kern' Horizontal Kerning in Latin lookup 1"
+        with one subtable
+    - Save font (go to steps 10-11)
+        Rule: name resulting font "consolidated_gposOK_font.ttf"

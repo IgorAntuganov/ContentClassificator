@@ -30,5 +30,5 @@ def print_kerning_pairs(_font_path):
 
 
 if __name__ == '__main__':
-    font_path = "consolidated_gposOK_font.ttf"
+    font_path = "kerned_AtoS.ttf"
     print_kerning_pairs(font_path)
