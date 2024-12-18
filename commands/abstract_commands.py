@@ -34,15 +34,5 @@ class UIElementCommand(BaseCommand):
 
 
 class CommandFamily:
+    """Base command family class"""
     pass
-
-
-# Commands initialization --------------------------------------------
-class ExitCommand(BaseCommand):
-    text = 'Exit'
-class TestCommand(BaseCommand):
-    text = 'Test'
-class TestCommand2(BaseCommand):
-    text = 'Test_2'
-class SaveUICommand(BaseCommand):
-    text = 'Save_UI'

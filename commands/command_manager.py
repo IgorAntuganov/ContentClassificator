@@ -1,7 +1,7 @@
 from abc import ABC
 from constants import debug_print_1
 from commands.scene_manager_protocols import SceneProtocol, CommandHandlerProtocol, CommandHandlerFamilyProtocol
-from commands.command_classes import CommandFamily, BaseCommand
+from commands.abstract_commands import CommandFamily, BaseCommand
 
 
 class CommandHandlerManager:

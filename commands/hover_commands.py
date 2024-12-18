@@ -1,5 +1,5 @@
-from commands.command_handlers import CommandFamilyHandler
-from commands.command_classes import CommandFamily, UIElementCommand
+from commands.abstract_handlers import CommandFamilyHandler
+from commands.abstract_commands import CommandFamily, UIElementCommand
 from abc import ABC
 from constants import debug_print_1
 

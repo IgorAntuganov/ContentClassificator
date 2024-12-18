@@ -8,9 +8,8 @@ import funny_text
 from constants import *
 import UI_scene
 from commands.command_manager import CommandHandlerManager
-import commands.trivial_handlers as triv_hand
-import commands.dragging_family as drag_family
-from commands.command_classes import TestCommand, TestCommand2
+import commands.trivial_commands as triv_comm
+import commands.dragging_commands as drag_comm
 from UI_element import MetaUIElement
 
 
@@ -28,14 +27,14 @@ def load_and_scale_image(image_path):
 def create_test_UI_elements() -> list[MetaUIElement]:
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
-        command=TestCommand(),
+        command=triv_comm.TestCommand(),
         path_to_json='buttons_saves/add_tag_button.json'
     )
     test_button_1 = simple_buttons.SimpleButton(add_tag_button_config)
 
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="..АббРа__чистота..",
-        command=TestCommand2(),
+        command=triv_comm.TestCommand2(),
         path_to_json='buttons_saves/test_2_button.json'
     )
     test_button_2 = simple_buttons.SimpleButton(add_tag_button_config)
@@ -71,17 +70,17 @@ def main(image_folder):
 
     # noinspection PyPep8Naming
     CHManager = CommandHandlerManager()
-    CHManager.register(triv_hand.TestCommandHandler())
-    CHManager.register(triv_hand.TestCommandHandler2())
-    CHManager.register_family(drag_family.DraggingHandler())
-    CHManager.register(triv_hand.SaveUIHandler())
+    CHManager.register(triv_comm.TestCommandHandler())
+    CHManager.register(triv_comm.TestCommandHandler2())
+    CHManager.register_family(drag_comm.DraggingHandler())
+    CHManager.register(triv_comm.SaveUIHandler())
 
     scene = UI_scene.Scene('Main', all_elements, CHManager)
     CHManager.set_scene(scene)
 
     # noinspection PyPep8Naming
     Out_CHManager = CommandHandlerManager()
-    Out_CHManager.register(triv_hand.ExitHandler())
+    Out_CHManager.register(triv_comm.ExitHandler())
     empty_scene = UI_scene.Scene('Empty', [], Out_CHManager)
     Out_CHManager.set_scene(empty_scene)
 
