@@ -68,8 +68,14 @@ class Scene:
             scene_commands = self.scene_manager.filter_handleable(element_commands)
             self.scene_manager.handle_commands(scene_commands)
 
+        if self._hovered_element is not None:
+            element_commands = self._hovered_element.handle_mouse(event_config)
+            not_scene_commands += self.scene_manager.filter_non_handleable(element_commands)
+            scene_commands = self.scene_manager.filter_handleable(element_commands)
+            self.scene_manager.handle_commands(scene_commands)
+
         element_index = 0
-        while self._focused_element is None and element_index < len(self.elements):
+        while self._focused_element is None and self._hovered_element is None and element_index < len(self.elements):
             ind = len(self.elements) - element_index - 1
             el = self.elements[ind]
             element_commands = el.handle_mouse(event_config)

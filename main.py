@@ -10,6 +10,7 @@ import UI_scene
 from commands.command_manager import CommandHandlerManager
 import commands.trivial_commands as triv_comm
 import commands.dragging_commands as drag_comm
+import commands.hover_commands as hover_comm
 from UI_element import MetaUIElement
 
 
@@ -41,7 +42,7 @@ def create_test_UI_elements() -> list[MetaUIElement]:
 
     halo_text_config = funny_text.HaloTextConfig(
         text="Experimental Text",
-        path_to_json='buttons_saves/text_element.json'
+        path_to_json='buttons_saves/text_element.json',
     )
     text_element = funny_text.HaloText(halo_text_config)
 
@@ -74,6 +75,7 @@ def main(image_folder):
     CHManager.register(triv_comm.TestCommandHandler2())
     CHManager.register_family(drag_comm.DraggingHandler())
     CHManager.register(triv_comm.SaveUIHandler())
+    CHManager.register_family(hover_comm.HoverHandler())
 
     scene = UI_scene.Scene('Main', all_elements, CHManager)
     CHManager.set_scene(scene)

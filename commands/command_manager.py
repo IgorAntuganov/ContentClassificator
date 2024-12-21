@@ -15,6 +15,13 @@ class CommandHandlerManager:
 
     def register(self, handler: CommandHandlerProtocol):
         com_type = handler.command_type
+        if not issubclass(com_type, BaseCommand):
+            raise TypeError(f"Handler command type must be BaseCommand subclass. "
+                            f"Wrong handler: {com_type}")
+        if issubclass(com_type, CommandFamily):
+            raise TypeError(f"Handler command type mustn't be CommandFamily subclass. "
+                            f"Wrong handler: {com_type}")
+
         debug_print_1('registering', com_type)
 
         if com_type not in self.handlers:
@@ -27,7 +34,7 @@ class CommandHandlerManager:
             raise TypeError(f"Family handler must be ABC subclass. "
                             f"Wrong handler: {com_family_type}")
         if not issubclass(com_family_type, CommandFamily):
-            raise TypeError(f"Family handler must be CommandFamilyHandler subclass. "
+            raise TypeError(f"Family handler command type must be CommandFamily subclass. "
                             f"Wrong handler: {com_family_type}")
         debug_print_1('registering family', com_family_type)
 

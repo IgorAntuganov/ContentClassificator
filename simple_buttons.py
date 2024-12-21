@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import pygame
 from states import TripleButtonState, MouseWheelState, DraggingState
 from commands.abstract_commands import BaseCommand
 from commands.dragging_commands import EndDragging
+from commands.hover_commands import *
 import constants as cnst
 from fonts import fonts_dict
 from color_schemes import buttons_color_schemes_dict
@@ -50,15 +51,20 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
         screen.blit(self.sprites[self.current_state], self.get_rect())
 
     def is_inactive(self, mouse_config: MouseConfig) -> bool:
-        return self.dragging == DraggingState.OFFED and \
-               self.current_state is not TripleButtonState.PRESSED and \
-               not self.rect_collidepoint(mouse_config.mouse_position)
+        dragging_offed = self.dragging == DraggingState.OFFED
+        not_pressed = self.current_state is not TripleButtonState.PRESSED
+        not_collide = not self.rect_collidepoint(mouse_config.mouse_position)
+        return dragging_offed and not_pressed and not_collide
 
     def handle_inactive(self) -> list[BaseCommand]:
-        self.current_state = TripleButtonState.NORMAL
+        commands_lst = []
         if self.dragging == DraggingState.ENDING:
-            return [EndDragging(self)]
-        return []
+            commands_lst.append(EndDragging(self))
+        if self.current_state in (TripleButtonState.PRESSED, TripleButtonState.PRESSED_OUTSIDE, TripleButtonState.HOVER):
+            commands_lst.append(EndHover(self))
+
+        self.current_state = TripleButtonState.NORMAL
+        return commands_lst
 
     def handle_mouse(self, mouse_config: MouseConfig) -> list[BaseCommand]:
         commands_lst: list[BaseCommand] = []
@@ -69,21 +75,42 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
             return self.handle_inactive()
 
         unpressed = False
-        # LMB
-        if mouse_config.mouse_pressed[0]:
-            self.current_state = TripleButtonState.PRESSED
-        # RMB
-        elif mouse_config.mouse_pressed[2]:
-            if (mouse_config.mouse_wheel_state is not None) and \
-                    (mouse_config.mouse_wheel_state != MouseWheelState.INACTIVE):
-                self.handle_size_changing(mouse_config.ctrl_alt_shift_array, mouse_config.mouse_wheel_state)
-        else:
-            if self.current_state == TripleButtonState.PRESSED and self.rect_collidepoint(mouse_config.mouse_position):
-                unpressed = True
+
+        # noinspection PyPep8Naming
+        LMB_pressed = mouse_config.mouse_pressed[0]
+        # noinspection PyPep8Naming
+        RMB_pressed = mouse_config.mouse_pressed[2]
+
+        if RMB_pressed:
+            mouse_wheel_nan = mouse_config.mouse_wheel_state is not None
+            mouse_wheel_active = mouse_config.mouse_wheel_state != MouseWheelState.INACTIVE
+            if mouse_wheel_nan and mouse_wheel_active:
+                self.handle_size_changing(mouse_config.ctrl_alt_shift_array,
+                                          mouse_config.mouse_wheel_state)
+
+        if LMB_pressed:
+            commands_lst.append(KeepHover(self))
+            if self.current_state in (TripleButtonState.PRESSED, TripleButtonState.PRESSED_OUTSIDE):
+                return commands_lst
+
             if self.rect_collidepoint(mouse_config.mouse_position):
-                self.current_state = TripleButtonState.HOVER
+                self.current_state = TripleButtonState.PRESSED
             else:
-                self.current_state = TripleButtonState.NORMAL
+                self.current_state = TripleButtonState.PRESSED_OUTSIDE
+            return commands_lst
+
+        if self.current_state == TripleButtonState.PRESSED:
+            unpressed = True
+
+        if self.rect_collidepoint(mouse_config.mouse_position):
+            if self.current_state == TripleButtonState.NORMAL:
+                commands_lst.append(StartHover(self))
+            else:
+                commands_lst.append(KeepHover(self))
+            self.current_state = TripleButtonState.HOVER
+        else:
+            self.current_state = TripleButtonState.NORMAL
+            commands_lst.append(EndHover(self))
 
         if unpressed:
             commands_lst.append(self.command)
