@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from abc import abstractmethod
 import pygame
-from states import TripleButtonState, MouseWheelState, DraggingState
+from states import QuadButtonState, MouseWheelState, DraggingState
 from commands.abstract_commands import BaseCommand
 from commands.dragging_commands import EndDragging
 from commands.hover_commands import *
@@ -22,7 +22,7 @@ class ButtonConfig:
     font_key: str | int | None = None
 
 
-class ABCTripleStateButton(DraggableAndResizableElement, ABC):
+class ABCQuadStateButton(DraggableAndResizableElement, ABC):
     def __init__(self, config: ButtonConfig):
         self.position = config.position
         self.size = config.size
@@ -37,22 +37,30 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
         assert config.colors_key in buttons_color_schemes_dict
         self.colors = buttons_color_schemes_dict[config.colors_key]
 
-        self.current_state = TripleButtonState.NORMAL
+        self.current_state = QuadButtonState.NORMAL
         self.sprites = self.create_all_sprites()
 
     def recreate_sprites_after_resizing(self):
         self.sprites = self.create_all_sprites()
 
     @abstractmethod
-    def create_all_sprites(self) -> dict[TripleButtonState, pygame.Surface]:
+    def create_all_sprites(self) -> dict[QuadButtonState, pygame.Surface]:
         pass
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.sprites[self.current_state], self.get_rect())
 
+    @staticmethod
+    def is_size_changing(mouse_config: MouseConfig) -> bool:
+        # noinspection PyPep8Naming
+        RMB_pressed = mouse_config.mouse_pressed[2]
+        mouse_wheel_nan = mouse_config.mouse_wheel_state is not None
+        mouse_wheel_active = mouse_config.mouse_wheel_state != MouseWheelState.INACTIVE
+        return RMB_pressed and mouse_wheel_nan and mouse_wheel_active
+
     def is_inactive(self, mouse_config: MouseConfig) -> bool:
         dragging_offed = self.dragging == DraggingState.OFFED
-        not_pressed = self.current_state is not TripleButtonState.PRESSED
+        not_pressed = self.current_state not in (QuadButtonState.PRESSED, QuadButtonState.PRESSED_OUTSIDE)
         not_collide = not self.rect_collidepoint(mouse_config.mouse_position)
         return dragging_offed and not_pressed and not_collide
 
@@ -60,83 +68,87 @@ class ABCTripleStateButton(DraggableAndResizableElement, ABC):
         commands_lst = []
         if self.dragging == DraggingState.ENDING:
             commands_lst.append(EndDragging(self))
-        if self.current_state in (TripleButtonState.PRESSED, TripleButtonState.PRESSED_OUTSIDE, TripleButtonState.HOVER):
+        if self.current_state in (QuadButtonState.PRESSED,
+                                  QuadButtonState.PRESSED_OUTSIDE,
+                                  QuadButtonState.HOVER):
             commands_lst.append(EndHover(self))
 
-        self.current_state = TripleButtonState.NORMAL
+        self.current_state = QuadButtonState.NORMAL
+        return commands_lst
+
+    def handle_pressed(self, commands_lst: list[BaseCommand], mouse_config: MouseConfig) -> list[BaseCommand]:
+        if self.current_state == QuadButtonState.NORMAL:
+            commands_lst.append(StartHover(self))
+        else:
+            commands_lst.append(KeepHover(self))
+
+        if self.rect_collidepoint(mouse_config.mouse_position):
+            self.current_state = QuadButtonState.PRESSED
+        else:
+            self.current_state = QuadButtonState.PRESSED_OUTSIDE
+
         return commands_lst
 
     def handle_mouse(self, mouse_config: MouseConfig) -> list[BaseCommand]:
         commands_lst: list[BaseCommand] = []
+
         dragging_commands = self.handle_dragging(mouse_config)
         commands_lst.extend(dragging_commands)
 
         if self.is_inactive(mouse_config):
             return self.handle_inactive()
 
+        if self.is_size_changing(mouse_config):
+            self.handle_size_changing(mouse_config.ctrl_alt_shift_array,
+                                      mouse_config.mouse_wheel_state)
+
+        # LMB pressed
+        if mouse_config.mouse_pressed[0]:
+            return self.handle_pressed(commands_lst, mouse_config)
+
         unpressed = False
-
-        # noinspection PyPep8Naming
-        LMB_pressed = mouse_config.mouse_pressed[0]
-        # noinspection PyPep8Naming
-        RMB_pressed = mouse_config.mouse_pressed[2]
-
-        if RMB_pressed:
-            mouse_wheel_nan = mouse_config.mouse_wheel_state is not None
-            mouse_wheel_active = mouse_config.mouse_wheel_state != MouseWheelState.INACTIVE
-            if mouse_wheel_nan and mouse_wheel_active:
-                self.handle_size_changing(mouse_config.ctrl_alt_shift_array,
-                                          mouse_config.mouse_wheel_state)
-
-        if LMB_pressed:
-            commands_lst.append(KeepHover(self))
-            if self.current_state in (TripleButtonState.PRESSED, TripleButtonState.PRESSED_OUTSIDE):
-                return commands_lst
-
-            if self.rect_collidepoint(mouse_config.mouse_position):
-                self.current_state = TripleButtonState.PRESSED
-            else:
-                self.current_state = TripleButtonState.PRESSED_OUTSIDE
-            return commands_lst
-
-        if self.current_state == TripleButtonState.PRESSED:
+        if self.current_state == QuadButtonState.PRESSED:
             unpressed = True
 
         if self.rect_collidepoint(mouse_config.mouse_position):
-            if self.current_state == TripleButtonState.NORMAL:
+            if self.current_state == QuadButtonState.NORMAL:
                 commands_lst.append(StartHover(self))
             else:
                 commands_lst.append(KeepHover(self))
-            self.current_state = TripleButtonState.HOVER
+            self.current_state = QuadButtonState.HOVER
         else:
-            self.current_state = TripleButtonState.NORMAL
+            self.current_state = QuadButtonState.NORMAL
             commands_lst.append(EndHover(self))
 
         if unpressed:
             commands_lst.append(self.command)
-
         return commands_lst
 
 
-class SimpleButton(ABCTripleStateButton):
+class SimpleButton(ABCQuadStateButton):
     def __init__(self, config: ButtonConfig, border_radius=cnst.SimpleButton_BORDER_RADIUS):
         self.border_radius = border_radius
-        ABCTripleStateButton.__init__(self, config)
+        ABCQuadStateButton.__init__(self, config)
 
-    def create_all_sprites(self) -> dict[TripleButtonState, pygame.Surface]:
+    def create_all_sprites(self) -> dict[QuadButtonState, pygame.Surface]:
         sprites = {
-            TripleButtonState.NORMAL: self._create_sprite_with_deflation(
-                self.colors[TripleButtonState.NORMAL],
+            QuadButtonState.NORMAL: self._create_sprite_with_deflation(
+                self.colors[QuadButtonState.NORMAL],
                 deflation=cnst.NORMAL_BUTTON_SPRITE_DEFLATION,
                 text_descent=0
             ),
-            TripleButtonState.HOVER: self._create_sprite_with_deflation(
-                self.colors[TripleButtonState.HOVER],
+            QuadButtonState.HOVER: self._create_sprite_with_deflation(
+                self.colors[QuadButtonState.HOVER],
                 deflation=(0, 0),
                 text_descent=0
             ),
-            TripleButtonState.PRESSED: self._create_sprite_with_deflation(
-                self.colors[TripleButtonState.PRESSED],
+            QuadButtonState.PRESSED: self._create_sprite_with_deflation(
+                self.colors[QuadButtonState.PRESSED],
+                deflation=cnst.ACTIVE_BUTTON_SPRITE_DEFLATION,
+                text_descent=cnst.ACTIVE_BUTTON_TEXT_DESCENT
+            ),
+            QuadButtonState.PRESSED_OUTSIDE: self._create_sprite_with_deflation(
+                self.colors[QuadButtonState.PRESSED_OUTSIDE],
                 deflation=cnst.ACTIVE_BUTTON_SPRITE_DEFLATION,
                 text_descent=cnst.ACTIVE_BUTTON_TEXT_DESCENT
             )
@@ -162,10 +174,10 @@ class SimpleButton(ABCTripleStateButton):
         return sprite
 
 
-class CoolRectButton(ABCTripleStateButton, ABC):
+class CoolRectButton(ABCQuadStateButton, ABC):
     # Not Implemented
     def __init__(self, config: ButtonConfig):
-        ABCTripleStateButton.__init__(self, config)
+        ABCQuadStateButton.__init__(self, config)
 
-    def create_all_sprites(self) -> dict[TripleButtonState, pygame.Surface]:
+    def create_all_sprites(self) -> dict[QuadButtonState, pygame.Surface]:
         return {}

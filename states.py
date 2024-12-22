@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-class TripleButtonState(Enum):
+class QuadButtonState(Enum):
     NORMAL = auto()
     HOVER = auto()
     PRESSED = auto()

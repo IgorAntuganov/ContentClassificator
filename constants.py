@@ -1,6 +1,6 @@
 import pygame
 
-FPS = 12
+FPS = 60
 WIN_SIZE = 1200, 800
 SCREEN_RECT = pygame.Rect((0, 0), WIN_SIZE)
 MAX_IMAGE_WIDTH = 800
@@ -32,7 +32,8 @@ SCREEN_FILLING_COLOR = (40, 40, 40)
 FOCUS_DEBUG_PRINTING = False
 RECENT_DEBUG_PRINTING = True
 DRAGGING_DEBUG_PRINTING = False
-HOVER_DEBUG_PRINTING = True
+HOVER_DEBUG_PRINTING = False
+HANDLERS_REGISTERING_PRINTING = True
 
 if FOCUS_DEBUG_PRINTING:
     def debug_print(*args): print(*args)
@@ -56,3 +57,10 @@ if HOVER_DEBUG_PRINTING:
 else:
     def hover_debug_print(*args):
         len(args)
+
+if HANDLERS_REGISTERING_PRINTING:
+    def handlers_registering_print(*args): print(*args)
+else:
+    def handlers_registering_print(*args):
+        len(args)
+
