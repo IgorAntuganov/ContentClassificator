@@ -108,7 +108,7 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
     def __init__(self, position: tuple[int, int], size: tuple[int, int]):
         self.position = position
         WithPrivateRect.__init__(self, position, size)
-        self.dragging:                DraggingState = DraggingState.OFFED
+        self.dragging:                         DraggingState = DraggingState.OFFED
         self.dragging_start_mouse:    None | tuple[int, int] = None
         self.dragging_start_top_left: None | tuple[int, int] = None
 
@@ -133,8 +133,9 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
             self.set_top_left((x, y))
             rect = self.get_rect()
             if not SCREEN_RECT.contains(rect.inflate(*BUTTON_SCREEN_COLLISION_DEFLATION)):
-                self.dragging = DraggingState.ENDING
-                self.set_top_left(last_position)
+                # self.dragging = DraggingState.ENDING
+                # self.set_top_left(last_position)
+                self.set_top_left(self.dragging_start_top_left)
 
         elif self.dragging in (DraggingState.STARTING, DraggingState.KEEPING):
             self.dragging = DraggingState.ENDING
@@ -151,10 +152,14 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
             commands_lst.append(EndDragging(self))
         return commands_lst
 
-class Resizable(WithPrivateRect, BaseUIElement, ABC):
+class Resizable(Draggable, WithPrivateRect, BaseUIElement, ABC):
     @abstractmethod
     def recreate_sprites_after_resizing(self):
         pass
+
+    def handle_dragging(self, config: MouseConfig) -> list[DraggingCommandFamily]:
+        self.handle_size_changing(config.ctrl_alt_shift_array, config.mouse_wheel_state)
+        return super().handle_dragging(config)
 
     def handle_size_changing(self, ctrl_alt_shift_array, mouse_wheel_state):
         sign = mouse_wheel_state.value

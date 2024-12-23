@@ -13,21 +13,21 @@ class Scene:
         self.name = name
         self.elements: list[MetaUIElement] = elements
         self.scene_manager = scene_manager
-        self._focused_element: MetaUIElement | None = None
+        self._dragging_element: UI_abstracts.Draggable | None = None
         self._hovered_element: MetaUIElement | None = None
 
     def set_dragging_element(self, element: MetaUIElement):
         if element not in self.elements:
             raise AssertionError(f'Trying to set dragging element, that not in scene.elements. Element: {element}')
-        self._focused_element = element
+        self._dragging_element = element
         self.elements.remove(element)
         self.elements.append(element)
 
     def get_dragging_element(self) -> MetaUIElement | None:
-        return self._focused_element
+        return self._dragging_element
 
     def clear_dragging_element(self):
-        self._focused_element = None
+        self._dragging_element = None
 
     def set_hovered_element(self, element: MetaUIElement):
         if element not in self.elements:
@@ -65,8 +65,8 @@ class Scene:
 
         event_config = UI_abstracts.MouseConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array)
 
-        if self._focused_element is not None:
-            element_commands = self._focused_element.handle_mouse(event_config)
+        if self._dragging_element is not None:
+            element_commands = self._dragging_element.handle_dragging(event_config)
             not_scene_commands += self.scene_manager.filter_non_handleable(element_commands)
             scene_commands = self.scene_manager.filter_handleable(element_commands)
             self.scene_manager.handle_commands(scene_commands)
@@ -80,7 +80,7 @@ class Scene:
             return not_scene_commands
 
         element_index = 0
-        while self._focused_element is None and self._hovered_element is None and element_index < len(self.elements):
+        while self._dragging_element is None and self._hovered_element is None and element_index < len(self.elements):
             ind = len(self.elements) - element_index - 1
             el = self.elements[ind]
             element_commands = el.handle_mouse(event_config)
