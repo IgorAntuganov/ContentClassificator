@@ -123,10 +123,11 @@ class HaloText(SimpleText):
         width += halo_w * 2
         height += halo_h * 2
         sprite = pygame.Surface((width, height), pygame.SRCALPHA)
-
         max_distance = (halo_w**2 + halo_h**2)**0.5
         for i in range(halo_w * 2 + 1):
             for j in range(halo_h * 2 + 1):
+                if i % 2 != 0 or j % 2 != 0:
+                    continue
                 distance = ((halo_w - i)**2 + (halo_h - j)**2)**0.5
                 part = 1 - (distance / max_distance)
                 alpha = int(part * self.halo_power)

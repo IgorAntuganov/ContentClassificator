@@ -18,7 +18,7 @@ class Scene:
 
     def set_dragging_element(self, element: MetaUIElement):
         if element not in self.elements:
-            raise AssertionError(f'Trying to focus element, that not in scene.elements. Element: {element}')
+            raise AssertionError(f'Trying to set dragging element, that not in scene.elements. Element: {element}')
         self._focused_element = element
         self.elements.remove(element)
         self.elements.append(element)
@@ -57,6 +57,9 @@ class Scene:
                 not_scene_commands.append(ExitCommand())
                 return not_scene_commands
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    not_scene_commands.append(ExitCommand())
+                    return not_scene_commands
                 if event.key == pygame.K_s:
                     self.scene_manager.handle_command(SaveUICommand())
 
@@ -67,12 +70,14 @@ class Scene:
             not_scene_commands += self.scene_manager.filter_non_handleable(element_commands)
             scene_commands = self.scene_manager.filter_handleable(element_commands)
             self.scene_manager.handle_commands(scene_commands)
+            return not_scene_commands
 
         if self._hovered_element is not None:
             element_commands = self._hovered_element.handle_mouse(event_config)
             not_scene_commands += self.scene_manager.filter_non_handleable(element_commands)
             scene_commands = self.scene_manager.filter_handleable(element_commands)
             self.scene_manager.handle_commands(scene_commands)
+            return not_scene_commands
 
         element_index = 0
         while self._focused_element is None and self._hovered_element is None and element_index < len(self.elements):

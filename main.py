@@ -46,15 +46,22 @@ def create_test_UI_elements() -> list[MetaUIElement]:
     )
     text_element = funny_text.HaloText(halo_text_config)
 
-    outline_text_config = funny_text.OutlinedTextConfig(
-        text='Experimental Text',
+    # outline_text_config = funny_text.OutlinedTextConfig(
+    #     text='Experimental Text',
+    #     path_to_json='buttons_saves/text2_element.json',
+    #     outline_color=(200, 50, 50),
+    #     outline_extent=(1, 1)
+    # )
+    # text_element_2 = funny_text.OutlinedText(outline_text_config)
+    shadow_text_config = funny_text.ShadowedTextConfig(
         path_to_json='buttons_saves/text2_element.json',
-        outline_color=(200, 50, 50),
-        outline_extent=(1, 1)
+        text='Experimental Text',
+        shadow_color=(255, 0, 0),
+        shadow_offset=(1, 2),
     )
-    text_element2 = funny_text.OutlinedText(outline_text_config)
+    text_element_2 = funny_text.ShadowedText(shadow_text_config)
 
-    return [test_button_1, text_element, test_button_2, text_element2]
+    return [test_button_1, text_element, test_button_2, text_element_2]
 
 
 def main(image_folder):
