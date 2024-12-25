@@ -2,7 +2,7 @@ from __future__ import annotations
 import pygame
 from typing import Protocol
 from abc import abstractmethod
-from states import MouseWheelState
+from constants.states import MouseWheelState
 from commands.abstract_commands import BaseCommand
 from UI_element import MetaUIElement
 

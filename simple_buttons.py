@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from abc import abstractmethod
 import pygame
-from states import QuadButtonState, MouseWheelState, DraggingState
+from constants.states import QuadButtonState, MouseWheelState, DraggingState
 from commands.abstract_commands import BaseCommand
 from commands.dragging_commands import EndDragging
 from commands.hover_commands import *
-import constants as cnst
-from fonts import fonts_dict
-from color_schemes import buttons_color_schemes_dict
+import constants.constants as cnst
+from constants.fonts import fonts_dict
+from constants.color_schemes import buttons_color_schemes_dict
 from UI_abstracts import JSONadjustable, Draggable, DraggableAndResizableElement, MouseConfig
 
 

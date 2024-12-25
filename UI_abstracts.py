@@ -4,8 +4,8 @@ import pygame
 import os
 import json
 
-from constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
-from states import MouseWheelState, DraggingState
+from constants.constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
+from constants.states import MouseWheelState, DraggingState
 from commands.abstract_commands import BaseCommand
 from commands.dragging_commands import DraggingCommandFamily, StartDragging, KeepDragging, EndDragging
 from UI_element import MetaUIElement

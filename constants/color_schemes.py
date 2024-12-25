@@ -1,4 +1,4 @@
-from states import QuadButtonState
+from constants.states import QuadButtonState
 
 BUTTON_COLOR_DICT1 = {
     QuadButtonState.NORMAL: (235, 165, 5),

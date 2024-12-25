@@ -16,9 +16,3 @@ class MouseWheelState(Enum):
     UP = 1
     INACTIVE = 0
     DOWN = -1
-
-class CtrlAltState(Enum):
-    INACTIVE = auto()
-    CTRL = auto()
-    ALT = auto()
-    CTRL_ALT = auto()

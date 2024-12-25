@@ -2,7 +2,7 @@ import pygame
 
 import UI_abstracts
 from UI_element import MetaUIElement
-from states import MouseWheelState
+from constants.states import MouseWheelState
 from commands.abstract_commands import BaseCommand
 from commands.trivial_commands import ExitCommand, SaveUICommand
 from commands.scene_manager_protocols import ManagerProtocol

@@ -1,5 +1,5 @@
 from abc import ABC
-from constants import handlers_registering_print
+from constants.debug_prints import handlers_registering_print
 from commands.scene_manager_protocols import SceneProtocol, CommandHandlerProtocol, CommandHandlerFamilyProtocol
 from commands.abstract_commands import CommandFamily, BaseCommand
 

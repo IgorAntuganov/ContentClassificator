@@ -5,7 +5,7 @@ import os
 import sys
 import simple_buttons
 import funny_text
-from constants import *
+from constants.constants import *
 import UI_scene
 from commands.command_manager import CommandHandlerManager
 import commands.trivial_commands as triv_comm

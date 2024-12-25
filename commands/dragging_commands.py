@@ -1,7 +1,7 @@
 from commands.abstract_handlers import CommandFamilyHandler
 from commands.abstract_commands import CommandFamily, UIElementCommand
 from abc import ABC
-from constants import dragging_debug_print
+from constants.debug_prints import dragging_debug_print
 
 
 class DraggingCommandFamily(CommandFamily, UIElementCommand, ABC): pass
