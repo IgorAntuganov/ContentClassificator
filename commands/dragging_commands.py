@@ -1,7 +1,7 @@
 from commands.abstract_handlers import CommandFamilyHandler
 from commands.abstract_commands import CommandFamily, UIElementCommand
 from abc import ABC
-from constants.debug_prints import dragging_debug_print
+from constants.debug_prints import DebugStates, debug_print
 
 
 class DraggingCommandFamily(CommandFamily, UIElementCommand, ABC): pass
@@ -14,7 +14,7 @@ class DraggingHandler(CommandFamilyHandler):
     command_type = DraggingCommandFamily
     def handler_func(self, command, scene):
         command: DraggingCommandFamily
-        dragging_debug_print('Dragging?', command.text, command.get_element(), scene)
+        debug_print(DebugStates.DRAGGING, command.text, command.get_element(), scene)
         element = command.get_element()
         now_focus = scene.get_dragging_element()
 
@@ -44,4 +44,4 @@ class DraggingHandler(CommandFamilyHandler):
         else:
             raise strange_error
 
-        dragging_debug_print('dragging element:', scene.get_dragging_element())
+        debug_print(DebugStates.DRAGGING, 'dragging element:', scene.get_dragging_element())

@@ -1,7 +1,7 @@
 from commands.abstract_handlers import CommandFamilyHandler
 from commands.abstract_commands import CommandFamily, UIElementCommand
 from abc import ABC
-from constants.debug_prints import hover_debug_print
+from constants.debug_prints import debug_print, DebugStates
 
 
 class HoverCommandFamily(CommandFamily, UIElementCommand, ABC): pass
@@ -14,7 +14,7 @@ class HoverHandler(CommandFamilyHandler):
     command_type = HoverCommandFamily
     def handler_func(self, command, scene):
         command: HoverCommandFamily
-        hover_debug_print('Hover?', command.text, command.get_element(), scene)
+        debug_print(DebugStates.HOVER, command.text, command.get_element(), scene)
         element = command.get_element()
         now_hover = scene.get_hovered_element()
 
@@ -44,4 +44,4 @@ class HoverHandler(CommandFamilyHandler):
         else:
             raise strange_error
 
-        hover_debug_print('hovered element:', scene.get_hovered_element())
+        debug_print(DebugStates.HOVER, 'hovered element:', scene.get_hovered_element())
