@@ -172,12 +172,3 @@ class SimpleButton(ABCQuadStateButton):
         text_rect.move_ip(0, text_descent)
         sprite.blit(text_surface, text_rect)
         return sprite
-
-
-class CoolRectButton(ABCQuadStateButton, ABC):
-    # Not Implemented
-    def __init__(self, config: ButtonConfig):
-        ABCQuadStateButton.__init__(self, config)
-
-    def create_all_sprites(self) -> dict[QuadButtonState, pygame.Surface]:
-        return {}

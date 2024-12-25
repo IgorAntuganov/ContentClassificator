@@ -14,19 +14,19 @@ class DraggingHandler(CommandFamilyHandler):
     command_type = DraggingCommandFamily
     def handler_func(self, command, scene):
         command: DraggingCommandFamily
-        dragging_debug_print('Focus?', command.text, command.get_element(), scene)
+        dragging_debug_print('Dragging?', command.text, command.get_element(), scene)
         element = command.get_element()
         now_focus = scene.get_dragging_element()
 
         error_info = f'\nNew element: {element}, Old element: {now_focus}, Scene: {scene}'
-        new_element_error = ValueError(f'Trying to focus new element when old is still in focus:' + error_info)
-        keep_focus_none_error = ValueError(f'Trying to keep focus element when focused '
+        new_element_error = ValueError(f'Trying to drag new element when old is still dragging:' + error_info)
+        keep_focus_none_error = ValueError(f'Trying to keep dragging element when focused '
                                            f'element is not defined:' + error_info)
-        keep_focus_another_error = ValueError(f'Trying to keep in focus an element that is not an element that'
+        keep_focus_another_error = ValueError(f'Trying to keep dragging an element that is not an element that'
                                               f'is currently defined:' + error_info)
-        end_focus_error = ValueError(f'Trying to end focusing an element that is not '
+        end_focus_error = ValueError(f'Trying to end dragging an element that is not '
                                      f'an element that is currently defined:' + error_info)
-        strange_error = TypeError('IDK, strange command in FocusHandler:', command)
+        strange_error = TypeError('IDK, strange command in DraggingHandler:', command)
 
         if isinstance(command, StartDragging):
             if now_focus is not None:

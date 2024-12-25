@@ -20,7 +20,7 @@ class WithPrivateRect(ABC):
     def rect_collidepoint(self, point: tuple[int, int]) -> bool:
         return self.__rect.collidepoint(*point)
 
-    def update_position_and_size(self):
+    def __update_position_and_size(self):
         self.position = self.__rect.topleft
         self.size = self.__rect.size
 
@@ -35,15 +35,15 @@ class WithPrivateRect(ABC):
 
     def set_rect(self, rect: pygame.Rect):
         self.__rect = rect
-        self.update_position_and_size()
+        self.__update_position_and_size()
 
     def set_top_left(self, top_left: tuple[int, int]):
         self.__rect.topleft = top_left
-        self.update_position_and_size()
+        self.__update_position_and_size()
 
     def set_size(self, size: tuple[int, int]):
         self.__rect.size = size
-        self.update_position_and_size()
+        self.__update_position_and_size()
 
 
 class JSONadjustable(ABC):
@@ -58,32 +58,32 @@ class JSONadjustable(ABC):
         for k in kwargs.keys():
             assert k in self.__dict__
 
-        if self.if_file_save_exists(path_to_json):
-            adjusted_values_dct = self.load_adjusted_values_from_json()
+        if self._if_file_save_exists(path_to_json):
+            adjusted_values_dct = self._load_adjusted_values_from_json()
             kwargs.update(adjusted_values_dct)
         self.adjusted_values = kwargs
         self.__dict__.update(kwargs)
 
     @classmethod
-    def if_file_save_exists(cls, path_to_json: str) -> bool:
+    def _if_file_save_exists(cls, path_to_json: str) -> bool:
         return os.path.exists(path_to_json)
 
-    def get_dict_for_json(self) -> dict:
+    def _get_dict_for_json(self) -> dict:
         values_dct = {}
         for key in self.adjusted_values:
             values_dct[key] = self.__dict__[key]
         return values_dct
 
-    def save_to_json(self):
-        adjusted_values = self.get_dict_for_json()
-        with open(self.path_to_json, 'w') as file:
-            print('dumping', adjusted_values, self.path_to_json)
-            json.dump(adjusted_values, file)
-
-    def load_adjusted_values_from_json(self) -> dict:
+    def _load_adjusted_values_from_json(self) -> dict:
         with open(self.path_to_json, 'r') as file:
             adjusted_values_dict = json.load(file)
         return adjusted_values_dict
+
+    def save_to_json(self):
+        adjusted_values = self._get_dict_for_json()
+        with open(self.path_to_json, 'w') as file:
+            print('dumping', adjusted_values, self.path_to_json)
+            json.dump(adjusted_values, file)
 
 
 @dataclass
@@ -112,20 +112,36 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
         self.dragging_start_mouse:    None | tuple[int, int] = None
         self.dragging_start_top_left: None | tuple[int, int] = None
 
-    def handle_dragging(self, config: MouseConfig) -> list[DraggingCommandFamily]:
+    def _update_dragging_state(self, config: MouseConfig) -> list[DraggingCommandFamily]:
+        commands_lst: list[DraggingCommandFamily]
+        commands_lst = []
         mouse_on_element = self.rect_collidepoint(config.mouse_position)
         rmb_pressed = config.mouse_pressed[2]
 
-        if mouse_on_element and rmb_pressed and self.dragging == DraggingState.OFFED:
-            self.dragging = DraggingState.STARTING
-            self.dragging_start_mouse = config.mouse_position
-            self.dragging_start_top_left = self.get_rect_topleft()
-
-        elif self.dragging in (DraggingState.STARTING, DraggingState.KEEPING) and rmb_pressed:
-            if self.dragging == DraggingState.STARTING:
+        if self.dragging == DraggingState.OFFED:
+            if mouse_on_element and rmb_pressed:
+                self.dragging = DraggingState.STARTING
+                self.dragging_start_mouse = config.mouse_position
+                self.dragging_start_top_left = self.get_rect_topleft()
+        elif self.dragging == DraggingState.STARTING:
+            if not rmb_pressed:
                 self.dragging = DraggingState.KEEPING
+                commands_lst.append(StartDragging(self))
+        elif self.dragging == DraggingState.KEEPING:
+            if rmb_pressed:
+                commands_lst.append(KeepDragging(self))
+                self.dragging = DraggingState.ENDING
+        elif self.dragging == DraggingState.ENDING:
+            if not rmb_pressed:
+                commands_lst.append(EndDragging(self))
+                self.dragging = DraggingState.OFFED
+        return commands_lst
+
+    def handle_dragging(self, config: MouseConfig) -> list[DraggingCommandFamily]:
+        commands_lst = self._update_dragging_state(config)
+
+        if self.dragging != DraggingState.OFFED:
             assert self.dragging_start_mouse is not None and self.dragging_start_top_left is not None
-            last_position = self.get_rect_topleft()
             offset_x = config.mouse_position[0] - self.dragging_start_mouse[0]
             offset_y = config.mouse_position[1] - self.dragging_start_mouse[1]
             x = self.dragging_start_top_left[0] + offset_x
@@ -133,23 +149,8 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
             self.set_top_left((x, y))
             rect = self.get_rect()
             if not SCREEN_RECT.contains(rect.inflate(*BUTTON_SCREEN_COLLISION_DEFLATION)):
-                # self.dragging = DraggingState.ENDING
-                # self.set_top_left(last_position)
                 self.set_top_left(self.dragging_start_top_left)
 
-        elif self.dragging in (DraggingState.STARTING, DraggingState.KEEPING):
-            self.dragging = DraggingState.ENDING
-        elif self.dragging == DraggingState.ENDING:
-            self.dragging = DraggingState.OFFED
-
-        commands_lst: list[DraggingCommandFamily]
-        commands_lst = []
-        if self.dragging == DraggingState.STARTING:
-            commands_lst.append(StartDragging(self))
-        elif self.dragging == DraggingState.KEEPING:
-            commands_lst.append(KeepDragging(self))
-        elif self.dragging == DraggingState.ENDING:
-            commands_lst.append(EndDragging(self))
         return commands_lst
 
 class Resizable(Draggable, WithPrivateRect, BaseUIElement, ABC):
