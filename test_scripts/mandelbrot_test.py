@@ -3,27 +3,27 @@ import time
 from dataclasses import dataclass
 from typing import Generator
 
-FRAME_TIME = .1  # in seconds
+FRAME_TIME = .2  # in seconds
 
 @dataclass
 class MandelbrotConfig:
-    size_rect: pygame.Rect = pygame.Rect((0, 0, 1024, 1024))
-    coords_rect_left_top: tuple[float, float] = (-2, -1.5)
-    coords_rect_size: tuple[float, float] = (3, 3)
+    rect_size: pygame.Rect = pygame.Rect((0, 0, 1024, 1024))
+    coords_rect_left_top: tuple[float, float] = (-2, -2)
+    coords_rect_size: tuple[float, float] = (4, 4)
     max_depth: int = 100
 
 
 def get_pixel_size(config: MandelbrotConfig) -> tuple[float, float]:
-    pixel_width = config.coords_rect_size[0] / config.size_rect.width
-    pixel_height = config.coords_rect_size[1] / config.size_rect.height
+    pixel_width = config.coords_rect_size[0] / config.rect_size.width
+    pixel_height = config.coords_rect_size[1] / config.rect_size.height
     pixel_width = round(pixel_width, 15)
     pixel_height = round(pixel_height, 15)
     return pixel_width, pixel_height
 
 
 def pixel_index_iterator(config: MandelbrotConfig) -> Generator[tuple[int, int], None, None]:
-    for i in range(config.size_rect.width):
-        for j in range(config.size_rect.height):
+    for i in range(config.rect_size.width):
+        for j in range(config.rect_size.height):
             yield i, j
 
 
@@ -40,7 +40,7 @@ def pixel_index_to_cords(config:     MandelbrotConfig,
 
     if i == 0 and j == 0:
         print('first xy', x, y)
-    if i == config.size_rect.width-1 and j == config.size_rect.height-1:
+    if i == config.rect_size.width-1 and j == config.rect_size.height-1:
         print('last xy', x, y)
     return x, y
 
@@ -49,8 +49,16 @@ def mandelbrot_value(x: float, y: float, depth: int) -> int:
     z: complex
     c: complex
     z = c = x + 1j * y
+    if z == 0:
+        return depth
     for k in range(depth):
-        z = z ** 2 + c
+        # z = z**3 + 3 * z**2 + c  # ! same as original, but smaller
+        # z = z**4 + 4 * z**3 + 12 * z**2 + c   # ! same as original, but smaller
+        # z = z ** 3 - 3 * z**2 + c  # same as original, but mirrored
+        # z = z ** 3 + 1/27 * z**-2 + c
+        # z = z ** 4 + 1/9 * z**-3 + c
+        # z = z ** 3 + z ** 2 + z + c
+        z = z ** 2 + 1/1.41 * z + c
         hypo_sqr = z.real ** 2 + z.imag ** 2
         if hypo_sqr > 4:
             return k
@@ -70,9 +78,9 @@ def update_screen(screen: pygame.Surface, image: pygame.Surface):
 def main(config: MandelbrotConfig):
     start = time.time()
     time_tick = time.time()
-    screen = pygame.display.set_mode(config.size_rect.size)
+    screen = pygame.display.set_mode(config.rect_size.size)
 
-    image = pygame.Surface(config.size_rect.size)
+    image = pygame.Surface(config.rect_size.size)
     pixel_size = get_pixel_size(config)
     for ij in pixel_index_iterator(config):
         x, y = pixel_index_to_cords(config, ij, pixel_size)

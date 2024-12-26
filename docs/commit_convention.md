@@ -11,6 +11,7 @@
 
    ## Commit format
  - `<type>`: `<short description>`
+ - [emtpy string]
  - `<commit body>`
  - [`<optional footer>`] (Details)
  - PS:`<number>` CWF: `<brief description>`
@@ -28,7 +29,7 @@
     pass
 
   ### Optional footer (Details)
-    pass
+    •
 
   ### Project Status (PS)
    - PS:0 - the project is in perfect condition
