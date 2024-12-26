@@ -6,6 +6,7 @@ from constants.states import MouseWheelState
 from commands.abstract_commands import BaseCommand
 from commands.trivial_commands import ExitCommand, SaveUICommand
 from commands.scene_manager_protocols import ManagerProtocol
+from cursor_manager import CursorManager
 
 
 class Scene:
@@ -15,6 +16,7 @@ class Scene:
         self.scene_manager = scene_manager
         self._dragging_element: UI_abstracts.Draggable | None = None
         self._hovered_element: AbstractUIElement | None = None
+        self._cursor_manager: CursorManager = CursorManager()
 
     def set_dragging_element(self, element: AbstractUIElement):
         if element not in self.elements:
@@ -41,6 +43,9 @@ class Scene:
 
     def clear_hovered_element(self):
         self._hovered_element = None
+
+    def get_cursor_manager(self) -> CursorManager:
+        return self._cursor_manager
 
     def handle_events(self) -> list[BaseCommand]:
         not_scene_commands: list[BaseCommand] = []

@@ -8,6 +8,7 @@ from constants.constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from constants.states import MouseWheelState, DraggingState
 from commands.abstract_commands import BaseCommand
 from commands.dragging_commands import DraggingCommandFamily, StartDragging, KeepDragging, EndDragging
+from commands.cursor_commands import ClearCursor, DraggingCursor, ErrorCursor
 from UI_elements.abstract_element import AbstractUIElement
 
 
@@ -112,8 +113,8 @@ class Draggable(WithPrivateRect, UIElement, ABC):
         self.dragging_start_mouse:    None | tuple[int, int] = None
         self.dragging_start_top_left: None | tuple[int, int] = None
 
-    def _update_dragging_state(self, config: MouseConfig) -> list[DraggingCommandFamily]:
-        commands_lst: list[DraggingCommandFamily]
+    def _update_dragging_state(self, config: MouseConfig) -> list[BaseCommand]:
+        commands_lst: list[BaseCommand]
         commands_lst = []
         mouse_on_element = self.rect_collidepoint(config.mouse_position)
         rmb_pressed = config.mouse_pressed[2]
@@ -123,21 +124,23 @@ class Draggable(WithPrivateRect, UIElement, ABC):
                 self.dragging = DraggingState.STARTING
                 self.dragging_start_mouse = config.mouse_position
                 self.dragging_start_top_left = self.get_rect_topleft()
+                commands_lst.append(DraggingCursor(self))
         elif self.dragging == DraggingState.STARTING:
             if not rmb_pressed:
                 self.dragging = DraggingState.KEEPING
                 commands_lst.append(StartDragging(self))
         elif self.dragging == DraggingState.KEEPING:
+            commands_lst.append(KeepDragging(self))
             if rmb_pressed:
-                commands_lst.append(KeepDragging(self))
                 self.dragging = DraggingState.ENDING
         elif self.dragging == DraggingState.ENDING:
             if not rmb_pressed:
                 commands_lst.append(EndDragging(self))
+                commands_lst.append(ClearCursor(self))
                 self.dragging = DraggingState.OFFED
         return commands_lst
 
-    def handle_dragging(self, config: MouseConfig) -> list[DraggingCommandFamily]:
+    def handle_dragging(self, config: MouseConfig) -> list[BaseCommand]:
         commands_lst = self._update_dragging_state(config)
 
         if self.dragging != DraggingState.OFFED:
@@ -158,7 +161,7 @@ class Resizable(Draggable, WithPrivateRect, UIElement, ABC):
     def recreate_sprites_after_resizing(self):
         pass
 
-    def handle_dragging(self, config: MouseConfig) -> list[DraggingCommandFamily]:
+    def handle_dragging(self, config: MouseConfig) -> list[BaseCommand]:
         self.handle_size_changing(config.ctrl_alt_shift_array, config.mouse_wheel_state)
         return super().handle_dragging(config)
 

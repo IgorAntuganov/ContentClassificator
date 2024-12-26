@@ -5,6 +5,7 @@ from abc import abstractmethod
 from constants.states import MouseWheelState
 from commands.abstract_commands import BaseCommand
 from UI_elements.abstract_element import AbstractUIElement
+from cursor_manager import CursorManager
 
 
 class CommandHandlerProtocol(Protocol):
@@ -75,6 +76,9 @@ class SceneProtocol(Protocol):
         pass
 
     def clear_hovered_element(self):
+        pass
+
+    def get_cursor_manager(self) -> CursorManager:
         pass
 
     def handle_events(self) -> list[BaseCommand]:

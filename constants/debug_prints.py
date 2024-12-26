@@ -1,10 +1,11 @@
 from enum import Enum
 
 class DebugStates(Enum):
+    HANDLERS_REGISTERING = False
     FOCUS = False
     DRAGGING = False
     HOVER = False
-    HANDLERS_REGISTERING = False
+    CURSOR = False
 
 def debug_print(debug_state: DebugStates, *args):
     if debug_state.value:

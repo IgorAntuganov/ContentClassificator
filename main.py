@@ -10,6 +10,7 @@ from commands.command_manager import CommandHandlerManager
 import commands.trivial_commands as triv_comm
 import commands.dragging_commands as drag_comm
 import commands.hover_commands as hover_comm
+import commands.cursor_commands as curs_comm
 from UI_elements.abstract_element import AbstractUIElement
 
 
@@ -82,6 +83,7 @@ def main(image_folder):
     CHManager.register_family(drag_comm.DraggingHandler())
     CHManager.register(triv_comm.SaveUIHandler())
     CHManager.register_family(hover_comm.HoverHandler())
+    CHManager.register_family(curs_comm.CursorHandler())
 
     scene = UI_scene.Scene('Main', all_elements, CHManager)
     CHManager.set_scene(scene)
