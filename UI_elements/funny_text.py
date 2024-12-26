@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import constants.constants as cnst
 import pygame
 from constants.fonts import fonts_dict
-from UI_abstracts import JSONadjustable, Draggable, OnlyDraggableElement, MouseConfig
+from UI_elements.UI_abstracts import JSONadjustable, Draggable, OnlyDraggableElement, MouseConfig
 from commands.abstract_commands import BaseCommand
 
 

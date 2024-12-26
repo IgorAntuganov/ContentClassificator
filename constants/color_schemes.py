@@ -7,8 +7,8 @@ BUTTON_COLOR_DICT1 = {
     QuadButtonState.PRESSED_OUTSIDE: (255, 255, 255),
 }
 BUTTON_COLOR_DICT2 = {
-    QuadButtonState.NORMAL: (224, 245, 245),
-    QuadButtonState.HOVER: (255, 214, 209),
+    QuadButtonState.NORMAL: (211, 245, 245),
+    QuadButtonState.HOVER: (224, 245, 245),
     QuadButtonState.PRESSED: (228, 214, 255),
     QuadButtonState.PRESSED_OUTSIDE: (214, 255, 228),
 }

@@ -8,7 +8,7 @@ from constants.constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from constants.states import MouseWheelState, DraggingState
 from commands.abstract_commands import BaseCommand
 from commands.dragging_commands import DraggingCommandFamily, StartDragging, KeepDragging, EndDragging
-from UI_element import MetaUIElement
+from UI_elements.abstract_element import AbstractUIElement
 
 
 class WithPrivateRect(ABC):
@@ -100,11 +100,11 @@ class MouseHandler(ABC):
         pass
 
 
-class BaseUIElement(MetaUIElement, MouseHandler, ABC):
+class UIElement(AbstractUIElement, MouseHandler, ABC):
     pass
 
 
-class Draggable(WithPrivateRect, BaseUIElement, ABC):
+class Draggable(WithPrivateRect, UIElement, ABC):
     def __init__(self, position: tuple[int, int], size: tuple[int, int]):
         self.position = position
         WithPrivateRect.__init__(self, position, size)
@@ -153,7 +153,7 @@ class Draggable(WithPrivateRect, BaseUIElement, ABC):
 
         return commands_lst
 
-class Resizable(Draggable, WithPrivateRect, BaseUIElement, ABC):
+class Resizable(Draggable, WithPrivateRect, UIElement, ABC):
     @abstractmethod
     def recreate_sprites_after_resizing(self):
         pass

@@ -1,6 +1,6 @@
 import pygame
 
-FPS = 15
+FPS = 60
 WIN_SIZE = 1200, 720
 SCREEN_RECT = pygame.Rect((0, 0), WIN_SIZE)
 MAX_IMAGE_WIDTH = 900

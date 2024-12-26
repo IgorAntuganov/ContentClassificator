@@ -8,7 +8,7 @@ from commands.hover_commands import *
 import constants.constants as cnst
 from constants.fonts import fonts_dict
 from constants.color_schemes import buttons_color_schemes_dict
-from UI_abstracts import JSONadjustable, Draggable, DraggableAndResizableElement, MouseConfig
+from UI_elements.UI_abstracts import JSONadjustable, Draggable, DraggableAndResizableElement, MouseConfig
 
 
 @dataclass

@@ -4,7 +4,7 @@ from typing import Protocol
 from abc import abstractmethod
 from constants.states import MouseWheelState
 from commands.abstract_commands import BaseCommand
-from UI_element import MetaUIElement
+from UI_elements.abstract_element import AbstractUIElement
 
 
 class CommandHandlerProtocol(Protocol):
@@ -59,19 +59,19 @@ class ManagerProtocol(Protocol):
 class SceneProtocol(Protocol):
     name: str = 'Protocol scene'
 
-    def set_dragging_element(self, element: MetaUIElement):
+    def set_dragging_element(self, element: AbstractUIElement):
         pass
 
-    def get_dragging_element(self) -> MetaUIElement | None:
+    def get_dragging_element(self) -> AbstractUIElement | None:
         pass
 
     def clear_dragging_element(self):
         pass
 
-    def set_hovered_element(self, element: MetaUIElement):
+    def set_hovered_element(self, element: AbstractUIElement):
         pass
 
-    def get_hovered_element(self) -> MetaUIElement | None:
+    def get_hovered_element(self) -> AbstractUIElement | None:
         pass
 
     def clear_hovered_element(self):

@@ -3,7 +3,7 @@ from enum import Enum
 class DebugStates(Enum):
     FOCUS = False
     DRAGGING = False
-    HOVER = True
+    HOVER = False
     HANDLERS_REGISTERING = False
 
 def debug_print(debug_state: DebugStates, *args):

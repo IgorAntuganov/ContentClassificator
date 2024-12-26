@@ -1,7 +1,7 @@
 import pygame
 
-import UI_abstracts
-from UI_element import MetaUIElement
+from UI_elements import UI_abstracts
+from UI_elements.abstract_element import AbstractUIElement
 from constants.states import MouseWheelState
 from commands.abstract_commands import BaseCommand
 from commands.trivial_commands import ExitCommand, SaveUICommand
@@ -9,34 +9,34 @@ from commands.scene_manager_protocols import ManagerProtocol
 
 
 class Scene:
-    def __init__(self, name: str, elements: list[MetaUIElement], scene_manager: ManagerProtocol):
+    def __init__(self, name: str, elements: list[AbstractUIElement], scene_manager: ManagerProtocol):
         self.name = name
-        self.elements: list[MetaUIElement] = elements
+        self.elements: list[AbstractUIElement] = elements
         self.scene_manager = scene_manager
         self._dragging_element: UI_abstracts.Draggable | None = None
-        self._hovered_element: MetaUIElement | None = None
+        self._hovered_element: AbstractUIElement | None = None
 
-    def set_dragging_element(self, element: MetaUIElement):
+    def set_dragging_element(self, element: AbstractUIElement):
         if element not in self.elements:
             raise AssertionError(f'Trying to set dragging element, that not in scene.elements. Element: {element}')
         self._dragging_element = element
         self.elements.remove(element)
         self.elements.append(element)
 
-    def get_dragging_element(self) -> MetaUIElement | None:
+    def get_dragging_element(self) -> AbstractUIElement | None:
         return self._dragging_element
 
     def clear_dragging_element(self):
         self._dragging_element = None
 
-    def set_hovered_element(self, element: MetaUIElement):
+    def set_hovered_element(self, element: AbstractUIElement):
         if element not in self.elements:
             raise AssertionError(f'Trying to hover element, that not in scene.elements. Element: {element}')
         self._hovered_element = element
         self.elements.remove(element)
         self.elements.append(element)
 
-    def get_hovered_element(self) -> MetaUIElement | None:
+    def get_hovered_element(self) -> AbstractUIElement | None:
         return self._hovered_element
 
     def clear_hovered_element(self):

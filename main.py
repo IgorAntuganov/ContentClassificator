@@ -3,15 +3,14 @@ pygame.init()
 import os
 # import shutil
 import sys
-import simple_buttons
-import funny_text
+from UI_elements import simple_buttons, funny_text
 from constants.constants import *
 import UI_scene
 from commands.command_manager import CommandHandlerManager
 import commands.trivial_commands as triv_comm
 import commands.dragging_commands as drag_comm
 import commands.hover_commands as hover_comm
-from UI_element import MetaUIElement
+from UI_elements.abstract_element import AbstractUIElement
 
 
 def load_and_scale_image(image_path):
@@ -25,7 +24,7 @@ def load_and_scale_image(image_path):
 
 
 # noinspection PyPep8Naming
-def create_test_UI_elements() -> list[MetaUIElement]:
+def create_test_UI_elements() -> list[AbstractUIElement]:
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
         command=triv_comm.TestCommand(),
