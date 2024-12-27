@@ -1,17 +1,11 @@
    # Agreement on Commits
-   ## Contents
 
-    • English Version
-    • Русская версия
-    • Examples
----
-
-   ## English Version
-##### auto translated by yandex, ru version down below (Версия на русском ниже)
+- auto translated from russian by yandex
+- ru version in separate file (Версия на русском в отдельном файле)
 
    ## Commit format
  - `<type>`: `<short description>`
- - [emtpy string]
+ - [empty string required]
  - `<commit body>`
  - [`<optional footer>`] (Details)
  - PS:`<number>` CWF: `<brief description>`
@@ -25,8 +19,16 @@
    - Docs: changes in documentation
    - Test: adding tests, refactoring tests; without changing the production code
 
+##### Optional
+   - (minor): small commit
+   - (major): enormous commit
+   - (`<scope name>`): name of the module/component being changed (e.g., font, commands)
+   - | WIP: Work In Progress - incomplete changes, project may be unstable
+
   ### Short description
-    pass
+Description should contain 3-8 words  
+Optionally you can use up to 12 or even more words, especially if words are short  
+Just look at readability
 
   ### Optional footer (Details)
     •
@@ -37,34 +39,6 @@
 
   ### Current Workflow (SWF)
 A brief description of the current main task or line of work
-
----
-
-   # Соглашение о коммитах
-   ## Русская версия
-
-   ## Формат коммита
-##### (Всё на английском)
- - `<тип>`: `<краткое описание>`
- - `<тело коммита>`
- - [`<опциональный футер>`] (Детали|Details)
- - PS:`<число>` CWF: `<краткое описание текущей задачи>`
-
-  ### Типы коммитов
-   - Feat: новая функциональность
-   - Fix: исправление ошибки
-   - Refactor: рефакторинг кода
-   - Chore: обновление рутинных задач и т.д.; без изменения продакшн-кода
-   - Style: форматирование, отступы и т.д.; без изменения кода
-   - Docs: изменения в документации
-   - Test: добавление тестов, рефакторинг тестов; без изменения продакшн-кода
-
-  ### Состояние проекта (PS)
-   - PS:0 - проект в идеальном состоянии
-   - PS:1, PS:2, и т.д. - количество известных проблем или незавершенных задач
-
-  ### Текущий рабочий процесс (CWF)
-Краткое описание текущей основной задачи или направления работы
 
 ---
 

@@ -52,13 +52,19 @@ def mandelbrot_value(x: float, y: float, depth: int) -> int:
     if z == 0:
         return depth
     for k in range(depth):
-        # z = z**3 + 3 * z**2 + c  # ! same as original, but smaller
-        # z = z**4 + 4 * z**3 + 12 * z**2 + c   # ! same as original, but smaller
+        # z = z ** 2 + c
+        # Another variants:
+        # z = z**3 + 3 * z**2 + c  # same as original, but smaller
+        # z = z**4 + 4 * z**3 + 12 * z**2 + c   # same as original, but smaller
         # z = z ** 3 - 3 * z**2 + c  # same as original, but mirrored
         # z = z ** 3 + 1/27 * z**-2 + c
         # z = z ** 4 + 1/9 * z**-3 + c
         # z = z ** 3 + z ** 2 + z + c
-        z = z ** 2 + 1/1.41 * z + c
+        # z = z ** 2 + 1/1.41 * z + c
+        # z = (z**2-c) ** 2 + c
+        # z = (z - 1/9*c**3) ** 2 + c
+        # z = - z ** 5 + z ** 4 - z ** 3 + z ** 2 - c
+        # z = z.real ** 2 + 1j/20 * z.imag ** 3 + c
         hypo_sqr = z.real ** 2 + z.imag ** 2
         if hypo_sqr > 4:
             return k
