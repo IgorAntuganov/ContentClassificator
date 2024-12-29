@@ -1,13 +1,15 @@
    # Agreement on Commits
 
-> - auto translated from russian by yandex  
-> - ru version in separate file (Версия на русском в отдельном файле)
+> - translated with yandex and redacted with GPT Claude 3.5 
+> - Версия на русском в отдельном файле (ru version in separate file)
 
    ## Commit format
  - `<type>`: `<short description>`
  - [empty string required]
  - `<commit body>`
+ - [empty string required]
  - [`<optional footer>`] (Details)
+ - [empty string required if footer exists]
  - PS:`<number>` CWF: `<brief description>`
 
   ### Types of commits
@@ -24,25 +26,40 @@
    - (major): enormous commit
    - (`<scope name>`): name of the module/component being changed (e.g., font, commands)
    - | WIP: Work In Progress - incomplete changes, project may be unstable
-
-  ### Commit Body
- - not finished
+   - Start, Merge for special conditions
 
   ### Short description
    Description should contain 3-8 words  
    Optionally you can use up to 12 or even more words, especially if words are short, just look at readability
 
-  ### Optional footer (Details)
-   - must starts with empty string before `Details` header
+  ### Empty string #1
+   Required for correct representation
 
-List of details, required to understand changes  
-For example 
+  ### Commit Body
+   List of changes in commit.
+   Description should contain string of 3-8 words
+   Optionally you can use up to 12 or even more words, especially if words are short, just look at readability
+
+  ### Empty string #2
+   Required for correct representation
+
+  ### Optional footer (Details)
+
+   List of details, required to understand changes   
+   Also may contain 1-2 small todo ideas  
+   For example:
+> &#45; Right-click on an element to initiate dragging  
+> &#45; Right-click again on the element to end dragging  
+
+  ### Empty string #3
+   Required for correct representation  
+   Use only after optional footer (Details) if you need one
 
   ### Project Status (PS)
    - PS:0 - the project is in perfect condition
    - PS:1, PS:2, etc. - the number of known problems or unfinished tasks
 
-  ### Current Workflow (SWF)
+  ### Current Workflow (CWF)
 A brief description of the current main task or line of work, maybe scope name
 
 ---
