@@ -14,7 +14,8 @@ def checkPoint(x, y, depth):
         # z = z ** 2 + c
         # z = z ** 2 - z  AV: 5
         # z = z ** 3 + z ** 2 - c
-        z = z ** 4 - z
+        # z = z ** 4 - z
+        z = z ** 8 - z ** 4 + z ** 2 + z
 
         if abs(z) > 4:
             break

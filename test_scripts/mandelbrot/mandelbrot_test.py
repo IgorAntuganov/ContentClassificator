@@ -10,7 +10,7 @@ class MandelbrotConfig:
     rect_size: pygame.Rect = pygame.Rect((0, 0, 1024, 1024))
     coords_rect_left_top: tuple[float, float] = (-2, -2)
     coords_rect_size: tuple[float, float] = (4, 4)
-    max_depth: int = 100
+    max_depth: int = 500
 
 
 def get_pixel_size(config: MandelbrotConfig) -> tuple[float, float]:
@@ -67,7 +67,32 @@ def mandelbrot_value(x: float, y: float, depth: int) -> int:
         # z = z.real ** 2 + 1j/20 * z.imag ** 3 + c
         # z = z ** 2 - z  # Почти то что нужно, но возрастающие итерации крайне компактны, плохо отображаются
         # Отображаются только диски, причем каждый диск "погружен"|"вминается" в месте контакта в большую фигуру
-        z = z ** 12.5 - z
+
+        # z = z ** 2 - z
+        # z = z ** 3 + z кажется диагональным отражением и незначительным усложнением предыдущего
+        # z = z ** 4 + z ** 2 + z  # Довольно любопытные варианты c 4мя вариантами расстановки знаков
+        # z = z ** 4 - z ** 2 + z  # Довольно любопытные варианты
+        # z = z ** 4 - z ** 2 - z  # Довольно любопытные варианты
+        # z = z ** 4 + z ** 2 - z  # Довольно любопытные варианты
+
+        # еще варианты, с минусом перед z**4
+        # z = -z**4 + z**2 + z
+        # z = -z ** 4 + z ** 2 - z
+        # z = -z**4 - z**2 + z
+        # z = -z**4 - z**2 - z
+
+        # следующий шаг предыдущей последовательности:
+        # z = z ** 8 + z ** 4 + z ** 2 + z
+        # z = z ** 8 + z ** 4 + z ** 2 - z
+        # z = z ** 8 + z ** 4 - z ** 2 + z
+        # z = z ** 8 + z ** 4 - z ** 2 - z
+        # z = z ** 8 - z ** 4 + z ** 2 + z
+        # z = z ** 8 - z ** 4 + z ** 2 - z
+        # z = z ** 8 - z ** 4 - z ** 2 + z
+        # z = z ** 8 - z ** 4 - z ** 2 - z
+        # Все результаты достойные, достаточно непрерывные для красоты
+        # z = - z ** 8 + z ** 4 + z ** 2 + z
+
         hypo_sqr = z.real ** 2 + z.imag ** 2
         if hypo_sqr > 4:
             return k
@@ -77,8 +102,13 @@ def mandelbrot_value(x: float, y: float, depth: int) -> int:
 def value_to_color(value: int, depth: int) -> tuple[int, int, int]:
     if value == depth:
         return 0, 0, 0
-    color_value = 200 - value * 2
-    return (color_value,) * 3
+    value = 64 * (value/8) ** .5
+    if value < 100:
+        color_value = (100 - value) * 2
+        return (int(color_value),) * 3
+    else:
+        color_value = abs(255 - depth % 510)
+        return color_value, 0, 0
 
 def update_screen(screen: pygame.Surface, image: pygame.Surface):
     screen.blit(image, (0, 0))
@@ -95,7 +125,10 @@ def main(config: MandelbrotConfig):
         x, y = pixel_index_to_cords(config, ij, pixel_size)
         value = mandelbrot_value(x, y, config.max_depth)
         color = value_to_color(value, config.max_depth)
-        image.set_at(ij, color)
+        try:
+            image.set_at(ij, color)
+        except ValueError:
+            print(color)
 
         if time.time() - time_tick > FRAME_TIME:
             [exit() for event in pygame.event.get() if event.type == pygame.QUIT]
