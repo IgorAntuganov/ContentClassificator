@@ -7,10 +7,10 @@ FRAME_TIME = .2  # in seconds
 
 @dataclass
 class MandelbrotConfig:
-    rect_size: pygame.Rect = pygame.Rect((0, 0, 1024, 1024))
-    coords_rect_left_top: tuple[float, float] = (-2, -2)
-    coords_rect_size: tuple[float, float] = (4, 4)
-    max_depth: int = 100
+    rect_size: pygame.Rect = pygame.Rect((0, 0, 1280, 720))
+    coords_rect_left_top: tuple[float, float] = (-4, -3)
+    coords_rect_size: tuple[float, float] = (8, 6)
+    max_depth: int = 32
 
 
 def get_pixel_size(config: MandelbrotConfig) -> tuple[float, float]:
@@ -38,33 +38,21 @@ def pixel_index_to_cords(config:     MandelbrotConfig,
     x = left + pixel_width * i
     y = top + pixel_height * j
 
-    if i == 0 and j == 0:
-        print('first xy', x, y)
-    if i == config.rect_size.width-1 and j == config.rect_size.height-1:
-        print('last xy', x, y)
+    # if i == 0 and j == 0:
+    #     print('first xy', x, y)
+    # if i == config.rect_size.width-1 and j == config.rect_size.height-1:
+    #     print('last xy', x, y)
     return x, y
 
 
-def mandelbrot_value(x: float, y: float, depth: int) -> int:
+def mandelbrot_value(x: float, y: float, depth: int, n: float) -> int:
     z: complex
     c: complex
-    z = c = x + 1j * y
+    z = x + 1j * y
     if z == 0:
         return depth
     for k in range(depth):
-        # z = z ** 2 + c
-        # Another variants:
-        # z = z**3 + 3 * z**2 + c  # same as original, but smaller
-        # z = z**4 + 4 * z**3 + 12 * z**2 + c   # same as original, but smaller
-        # z = z ** 3 - 3 * z**2 + c  # same as original, but mirrored
-        # z = z ** 3 + 1/27 * z**-2 + c
-        # z = z ** 4 + 1/9 * z**-3 + c
-        # z = z ** 3 + z ** 2 + z + c
-        # z = z ** 2 + 1/1.41 * z + c
-        # z = (z**2-c) ** 2 + c
-        # z = (z - 1/9*c**3) ** 2 + c
-        # z = - z ** 5 + z ** 4 - z ** 3 + z ** 2 - c
-        # z = z.real ** 2 + 1j/20 * z.imag ** 3 + c
+        z = z ** n - z
         hypo_sqr = z.real ** 2 + z.imag ** 2
         if hypo_sqr > 4:
             return k
@@ -88,16 +76,26 @@ def main(config: MandelbrotConfig):
 
     image = pygame.Surface(config.rect_size.size)
     pixel_size = get_pixel_size(config)
-    for ij in pixel_index_iterator(config):
-        x, y = pixel_index_to_cords(config, ij, pixel_size)
-        value = mandelbrot_value(x, y, config.max_depth)
-        color = value_to_color(value, config.max_depth)
-        image.set_at(ij, color)
+    for k in range(-121, 121):
+        print(f'\r{k}', end='')
+        n = round(k/10, 1)
+        for ij in pixel_index_iterator(config):
+            x, y = pixel_index_to_cords(config, ij, pixel_size)
+            try:
+                value = mandelbrot_value(x, y, config.max_depth, n)
+                color = value_to_color(value, config.max_depth)
+            except ZeroDivisionError:
+                color = (250, 0, 0)
+            except OverflowError:
+                color = (0, 250, 0)
+            image.set_at(ij, color)
 
-        if time.time() - time_tick > FRAME_TIME:
-            [exit() for event in pygame.event.get() if event.type == pygame.QUIT]
-            update_screen(screen, image)
-            time_tick = time.time()
+            if time.time() - time_tick > FRAME_TIME:
+                [exit() for event in pygame.event.get() if event.type == pygame.QUIT]
+                update_screen(screen, image)
+                time_tick = time.time()
+        file_index = k + 121
+        pygame.image.save(image, f'image_folder2/{file_index}_({n}).png')
 
     update_screen(screen, image)
     print('Elapsed time:', round(time.time()-start, 10))

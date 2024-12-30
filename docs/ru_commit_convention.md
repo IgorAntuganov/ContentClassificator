@@ -1,4 +1,4 @@
-   # Agreement on Commits
+   # Agreement on Commits (NOT FINISHED)
 
    ## Формат коммита
 ##### (Всё на английском)
