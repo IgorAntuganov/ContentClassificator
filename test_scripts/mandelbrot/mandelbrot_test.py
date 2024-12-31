@@ -8,8 +8,8 @@ FRAME_TIME = .2  # in seconds
 @dataclass
 class MandelbrotConfig:
     rect_size: pygame.Rect = pygame.Rect((0, 0, 1024, 1024))
-    coords_rect_left_top: tuple[float, float] = (-2, -2)
-    coords_rect_size: tuple[float, float] = (4, 4)
+    coords_rect_left_top: tuple[float, float] = (-4, -4)
+    coords_rect_size: tuple[float, float] = (8, 8)
     max_depth: int = 500
 
 
@@ -93,13 +93,28 @@ def mandelbrot_value(x: float, y: float, depth: int) -> int:
         # Все результаты достойные, достаточно непрерывные для красоты
         # z = - z ** 8 + z ** 4 + z ** 2 + z
 
+        # Дальнейшее усложнение:
+        # z = z ** 32 + z ** 16 + z ** 8 - z ** 4 - z ** 2 - z
+        # z = z ** 32 + z ** 16 + z ** 8 - z ** 4 - z ** 2 - z + c**z
+        # z = z ** 32 + z ** 16 + z ** 8 - z ** 4 - z ** 2 - z + z**c
+        # z = z ** 2 - z**c
+        # z = z ** 2 + c ** z
+        # z = z ** 2 + c**z + z**c
+        # z = z ** 2 + c**z - z**c
+        # z = z ** 2 - c ** z + z ** c
+        # z = z ** 2 - c ** z - z ** c
+        # z = z**4 + z ** 2 - c ** z - z ** c
+        z = z ** 4 - z ** 2 - c ** z - z ** c
+
         hypo_sqr = z.real ** 2 + z.imag ** 2
         if hypo_sqr > 4:
             return k
     return depth
 
 
-def value_to_color(value: int, depth: int) -> tuple[int, int, int]:
+def value_to_color(value: int | None, depth: int) -> tuple[int, int, int]:
+    if value is None:
+        return 160, 200, 150
     if value == depth:
         return 0, 0, 0
     value = 64 * (value/8) ** .5
@@ -123,7 +138,10 @@ def main(config: MandelbrotConfig):
     pixel_size = get_pixel_size(config)
     for ij in pixel_index_iterator(config):
         x, y = pixel_index_to_cords(config, ij, pixel_size)
-        value = mandelbrot_value(x, y, config.max_depth)
+        try:
+            value = mandelbrot_value(x, y, config.max_depth)
+        except ZeroDivisionError:
+            value = None
         color = value_to_color(value, config.max_depth)
         try:
             image.set_at(ij, color)
