@@ -10,12 +10,27 @@ from time import time
 def checkPoint(x, y, depth):
     z = c = x + 1j * y
 
+    k = 0
     for k in range(depth):
         # z = z ** 2 + c
         # z = z ** 2 - z  AV: 5
         # z = z ** 3 + z ** 2 - c
         # z = z ** 4 - z
-        z = z ** 8 - z ** 4 + z ** 2 + z
+        # z = z ** 8 - z ** 4 + z ** 2 + z
+        # z = z ** 4 - z ** 2 - c ** z * z ** c
+        # z = (z + 1) ** 2
+        # z = (z**c) ** 2  # !!!
+        # z = (c**z) ** 2  # !!!
+        # z = (z**c) ** 3  # Плавное усложнение предыдущего
+        # z = (z**c) ** 20 #
+        # z = z ** 4 - z ** 2 - c ** z * z ** c
+        # z = z ** 4 - z ** 2 - c ** z * z ** (c**1/8)
+        # z = z ** 8 - z ** 4 - z ** 2 - c ** z * z ** c
+        # z = - z ** 4 + z ** 2 - c**z * z**c  # cool
+        # z = z ** 37 - z ** 31 - c**z * z**c  # cool
+        # z = z ** 4 - z ** 2 - (c ** z * z ** c) ** 2
+        # z = z ** 4 - z ** 2 - (c ** z * z ** c) ** 1/2
+        z = z ** 4 - z ** 2 - (c ** z * z ** c) * c
 
         if abs(z) > 4:
             break
@@ -24,8 +39,9 @@ def checkPoint(x, y, depth):
 
     return k
 
-
-def chooseColor(n):
+def chooseColor(n: int | None):
+    if n is None:
+        return 160, 200, 150
     color = [0, 0, 0]
     if n < 0:
         return color
@@ -123,7 +139,10 @@ class Info:
             if event.type == pygame.QUIT:
                 exit()
             if event.type == pygame.KEYUP:
-                changed = True
+                if event.key in (pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d,
+                                 pygame.K_z, pygame.K_x, pygame.K_e, pygame.K_q,
+                                 pygame.K_r):
+                    changed = True
                 if event.key == pygame.K_w:
                     self.move(0, 1)
                 if event.key == pygame.K_s:
@@ -136,9 +155,9 @@ class Info:
                     self.changedepth(False)
                 if event.key == pygame.K_x:
                     self.changedepth(True)
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_e:
                     self.zooming(True)
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_q:
                     self.zooming(False)
                 if event.key == pygame.K_r:
                     self.scale = 1
@@ -146,10 +165,10 @@ class Info:
                     self.x = 0
                     self.y = 0
         if changed:
-            print(I.x)
-            print(I.y)
-            print(I.scale, I.zoom)
-            print(I.depth)
+            print('real:', I.x)
+            print('imag:', I.y)
+            print(f'zoom: 2^{I.scale}', 'or', I.zoom, 'times')
+            print('iterations limit:', I.depth)
             print(' -------------------------------------------- ')
             return True
         return False
@@ -161,10 +180,14 @@ def draw_surf(I, rel):
         for j in range(int(216 / rel)):
             x = I.left + I.pix_offset * rel * i
             y = I.up - I.pix_offset * rel * j
-            k = checkPoint(x, y, I.depth)
-            points.append(k)
-        for i1, point in enumerate(points):
-            points[i1] = chooseColor(point)
+            try:
+                k = checkPoint(x, y, I.depth)
+                color = chooseColor(k)
+            except ZeroDivisionError:
+                color = (160, 210, 150)
+            except OverflowError:
+                color = (150, 155, 210)
+            points.append(color)
         yield points, i
 
 
@@ -176,7 +199,7 @@ def draw(I):
             yield
 
 
-sc = pygame.display.set_mode((384 * 2, 216 * 2))
+sc = pygame.display.set_mode((384 * 2, 216 * 2), pygame.HWSURFACE)
 pygame.display.set_caption('Live view')
 font = pygame.font.Font('C:/Windows/Fonts/comic.ttf', 20)
 

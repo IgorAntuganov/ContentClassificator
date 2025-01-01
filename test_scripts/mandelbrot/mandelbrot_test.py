@@ -8,8 +8,8 @@ FRAME_TIME = .2  # in seconds
 @dataclass
 class MandelbrotConfig:
     rect_size: pygame.Rect = pygame.Rect((0, 0, 1024, 1024))
-    coords_rect_left_top: tuple[float, float] = (-4, -4)
-    coords_rect_size: tuple[float, float] = (8, 8)
+    coords_rect_left_top: tuple[float, float] = (-2, -2)
+    coords_rect_size: tuple[float, float] = (4, 4)
     max_depth: int = 500
 
 
@@ -104,7 +104,16 @@ def mandelbrot_value(x: float, y: float, depth: int) -> int:
         # z = z ** 2 - c ** z + z ** c
         # z = z ** 2 - c ** z - z ** c
         # z = z**4 + z ** 2 - c ** z - z ** c
-        z = z ** 4 - z ** 2 - c ** z - z ** c
+        # z = z ** 4 - z ** 2 - c ** z - z ** c
+        # z = z ** 4 - z ** 2 - c ** z * z ** c
+
+        # z = (z + 1) ** 2  # Слегка искаженные песочные часы
+        # z = (z - 1) ** 2  # Что то среднее. Похоже на некоторое множество жулиа
+        # z = (z - c) ** 2  # Отраженное по вертикали множество мандельброта
+
+        # z = (z**c) ** 2
+        # Имеет крайне много элементов: складки, приятные эффекты пикселизации, баги отображения,
+        # позволяет отдалять, есть ZeroDivisionError, OverflowError
 
         hypo_sqr = z.real ** 2 + z.imag ** 2
         if hypo_sqr > 4:
@@ -140,9 +149,11 @@ def main(config: MandelbrotConfig):
         x, y = pixel_index_to_cords(config, ij, pixel_size)
         try:
             value = mandelbrot_value(x, y, config.max_depth)
+            color = value_to_color(value, config.max_depth)
         except ZeroDivisionError:
-            value = None
-        color = value_to_color(value, config.max_depth)
+            color = (160, 210, 150)
+        except OverflowError:
+            color = (150, 155, 210)
         try:
             image.set_at(ij, color)
         except ValueError:
