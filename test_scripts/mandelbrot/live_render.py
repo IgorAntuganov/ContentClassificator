@@ -30,7 +30,12 @@ def checkPoint(x, y, depth):
         # z = z ** 37 - z ** 31 - c**z * z**c  # cool
         # z = z ** 4 - z ** 2 - (c ** z * z ** c) ** 2
         # z = z ** 4 - z ** 2 - (c ** z * z ** c) ** 1/2
-        z = z ** 4 - z ** 2 - (c ** z * z ** c) * c
+        # z = z ** 4 - z ** 2 - (c ** z * z ** c) * c
+        # z = z ** (-5) - z
+        # z = z ** (-5.5) - z
+        # z = z ** (-4) - z
+        # z = z ** (-5 - 1/3) - z
+        z = z ** (-5 - 1/5) - z
 
         if abs(z) > 4:
             break
@@ -79,8 +84,8 @@ class Time:
 
 
 class Info:
-    x = 0
-    y = 0
+    x = -4
+    y = 9/4
     scale = 1
     depth = 100
     surfaces = [0, 0, 0, 0]
@@ -103,13 +108,13 @@ class Info:
 
     def move(self, x, y):
         if x > 0:
-            self.x += 30 * self.pix_offset
+            self.x += 70 * self.pix_offset
         if x < 0:
-            self.x -= 30 * self.pix_offset
+            self.x -= 70 * self.pix_offset
         if y > 0:
-            self.y += 30 * self.pix_offset
+            self.y += 70 * self.pix_offset
         if y < 0:
-            self.y -= 30 * self.pix_offset
+            self.y -= 70 * self.pix_offset
         self.littlesurface = False
         self.middlesurface = False
         self.normalsufrace = False
@@ -175,9 +180,9 @@ class Info:
 
 
 def draw_surf(I, rel):
-    for i in range(int(384 / rel)):
+    for i in range(int(384 * 3 / rel)):
         points = []
-        for j in range(int(216 / rel)):
+        for j in range(int(216 * 3 / rel)):
             x = I.left + I.pix_offset * rel * i
             y = I.up - I.pix_offset * rel * j
             try:
@@ -192,16 +197,15 @@ def draw_surf(I, rel):
 
 
 def draw(I):
-    for rel in 24, 12, 4, 2, 1:
+    for rel in 36, 24, 12, 4, 2, 1:
         for points, i in draw_surf(I, rel):
             for j, point in enumerate(points):
-                pygame.draw.rect(sc, point, (2 * i * rel, 2 * j * rel, 2 * rel, 2 * rel))
+                pygame.draw.rect(sc, point, (i * rel, j * rel, rel, rel))
             yield
 
 
-sc = pygame.display.set_mode((384 * 2, 216 * 2), pygame.HWSURFACE)
+sc = pygame.display.set_mode((384 * 3, 216 * 3), pygame.HWSURFACE)
 pygame.display.set_caption('Live view')
-font = pygame.font.Font('C:/Windows/Fonts/comic.ttf', 20)
 
 I = Info()
 T = Time()
