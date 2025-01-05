@@ -72,6 +72,8 @@ def main(image_folder):
     all_elements = create_test_UI_elements()
 
     images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]
+    if len(images) < 1:
+        raise AssertionError('Zero images in image folder')
     image_index = 0
     image_name = images[image_index]
     image = load_and_scale_image(os.path.join(image_folder, image_name))
@@ -120,4 +122,5 @@ def main(image_folder):
 
 
 if __name__ == '__main__':
-    main('C:\\Users\\Игорь\\2')
+    # main('C:\\Users\\Игорь\\2')
+    main('test_scripts/test_images')
