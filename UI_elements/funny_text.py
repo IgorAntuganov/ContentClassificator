@@ -2,7 +2,8 @@ from dataclasses import dataclass
 import constants.constants as cnst
 import pygame
 from constants.fonts import fonts_dict
-from UI_elements.UI_abstracts import JSONadjustable, Draggable, OnlyDraggableElement, MouseConfig
+from constants.configs import MouseConfig
+from UI_elements.manual_adjusting import OnlyDraggableElement
 from commands.abstract_commands import BaseCommand
 
 
@@ -18,15 +19,15 @@ class TextConfig:
 class SimpleText(OnlyDraggableElement):
     def __init__(self, config: TextConfig):
         self.position = config.position
-        JSONadjustable.__init__(self, config.path_to_json, position=config.position)
 
         assert config.font_key in fonts_dict
         self.font = fonts_dict[config.font_key]
         self.text = config.text
         self.color = config.color
         self.sprite = self.create_sprite()
+        self.size = self.sprite.get_size()
 
-        Draggable.__init__(self, self.position, self.sprite.get_size())
+        super().__init__(config.path_to_json, self.position, self.size)
 
     def create_sprite(self) -> pygame.Surface:
         text_surface = self.font.render(self.text, True, self.color)

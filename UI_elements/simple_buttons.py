@@ -1,14 +1,19 @@
 from dataclasses import dataclass
 from abc import abstractmethod
 import pygame
+
 from constants.states import QuadButtonState, MouseWheelState, DraggingState
+from constants.configs import MouseConfig
+
 from commands.abstract_commands import BaseCommand
 from commands.dragging_commands import EndDragging
 from commands.hover_commands import *
+
 import constants.constants as cnst
 from constants.fonts import fonts_dict
 from constants.color_schemes import buttons_color_schemes_dict
-from UI_elements.UI_abstracts import JSONadjustable, Draggable, DraggableAndResizableElement, MouseConfig
+
+from UI_elements.manual_adjusting import DraggableAndResizableElement
 
 
 @dataclass
@@ -26,8 +31,7 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
     def __init__(self, config: ButtonConfig):
         self.position = config.position
         self.size = config.size
-        JSONadjustable.__init__(self, config.path_to_json, position=config.position, size=config.size)
-        Draggable.__init__(self, self.position, self.size)
+        super().__init__(config.path_to_json, self.position, self.size)
 
         self.text = config.text
         self.command = config.command

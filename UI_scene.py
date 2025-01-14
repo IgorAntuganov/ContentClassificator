@@ -2,6 +2,7 @@ import pygame
 
 from UI_elements import UI_abstracts
 from UI_elements.abstract_element import AbstractUIElement
+from UI_elements.manual_adjusting import Draggable
 from constants.states import MouseWheelState
 from commands.abstract_commands import BaseCommand
 from commands.trivial_commands import ExitCommand, SaveUICommand
@@ -14,7 +15,7 @@ class Scene:
         self.name = name
         self.elements: list[AbstractUIElement] = elements
         self.scene_manager = scene_manager
-        self._dragging_element: UI_abstracts.Draggable | None = None
+        self._dragging_element: Draggable | None = None
         self._hovered_element: AbstractUIElement | None = None
         self._cursor_manager: CursorManager = CursorManager()
 
