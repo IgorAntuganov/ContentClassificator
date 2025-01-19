@@ -2,7 +2,6 @@ from enum import Enum
 
 class DebugStates(Enum):
     HANDLERS_REGISTERING = False
-    FOCUS = False
     DRAGGING = False
     HOVER = False
     CURSOR = False

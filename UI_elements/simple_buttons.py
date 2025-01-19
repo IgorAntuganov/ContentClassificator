@@ -63,7 +63,7 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
         return RMB_pressed and mouse_wheel_nan and mouse_wheel_active
 
     def is_inactive(self, mouse_config: MouseConfig) -> bool:
-        dragging_offed = self.dragging == DraggingState.OFFED
+        dragging_offed = not self.is_dragging
         not_pressed = self.current_state not in (QuadButtonState.PRESSED, QuadButtonState.PRESSED_OUTSIDE)
         not_collide = not self.rect_collidepoint(mouse_config.mouse_position)
         return dragging_offed and not_pressed and not_collide
@@ -96,25 +96,28 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
     def handle_mouse(self, mouse_config: MouseConfig) -> list[BaseCommand]:
         commands_lst: list[BaseCommand] = []
 
-        dragging_commands = self.handle_dragging(mouse_config)
-        commands_lst.extend(dragging_commands)
-
         if self.is_inactive(mouse_config):
             return self.handle_inactive()
+
+        dragging_commands = self.handle_dragging(mouse_config)
 
         if self.is_size_changing(mouse_config):
             self.handle_size_changing(mouse_config.ctrl_alt_shift_array,
                                       mouse_config.mouse_wheel_state)
 
         # LMB pressed
-        if mouse_config.mouse_pressed[0]:
+        if len(dragging_commands) == 0 and mouse_config.mouse_pressed[0]:
             return self.handle_pressed(commands_lst, mouse_config)
 
-        unpressed = False
+        # LMB unpressed (legitimate click)
         if self.current_state == QuadButtonState.PRESSED:
-            unpressed = True
+            commands_lst.append(self.command)
 
-        if self.rect_collidepoint(mouse_config.mouse_position):
+        if len(dragging_commands) > 0:
+            if self.current_state != QuadButtonState.NORMAL:
+                commands_lst.append(EndHover(self))
+            self.current_state = QuadButtonState.NORMAL
+        elif self.rect_collidepoint(mouse_config.mouse_position):
             if self.current_state == QuadButtonState.NORMAL:
                 commands_lst.append(StartHover(self))
             else:
@@ -124,8 +127,7 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
             self.current_state = QuadButtonState.NORMAL
             commands_lst.append(EndHover(self))
 
-        if unpressed:
-            commands_lst.append(self.command)
+        commands_lst.extend(dragging_commands)
         return commands_lst
 
 

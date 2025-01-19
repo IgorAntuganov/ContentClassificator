@@ -19,6 +19,10 @@ class Draggable(WithPrivateRect, UIElement, ABC):
         self.dragging_start_mouse:    None | tuple[int, int] = None
         self.dragging_start_top_left: None | tuple[int, int] = None
 
+    @property
+    def is_dragging(self) -> bool:
+        return self.dragging != DraggingState.OFFED
+
     def _update_dragging_state(self, config: MouseConfig) -> list[BaseCommand]:
         commands_lst: list[BaseCommand]
         commands_lst = []
@@ -33,18 +37,21 @@ class Draggable(WithPrivateRect, UIElement, ABC):
                 commands_lst.append(DraggingCursor(self))
                 commands_lst.append(StartDragging(self))
         elif self.dragging == DraggingState.STARTING:
+            commands_lst.append(KeepDragging(self))
             if not rmb_pressed:
                 self.dragging = DraggingState.KEEPING
-                commands_lst.append(KeepDragging(self))
         elif self.dragging == DraggingState.KEEPING:
             commands_lst.append(KeepDragging(self))
             if rmb_pressed:
                 self.dragging = DraggingState.ENDING
         elif self.dragging == DraggingState.ENDING:
-            if not rmb_pressed:
+            if rmb_pressed:
+                commands_lst.append(KeepDragging(self))
+            else:
                 commands_lst.append(EndDragging(self))
                 commands_lst.append(ClearCursor(self))
                 self.dragging = DraggingState.OFFED
+
         return commands_lst
 
     def handle_dragging(self, config: MouseConfig) -> list[BaseCommand]:

@@ -13,13 +13,14 @@ To prevent highlighting in PyCharm IDE:
 2) The following PEP 8 warnings have been disabled in the project settings:
    - E301: Expected 1 blank line, found 0
    - E302: Expected 2 blank lines, found 0
+   - E303: Too many blank lines
    - E701: Multiple statements on one line (colon)
    - Potentially some more
 
 #### How to Apply These Settings
 - Go to Settings/Preferences → Editor → Inspections
 - Find "PEP 8 coding style violation"
-- Add the mentioned error codes (E301, E302, E701) to the ignored list
+- Add the mentioned error codes (E301, E302, E303, E701) to the ignored list
 
 ---
 
@@ -40,5 +41,8 @@ Run `main.py`
 ### Refactoring Needed
    The following files require refactoring:
    - `main.py`
-   - `UI_scene.py`
+   - `UI_scene/UI_scene.py`
    - `cursor_manager.py`
+   - `UI_elements/simple_buttons.py`
+   - `commands/scene_manager_protocols.py`
+   - `commands/commands_manager.py`

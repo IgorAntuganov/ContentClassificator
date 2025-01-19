@@ -5,7 +5,8 @@ import os
 import sys
 from UI_elements import simple_buttons, funny_text
 from constants.constants import *
-import UI_scene
+# import UI_scene
+from UI_scene.scene import Scene
 from commands.command_manager import CommandHandlerManager
 import commands.trivial_commands as triv_comm
 import commands.dragging_commands as drag_comm
@@ -87,13 +88,13 @@ def main(image_folder):
     CHManager.register_family(hover_comm.HoverHandler())
     CHManager.register_family(curs_comm.CursorHandler())
 
-    scene = UI_scene.Scene('Main', all_elements, CHManager)
+    scene = Scene('Main', all_elements, CHManager)
     CHManager.set_scene(scene)
 
     # noinspection PyPep8Naming
     Out_CHManager = CommandHandlerManager()
     Out_CHManager.register(triv_comm.ExitHandler())
-    empty_scene = UI_scene.Scene('Empty', [], Out_CHManager)
+    empty_scene = Scene('Empty', [], Out_CHManager)
     Out_CHManager.set_scene(empty_scene)
 
     running = True

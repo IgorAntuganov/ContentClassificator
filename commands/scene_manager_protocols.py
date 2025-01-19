@@ -2,7 +2,7 @@ from __future__ import annotations
 import pygame
 from typing import Protocol
 from abc import abstractmethod
-from constants.states import MouseWheelState
+from constants.states import MouseWheelState, TargetPriority
 from commands.abstract_commands import BaseCommand
 from UI_elements.abstract_element import AbstractUIElement
 from cursor_manager import CursorManager
@@ -60,22 +60,13 @@ class ManagerProtocol(Protocol):
 class SceneProtocol(Protocol):
     name: str = 'Protocol scene'
 
-    def set_dragging_element(self, element: AbstractUIElement):
+    def set_target(self, element: AbstractUIElement, priority: TargetPriority):
         pass
 
-    def get_dragging_element(self) -> AbstractUIElement | None:
+    def keep_target(self, element: AbstractUIElement, priority: TargetPriority):
         pass
 
-    def clear_dragging_element(self):
-        pass
-
-    def set_hovered_element(self, element: AbstractUIElement):
-        pass
-
-    def get_hovered_element(self) -> AbstractUIElement | None:
-        pass
-
-    def clear_hovered_element(self):
+    def clear_target(self, element: AbstractUIElement, priority: TargetPriority):
         pass
 
     def get_cursor_manager(self) -> CursorManager:

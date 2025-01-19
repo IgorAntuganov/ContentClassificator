@@ -16,3 +16,8 @@ class MouseWheelState(Enum):
     UP = 1
     INACTIVE = 0
     DOWN = -1
+
+class TargetPriority(Enum):
+    ZERO = 0
+    HOVER = 1
+    DRAGGING = 2
