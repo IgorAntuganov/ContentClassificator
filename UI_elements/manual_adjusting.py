@@ -7,7 +7,7 @@ from commands.dragging_commands import StartDragging, KeepDragging, EndDragging
 from commands.cursor_commands import ClearCursor, DraggingCursor
 
 from constants.constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
-from constants.states import DraggingState
+from constants.enums import DraggingState
 from constants.configs import MouseConfig
 
 

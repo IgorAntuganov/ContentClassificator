@@ -2,7 +2,7 @@ from commands.abstract_handlers import CommandFamilyHandler
 from commands.abstract_commands import CommandFamily, UIElementCommand
 from abc import ABC
 from constants.debug_prints import DebugStates, debug_print
-from constants.states import TargetPriority
+from constants.enums import TargetPriority
 
 
 class DraggingCommandFamily(CommandFamily, UIElementCommand, ABC): pass

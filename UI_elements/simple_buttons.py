@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from abc import abstractmethod
 import pygame
 
-from constants.states import QuadButtonState, MouseWheelState, DraggingState
+from constants.enums import QuadButtonState, MouseWheelState, DraggingState
 from constants.configs import MouseConfig
 
 from commands.abstract_commands import BaseCommand

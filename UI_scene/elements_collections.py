@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from UI_elements.abstract_element import AbstractUIElement
-from constants.states import TargetPriority
+from constants.enums import TargetPriority
 from UI_elements.manual_adjusting import Draggable
 
 

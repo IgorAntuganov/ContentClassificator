@@ -2,10 +2,8 @@ import pygame
 pygame.init()
 import os
 # import shutil
-import sys
 from UI_elements import simple_buttons, funny_text
 from constants.constants import *
-# import UI_scene
 from UI_scene.scene import Scene
 from commands.command_manager import CommandHandlerManager
 import commands.trivial_commands as triv_comm
@@ -30,20 +28,20 @@ def create_test_UI_elements() -> list[AbstractUIElement]:
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
         command=triv_comm.TestCommand(),
-        path_to_json='buttons_saves/add_tag_button.json'
+        path_to_json='UI_elements/buttons_saves/add_tag_button.json'
     )
     test_button_1 = simple_buttons.SimpleButton(add_tag_button_config)
 
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="..АббРа__чистота..",
         command=triv_comm.TestCommand2(),
-        path_to_json='buttons_saves/test_2_button.json'
+        path_to_json='UI_elements/buttons_saves/test_2_button.json'
     )
     test_button_2 = simple_buttons.SimpleButton(add_tag_button_config)
 
     halo_text_config = funny_text.HaloTextConfig(
         text="Experimental Text",
-        path_to_json='buttons_saves/text_element.json',
+        path_to_json='UI_elements/buttons_saves/text_element.json',
     )
     text_element = funny_text.HaloText(halo_text_config)
 
@@ -55,7 +53,7 @@ def create_test_UI_elements() -> list[AbstractUIElement]:
     # )
     # text_element_2 = funny_text.OutlinedText(outline_text_config)
     shadow_text_config = funny_text.ShadowedTextConfig(
-        path_to_json='buttons_saves/text2_element.json',
+        path_to_json='UI_elements/buttons_saves/text2_element.json',
         text='Experimental Text',
         shadow_color=(255, 0, 0),
         shadow_offset=(1, 2),
@@ -119,7 +117,6 @@ def main(image_folder):
         clock.tick(FPS)
 
     pygame.quit()
-    sys.exit()
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ from commands.abstract_handlers import CommandFamilyHandler
 from commands.abstract_commands import CommandFamily, UIElementCommand
 from abc import ABC
 from constants.debug_prints import debug_print, DebugStates
-from constants.states import TargetPriority
+from constants.enums import TargetPriority
 from commands.scene_manager_protocols import SceneProtocol
 
 

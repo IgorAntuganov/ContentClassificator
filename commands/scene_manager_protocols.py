@@ -2,7 +2,8 @@ from __future__ import annotations
 import pygame
 from typing import Protocol
 from abc import abstractmethod
-from constants.states import MouseWheelState, TargetPriority
+
+from constants.enums import MouseWheelState, TargetPriority
 from commands.abstract_commands import BaseCommand
 from UI_elements.abstract_element import AbstractUIElement
 from cursor_manager import CursorManager
@@ -70,6 +71,9 @@ class SceneProtocol(Protocol):
         pass
 
     def get_cursor_manager(self) -> CursorManager:
+        pass
+
+    def get_elements_manager(self):  # can't type hint output
         pass
 
     def handle_events(self) -> list[BaseCommand]:

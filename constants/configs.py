@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from constants.states import MouseWheelState
+from constants.enums import MouseWheelState
 
 @dataclass
 class MouseConfig:
