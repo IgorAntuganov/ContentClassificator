@@ -4,57 +4,14 @@ from typing import Protocol
 from abc import abstractmethod
 
 from constants.enums import MouseWheelState, TargetPriority
-from commands.abstract_commands import BaseCommand
 from UI_elements.abstract_element import AbstractUIElement
 from cursor_manager import CursorManager
 
 
-class CommandHandlerProtocol(Protocol):
+class BaseCommandProtocol(Protocol):
     @property
     @abstractmethod
-    def command_type(self):
-        pass
-
-    def handle(self, command: BaseCommand, scene: SceneProtocol):
-        pass
-
-    def handler_func(self, command: BaseCommand, scene: SceneProtocol):
-        pass
-
-
-class CommandHandlerFamilyProtocol(Protocol):
-    @property
-    @abstractmethod
-    def command_type(self):
-        pass
-
-    def handle(self, command: BaseCommand, scene: SceneProtocol):
-        pass
-
-    def handler_func(self, command: BaseCommand, scene: SceneProtocol):
-        pass
-
-
-class ManagerProtocol(Protocol):
-    def set_scene(self, scene: SceneProtocol):
-        pass
-
-    def register(self, handler: CommandHandlerProtocol):
-        pass
-
-    def register_family(self, family_handler: CommandHandlerFamilyProtocol):
-        pass
-
-    def handle_command(self, command):
-        pass
-
-    def handle_commands(self, commands_pool):
-        pass
-
-    def filter_handleable(self, commands_lst: list[BaseCommand]) -> list[BaseCommand]:
-        pass
-
-    def filter_non_handleable(self, commands_lst: list[BaseCommand]) -> list[BaseCommand]:
+    def text(self):
         pass
 
 
@@ -76,7 +33,7 @@ class SceneProtocol(Protocol):
     def get_elements_manager(self):  # can't type hint output
         pass
 
-    def handle_events(self) -> list[BaseCommand]:
+    def handle_events(self) -> list[BaseCommandProtocol]:
         pass
 
     @staticmethod

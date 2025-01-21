@@ -9,10 +9,12 @@ class ClearCursor(CursorCommandFamily): pass
 class DraggingCursor(CursorCommandFamily): pass
 class ErrorCursor(CursorCommandFamily): pass
 
+
 class CursorHandler(CommandFamilyHandler):
     command_type = CursorCommandFamily
-    def handler_func(self, command, scene):
+    def handler_func(self, command):
         command: CursorCommandFamily
+        scene = command.get_scene()
         debug_print(DebugStates.CURSOR, command.text, command.get_element(), scene)
         _cursor_manager = scene.get_cursor_manager()
 

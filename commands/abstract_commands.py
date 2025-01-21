@@ -2,6 +2,8 @@ from __future__ import annotations
 from UI_elements.abstract_element import AbstractUIElement
 from abc import ABC, abstractmethod
 
+from commands.scene_manager_protocols import SceneProtocol
+
 
 class BaseCommand(ABC):
     """Base command class"""
@@ -10,21 +12,24 @@ class BaseCommand(ABC):
     def text(self):
         pass
 
-    def __init__(self):
-        pass
 
-    def __hash__(self):
-        return hash(self.text)
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__)
-
-
-class UIElementCommand(BaseCommand):
+class SceneCommand(BaseCommand, ABC):
     @property
     def text(self):
         return self.__class__.__name__
 
+    def __init__(self):
+        super().__init__()
+        self._scene_association: None | SceneProtocol = None
+
+    def set_scene(self, scene: SceneProtocol):
+        self._scene_association = scene
+
+    def get_scene(self) -> SceneProtocol:
+        return self._scene_association
+
+
+class UIElementCommand(SceneCommand, ABC):
     def __init__(self, element_association: AbstractUIElement):
         super().__init__()
         self._element_association: AbstractUIElement = element_association

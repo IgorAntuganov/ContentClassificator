@@ -1,47 +1,36 @@
 from abc import ABC
 from constants.debug_prints import debug_print, DebugStates
-from commands.scene_manager_protocols import SceneProtocol, CommandHandlerProtocol, CommandHandlerFamilyProtocol
-from commands.abstract_commands import CommandFamily, BaseCommand
+from commands.abstract_handlers import CommandHandler, CommandFamilyHandler
+from commands.abstract_commands import CommandFamily, BaseCommand, SceneCommand
 
 
 class CommandHandlerManager:
-    def __init__(self, scene: SceneProtocol | None = None):
-        self.scene: SceneProtocol | None = scene
-        self.handlers: dict[type, list[CommandHandlerProtocol]] = {}
-        self.family_handlers: dict[type, list[CommandHandlerProtocol]] = {}
+    def __init__(self):
+        self.handlers: dict[type, CommandHandler] = {}
+        self.family_handlers: dict[type, CommandHandler] = {}
 
-    def set_scene(self, scene: SceneProtocol):
-        self.scene = scene
-
-
-    def register(self, handler: CommandHandlerProtocol):
-        self._register_check_for_errors(handler)
+    def register(self, handler: CommandHandler):
+        self._validate_registration(handler)
         com_type = handler.command_type
         debug_print(DebugStates.HANDLERS_REGISTERING, 'registering', com_type)
+        self.handlers[com_type] = handler
 
-        if com_type not in self.handlers:
-            self.handlers[com_type] = []
-        self.handlers[com_type].append(handler)
-
-    def register_family(self, family_handler: CommandHandlerFamilyProtocol):
+    def register_family(self, family_handler: CommandFamilyHandler):
+        self._verify_family_registration(family_handler)
         com_family_type = family_handler.command_type
         debug_print(DebugStates.HANDLERS_REGISTERING, 'registering family', com_family_type)
 
         for child_class in com_family_type.__subclasses__():
             debug_print(DebugStates.HANDLERS_REGISTERING, '\tregistering family member', child_class)
-            if child_class not in self.handlers:
-                self.handlers[child_class] = []
-            self.handlers[child_class].append(family_handler)
+            self.handlers[child_class] = family_handler
 
 
     def handle_command(self, command):
-        self._handle_command_errors(command)
-        handlers = self.handlers.get(type(command))
-        for handler in handlers:
-            handler.handle(command, self.scene)
+        self._verify_command(command)
+        handler = self.handlers.get(type(command))
+        handler.handle(command)
 
     def handle_commands(self, commands_pool):
-        self._handle_commands_errors()
         for command in commands_pool:
             self.handle_command(command)
 
@@ -63,7 +52,7 @@ class CommandHandlerManager:
 
     # Checking for errors methods
     @staticmethod
-    def _register_check_for_errors(handler: CommandHandlerProtocol):
+    def _validate_registration(handler: CommandHandler):
         com_type = handler.command_type
         if not issubclass(com_type, BaseCommand):
             raise TypeError(f"Handler command type must be BaseCommand subclass. "
@@ -73,7 +62,7 @@ class CommandHandlerManager:
                             f"Wrong handler: {com_type}")
 
     @staticmethod
-    def _register_family_errors(family_handler: CommandHandlerFamilyProtocol):
+    def _verify_family_registration(family_handler: CommandFamilyHandler):
         com_family_type = family_handler.command_type
         if not issubclass(com_family_type, ABC):
             raise TypeError(f"Family handler must be ABC subclass. "
@@ -82,15 +71,10 @@ class CommandHandlerManager:
             raise TypeError(f"Family handler command type must be CommandFamily subclass. "
                             f"Wrong handler: {com_family_type}")
 
-    def _handle_command_errors(self, command):
-        assert self.scene is not None
-        if self.scene is None:
-            raise AssertionError('CommandHandlerManager scene is not defined. Use set_scene()')
+    def _verify_command(self, command):
+        if isinstance(command, SceneCommand) and command.get_scene() is None:
+            raise ValueError(f"SceneCommand scene attribute is not defined. Command: {command}")
         handlers = self.handlers.get(type(command))
         if not handlers:
             raise ValueError(f"No handler registered for command type {type(command)}"
                              f"\nRegistered commands: {list(self.handlers.keys())}")
-
-    def _handle_commands_errors(self):
-        if self.scene is None:
-            raise AssertionError('CommandHandlerManager scene is not defined. Use set_scene()')

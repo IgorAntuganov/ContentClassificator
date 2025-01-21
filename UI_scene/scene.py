@@ -2,8 +2,8 @@ import pygame
 
 from UI_elements.abstract_element import AbstractUIElement
 from constants.enums import TargetPriority
-from commands.abstract_commands import BaseCommand
-from commands.scene_manager_protocols import ManagerProtocol
+from commands.abstract_commands import BaseCommand, SceneCommand
+from commands.command_manager import CommandHandlerManager
 from cursor_manager import CursorManager
 
 import UI_scene.input_handler as inp_handler
@@ -11,7 +11,7 @@ from UI_scene.elements_collections import SceneElements, SceneElementsManager
 
 
 class Scene:
-    def __init__(self, name: str, elements: list[AbstractUIElement], scene_commands_manager: ManagerProtocol):
+    def __init__(self, name: str, elements: list[AbstractUIElement], scene_commands_manager: CommandHandlerManager):
         self.name = name
         self.tick = 0
         self.last_target_tick = self.tick
@@ -44,6 +44,9 @@ class Scene:
 
 
     def filter_and_handle_unsorted(self, commands_lst: list[BaseCommand]) -> list[BaseCommand]:
+        for command in commands_lst:
+            if isinstance(command, SceneCommand):
+                command.set_scene(self)
         non_handleable = self._commands_manager.filter_non_handleable(commands_lst)
         scene_commands = self._commands_manager.filter_handleable(commands_lst)
         self._commands_manager.handle_commands(scene_commands)

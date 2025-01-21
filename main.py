@@ -87,13 +87,10 @@ def main(image_folder):
     CHManager.register_family(curs_comm.CursorHandler())
 
     scene = Scene('Main', all_elements, CHManager)
-    CHManager.set_scene(scene)
 
     # noinspection PyPep8Naming
     Out_CHManager = CommandHandlerManager()
     Out_CHManager.register(triv_comm.ExitHandler())
-    empty_scene = Scene('Empty', [], Out_CHManager)
-    Out_CHManager.set_scene(empty_scene)
 
     running = True
     while running:
@@ -101,13 +98,6 @@ def main(image_folder):
         if len(not_scene_commands) > 0:
             print('NOT SCENE COMMANDS (FOR EMPTY SCENE): ', not_scene_commands)
         Out_CHManager.handle_commands(not_scene_commands)
-
-        # for command in commands_pool:
-        #     if BaseCommand('NEXT_IMAGE') == command:
-        #         if image_index < len(images)-1:
-        #             image_index += 1
-        #             image_name = images[image_index]
-        #             image = load_and_scale_image(os.path.join(image_folder, image_name))
 
         screen.fill(SCREEN_FILLING_COLOR)
         if image_index < len(images):
