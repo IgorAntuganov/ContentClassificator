@@ -75,7 +75,7 @@ def create_edges(module_dependencies: dict[str, set[str]]) -> str:
     return dot
 
 
-def generate_graphviz(dependencies: dict[str, list[str]]) -> str:
+def generate_dot(dependencies: dict[str, list[str]]) -> str:
 
     modules, module_dependencies, builtin_modules = process_dependencies(dependencies, EXCLUDED_DIRS)
 
@@ -95,8 +95,8 @@ def main(project_path) -> None:
     raw_dependencies: dict[str, list[str]] = analyze_project(project_path)
     filtered_dependencies: dict[str, list[str]] = filter_dependencies(raw_dependencies)
 
-    graphviz_output = generate_graphviz(filtered_dependencies)
-    print(graphviz_output)
+    dot_output = generate_dot(filtered_dependencies)
+    print(dot_output)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,20 @@
 # ContentClassificator
 
 ## Project Status:
-🚧Temporarily paused🚧  
-Development is currently on hold and will resume in approximately two weeks (~20.01.25) or more
+In development
+
+---
+
+### Entry point
+Run `main.py`
+
+---
+
+### Features
+- Custom UI library based on Pygame (core component of the project)
+- Import graph generator script for project structure analysis (experimental)
+- Custom font creation toolkit (work in progress)
+  - Includes tools and instructions for font development
 
 ---
 
@@ -24,17 +36,13 @@ To prevent highlighting in PyCharm IDE:
 
 ---
 
-### Entry point
-Run `main.py`
-
----
-
 ### Available documentation
 
 - `docs/`: project documentation
   - `commint_convention.md`: a binding list of rules for commit text
   - `kerning_manual.txt`: instructions for working with font kerning
   - `issues.md`: known issues (almost empty, just initialized)
+- `test_scripts/auto_analyze/README.md`: instructions for visualization imports across the project
 
 ---
 
@@ -44,5 +52,3 @@ Run `main.py`
    - `UI_scene/UI_scene.py`
    - `cursor_manager.py`
    - `UI_elements/simple_buttons.py`
-   - `commands/scene_manager_protocols.py`
-   - `commands/commands_manager.py`
