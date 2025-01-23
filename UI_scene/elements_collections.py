@@ -21,7 +21,7 @@ class SceneElementsManager:
 
 
     def set_interation_element(self, element: AbstractUIElement, level: TargetPriority):
-        assert self.check_if_element_can_be_targeted(element, level)
+        assert self._check_if_element_can_be_targeted(element, level)
         self.elements.interaction_target = element
         self.elements.interaction_target_level = level
         self.elements.elements_lst.remove(element)
@@ -33,11 +33,11 @@ class SceneElementsManager:
         self.elements.interaction_target_level = TargetPriority.ZERO
 
 
-    def check_if_element_can_be_targeted(self, element: AbstractUIElement, level: TargetPriority) -> bool:
-        is_not_none = self.elements.interaction_target is None
+    def _check_if_element_can_be_targeted(self, element: AbstractUIElement, level: TargetPriority) -> bool:
+        is_none = self.elements.interaction_target is None
         level_higher = self.elements.interaction_target_level.value < level.value
         in_scene = element in self.elements.elements_set
-        return (is_not_none or level_higher) and in_scene
+        return (is_none or level_higher) and in_scene
 
     def is_element_targeted(self, element: AbstractUIElement, level: TargetPriority) -> bool:
         is_same = self.elements.interaction_target is element

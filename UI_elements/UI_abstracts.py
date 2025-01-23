@@ -4,7 +4,7 @@ import os
 import json
 
 from constants.configs import MouseConfig
-from commands.abstract_commands import BaseCommand
+from commands.abstract_commands import SimpleCommand
 from UI_elements.abstract_element import AbstractUIElement
 
 
@@ -86,7 +86,7 @@ class JSONadjustable(ABC):
 
 class MouseHandler(ABC):
     @abstractmethod
-    def handle_mouse(self, mouse_config: MouseConfig) -> list[BaseCommand]:
+    def handle_mouse(self, mouse_config: MouseConfig) -> list[SimpleCommand]:
         pass
 
 

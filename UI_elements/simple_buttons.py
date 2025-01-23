@@ -5,7 +5,7 @@ import pygame
 from constants.enums import QuadButtonState, MouseWheelState, DraggingState
 from constants.configs import MouseConfig
 
-from commands.abstract_commands import BaseCommand
+from commands.abstract_commands import AbstractCommand
 from commands.dragging_commands import EndDragging
 from commands.hover_commands import *
 
@@ -19,7 +19,7 @@ from UI_elements.manual_adjusting import DraggableAndResizableElement
 @dataclass
 class ButtonConfig:
     text: str
-    command: BaseCommand
+    command: AbstractCommand
     path_to_json: str
     position: tuple[int, int] = cnst.STANDARD_UI_POSITION
     size: tuple[int, int] = cnst.STANDARD_UI_SIZE
@@ -68,23 +68,23 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
         not_collide = not self.rect_collidepoint(mouse_config.mouse_position)
         return dragging_offed and not_pressed and not_collide
 
-    def handle_inactive(self) -> list[BaseCommand]:
+    def handle_inactive(self) -> list[AbstractCommand]:
         commands_lst = []
         if self.dragging == DraggingState.ENDING:
-            commands_lst.append(EndDragging(self))
+            commands_lst.append(EndDragging())
         if self.current_state in (QuadButtonState.PRESSED,
                                   QuadButtonState.PRESSED_OUTSIDE,
                                   QuadButtonState.HOVER):
-            commands_lst.append(EndHover(self))
+            commands_lst.append(EndHover())
 
         self.current_state = QuadButtonState.NORMAL
         return commands_lst
 
-    def handle_pressed(self, commands_lst: list[BaseCommand], mouse_config: MouseConfig) -> list[BaseCommand]:
+    def handle_pressed(self, commands_lst: list[AbstractCommand], mouse_config: MouseConfig) -> list[AbstractCommand]:
         if self.current_state == QuadButtonState.NORMAL:
-            commands_lst.append(StartHover(self))
+            commands_lst.append(StartHover())
         else:
-            commands_lst.append(KeepHover(self))
+            commands_lst.append(KeepHover())
 
         if self.rect_collidepoint(mouse_config.mouse_position):
             self.current_state = QuadButtonState.PRESSED
@@ -93,8 +93,8 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
 
         return commands_lst
 
-    def handle_mouse(self, mouse_config: MouseConfig) -> list[BaseCommand]:
-        commands_lst: list[BaseCommand] = []
+    def handle_mouse(self, mouse_config: MouseConfig) -> list[AbstractCommand]:
+        commands_lst: list[AbstractCommand] = []
 
         if self.is_inactive(mouse_config):
             return self.handle_inactive()
@@ -115,17 +115,17 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
 
         if len(dragging_commands) > 0:
             if self.current_state != QuadButtonState.NORMAL:
-                commands_lst.append(EndHover(self))
+                commands_lst.append(EndHover())
             self.current_state = QuadButtonState.NORMAL
         elif self.rect_collidepoint(mouse_config.mouse_position):
             if self.current_state == QuadButtonState.NORMAL:
-                commands_lst.append(StartHover(self))
+                commands_lst.append(StartHover())
             else:
-                commands_lst.append(KeepHover(self))
+                commands_lst.append(KeepHover())
             self.current_state = QuadButtonState.HOVER
         else:
             self.current_state = QuadButtonState.NORMAL
-            commands_lst.append(EndHover(self))
+            commands_lst.append(EndHover())
 
         commands_lst.extend(dragging_commands)
         return commands_lst

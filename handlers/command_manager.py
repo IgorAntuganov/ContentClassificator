@@ -1,13 +1,17 @@
 from abc import ABC
 from constants.debug_prints import debug_print, DebugStates
-from commands.abstract_handlers import CommandHandler, CommandFamilyHandler
-from commands.abstract_commands import CommandFamily, BaseCommand, SceneCommand
+from handlers.abstract_handlers import CommandHandler
+from commands.abstract_commands import SceneCommand, ElementCommand, BASE_COMMAND_TYPES
+from UI_scene.scene import Scene
+from UI_elements.abstract_element import AbstractUIElement
 
 
 class CommandHandlerManager:
-    def __init__(self):
+    def __init__(self, scene: Scene):
         self.handlers: dict[type, CommandHandler] = {}
         self.family_handlers: dict[type, CommandHandler] = {}
+        self._scene = scene
+
 
     def register(self, handler: CommandHandler):
         self._validate_registration(handler)
@@ -15,7 +19,7 @@ class CommandHandlerManager:
         debug_print(DebugStates.HANDLERS_REGISTERING, 'registering', com_type)
         self.handlers[com_type] = handler
 
-    def register_family(self, family_handler: CommandFamilyHandler):
+    def register_family(self, family_handler: CommandHandler):
         self._verify_family_registration(family_handler)
         com_family_type = family_handler.command_type
         debug_print(DebugStates.HANDLERS_REGISTERING, 'registering family', com_family_type)
@@ -25,55 +29,53 @@ class CommandHandlerManager:
             self.handlers[child_class] = family_handler
 
 
-    def handle_command(self, command):
+    def handle_events(self):
+        for commands_lst in self._scene.handle_events():
+            for command in commands_lst:
+                self._handle_command(command)
+
+    def _handle_command(self, command):
         self._verify_command(command)
         handler = self.handlers.get(type(command))
         handler.handle(command)
 
-    def handle_commands(self, commands_pool):
+    def _handle_commands(self, commands_pool):
         for command in commands_pool:
-            self.handle_command(command)
-
-
-    def filter_handleable(self, commands_lst: list[BaseCommand]) -> list[BaseCommand]:
-        filtered = []
-        for comm in commands_lst:
-            if type(comm) in self.handlers:
-                filtered.append(comm)
-        return filtered
-
-    def filter_non_handleable(self, commands_lst: list[BaseCommand]) -> list[BaseCommand]:
-        filtered = []
-        for comm in commands_lst:
-            if type(comm) not in self.handlers:
-                filtered.append(comm)
-        return filtered
+            self._handle_command(command)
 
 
     # Checking for errors methods
     @staticmethod
     def _validate_registration(handler: CommandHandler):
         com_type = handler.command_type
-        if not issubclass(com_type, BaseCommand):
-            raise TypeError(f"Handler command type must be BaseCommand subclass. "
-                            f"Wrong handler: {com_type}")
-        if issubclass(com_type, CommandFamily):
-            raise TypeError(f"Handler command type mustn't be CommandFamily subclass. "
-                            f"Wrong handler: {com_type}")
-
+        if not issubclass(com_type, BASE_COMMAND_TYPES):
+            raise TypeError(f"Handler command type must be one of base command classes.\n"
+                            f"Wrong handler: {com_type}\n"
+                            f"Possible command types: {BASE_COMMAND_TYPES}")
     @staticmethod
-    def _verify_family_registration(family_handler: CommandFamilyHandler):
+    def _verify_family_registration(family_handler: CommandHandler):
         com_family_type = family_handler.command_type
         if not issubclass(com_family_type, ABC):
             raise TypeError(f"Family handler must be ABC subclass. "
                             f"Wrong handler: {com_family_type}")
-        if not issubclass(com_family_type, CommandFamily):
+        if not issubclass(com_family_type, BASE_COMMAND_TYPES):
             raise TypeError(f"Family handler command type must be CommandFamily subclass. "
                             f"Wrong handler: {com_family_type}")
 
     def _verify_command(self, command):
         if isinstance(command, SceneCommand) and command.get_scene() is None:
             raise ValueError(f"SceneCommand scene attribute is not defined. Command: {command}")
+        if isinstance(command, SceneCommand) and command.get_element() is None:
+            raise ValueError(f"SceneCommand element attribute is not defined. Command: {command}")
+
+        if isinstance(command, ElementCommand) and command.get_element() is None:
+            raise ValueError(f"ElementCommand element attribute is not defined. Command: {command}")
+
+        if command.get_scene() is not None and not isinstance(command.get_scene(), Scene):
+            raise TypeError(f"Scene attribute of command is not Scene type. Command: {command}")
+        if command.get_element() is not None and not isinstance(command.get_element(), AbstractUIElement):
+            raise TypeError(f"Element attribute of command is not one of base command types. Command: {command}")
+
         handlers = self.handlers.get(type(command))
         if not handlers:
             raise ValueError(f"No handler registered for command type {type(command)}"

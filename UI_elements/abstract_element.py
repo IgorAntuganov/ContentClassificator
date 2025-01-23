@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
 import pygame
+from constants.configs import MouseConfig
 
 
 class AbstractUIElement(ABC):
@@ -9,5 +10,5 @@ class AbstractUIElement(ABC):
         pass
 
     @abstractmethod
-    def handle_mouse(self, *args, **kwargs):
+    def handle_mouse(self, config: MouseConfig):
         pass

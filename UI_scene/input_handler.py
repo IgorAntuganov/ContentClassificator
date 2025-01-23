@@ -1,9 +1,10 @@
 import pygame
 
-from commands.abstract_commands import BaseCommand
+from commands.abstract_commands import SimpleCommand, SceneCommand
 from constants.configs import MouseConfig
 from constants.enums import MouseWheelState
 from commands.trivial_commands import ExitCommand, SaveUICommand
+
 
 def get_ctrl_alt_shift_array() -> tuple[bool, bool, bool]:
     keys = pygame.key.get_pressed()
@@ -28,7 +29,7 @@ class InputHandler:
         self.commands_lst = None
 
     def process_tick_events(self):
-        self.commands_lst = []
+        self.commands_lst: list[SimpleCommand | SceneCommand] = []
 
         mouse_pos = pygame.mouse.get_pos()
         mouse_pressed = pygame.mouse.get_pressed()
@@ -51,5 +52,5 @@ class InputHandler:
     def get_mouse_config(self) -> MouseConfig:
         return self.event_config
 
-    def get_commands(self) -> list[BaseCommand]:
+    def get_commands(self) -> list[SimpleCommand | SceneCommand]:
         return self.commands_lst

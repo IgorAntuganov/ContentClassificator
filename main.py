@@ -5,11 +5,12 @@ import os
 from UI_elements import simple_buttons, funny_text
 from constants.constants import *
 from UI_scene.scene import Scene
-from commands.command_manager import CommandHandlerManager
-import commands.trivial_commands as triv_comm
-import commands.dragging_commands as drag_comm
-import commands.hover_commands as hover_comm
-import commands.cursor_commands as curs_comm
+from handlers.command_manager import CommandHandlerManager
+from commands.trivial_commands import TestCommand, TestCommand2
+import handlers.trivial_handlers as triv
+import handlers.dragging_handler as drag
+import handlers.hover_handler as hover
+import handlers.cursor_handler as cursor
 from UI_elements.abstract_element import AbstractUIElement
 
 
@@ -27,14 +28,14 @@ def load_and_scale_image(image_path):
 def create_test_UI_elements() -> list[AbstractUIElement]:
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
-        command=triv_comm.TestCommand(),
+        command=TestCommand(),
         path_to_json='UI_elements/buttons_saves/add_tag_button.json'
     )
     test_button_1 = simple_buttons.SimpleButton(add_tag_button_config)
 
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="..АббРа__чистота..",
-        command=triv_comm.TestCommand2(),
+        command=TestCommand2(),
         path_to_json='UI_elements/buttons_saves/test_2_button.json'
     )
     test_button_2 = simple_buttons.SimpleButton(add_tag_button_config)
@@ -69,6 +70,7 @@ def main(image_folder):
     clock = pygame.time.Clock()
 
     all_elements = create_test_UI_elements()
+    scene = Scene('Main', all_elements)
 
     images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]
     if len(images) < 1:
@@ -77,27 +79,18 @@ def main(image_folder):
     image_name = images[image_index]
     image = load_and_scale_image(os.path.join(image_folder, image_name))
 
-    # noinspection PyPep8Naming
-    CHManager = CommandHandlerManager()
-    CHManager.register(triv_comm.TestCommandHandler())
-    CHManager.register(triv_comm.TestCommandHandler2())
-    CHManager.register_family(drag_comm.DraggingHandler())
-    CHManager.register(triv_comm.SaveUIHandler())
-    CHManager.register_family(hover_comm.HoverHandler())
-    CHManager.register_family(curs_comm.CursorHandler())
-
-    scene = Scene('Main', all_elements, CHManager)
-
-    # noinspection PyPep8Naming
-    Out_CHManager = CommandHandlerManager()
-    Out_CHManager.register(triv_comm.ExitHandler())
+    command_manager = CommandHandlerManager(scene)
+    command_manager.register(triv.TestCommandHandler())
+    command_manager.register(triv.TestCommandHandler2())
+    command_manager.register_family(drag.DraggingHandler())
+    command_manager.register(triv.SaveUIHandler())
+    command_manager.register_family(hover.HoverHandler())
+    command_manager.register_family(cursor.CursorHandler())
+    command_manager.register(triv.ExitHandler())
 
     running = True
     while running:
-        not_scene_commands = scene.handle_events()
-        if len(not_scene_commands) > 0:
-            print('NOT SCENE COMMANDS (FOR EMPTY SCENE): ', not_scene_commands)
-        Out_CHManager.handle_commands(not_scene_commands)
+        command_manager.handle_events()
 
         screen.fill(SCREEN_FILLING_COLOR)
         if image_index < len(images):
