@@ -1,7 +1,7 @@
 import pygame
 
-from commands.abstract_commands import SimpleCommand, SceneCommand
-from constants.configs import MouseConfig
+from commands.abstract_commands import base_command_alias
+from constants.configs import MouseConfig, create_empty_mouse_config
 from constants.enums import MouseWheelState
 from commands.trivial_commands import ExitCommand, SaveUICommand
 
@@ -25,11 +25,11 @@ def update_mouse_wheel_state(mws: MouseWheelState, event: pygame.event.Event) ->
 
 class InputHandler:
     def __init__(self):
-        self.event_config = None
-        self.commands_lst = None
+        self.event_config: MouseConfig = create_empty_mouse_config()
+        self.commands_lst: list[base_command_alias] = []
 
     def process_tick_events(self):
-        self.commands_lst: list[SimpleCommand | SceneCommand] = []
+        self.commands_lst = []
 
         mouse_pos = pygame.mouse.get_pos()
         mouse_pressed = pygame.mouse.get_pressed()
@@ -52,5 +52,5 @@ class InputHandler:
     def get_mouse_config(self) -> MouseConfig:
         return self.event_config
 
-    def get_commands(self) -> list[SimpleCommand | SceneCommand]:
+    def get_commands(self) -> list[base_command_alias]:
         return self.commands_lst

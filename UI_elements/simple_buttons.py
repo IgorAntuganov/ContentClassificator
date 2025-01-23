@@ -69,7 +69,7 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
         return dragging_offed and not_pressed and not_collide
 
     def handle_inactive(self) -> list[AbstractCommand]:
-        commands_lst = []
+        commands_lst: list[AbstractCommand] = []
         if self.dragging == DraggingState.ENDING:
             commands_lst.append(EndDragging())
         if self.current_state in (QuadButtonState.PRESSED,

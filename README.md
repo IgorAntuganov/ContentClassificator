@@ -52,3 +52,5 @@ To prevent highlighting in PyCharm IDE:
    - `UI_scene/UI_scene.py`
    - `cursor_manager.py`
    - `UI_elements/simple_buttons.py`
+   - `print` statement in `UI_elements/UI_abstracts.py`
+   - `print` statements in `handlers/trivial_handlers.py`

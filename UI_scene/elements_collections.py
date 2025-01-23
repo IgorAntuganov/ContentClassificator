@@ -16,7 +16,11 @@ class SceneElementsManager:
     def __init__(self, elements: SceneElements):
         self.elements = elements
 
-    def get_targeted_element(self) -> None | AbstractUIElement | Draggable:
+    def get_target(self) -> None | AbstractUIElement | Draggable:
+        return self.elements.interaction_target
+
+    def get_targeted_element(self) -> AbstractUIElement | Draggable:
+        assert self.elements.interaction_target is not None
         return self.elements.interaction_target
 
 
@@ -55,9 +59,4 @@ class SceneElementsManager:
 
 
     def get_ordered_elements(self) -> list[AbstractUIElement]:
-        return self.elements.elements_lst
-
-    def get_elements_for_interaction(self) -> list[AbstractUIElement]:
-        if self.elements.interaction_target_level != TargetPriority.ZERO:
-            return [self.elements.interaction_target]
         return self.elements.elements_lst

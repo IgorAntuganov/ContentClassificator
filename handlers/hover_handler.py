@@ -8,7 +8,7 @@ from UI_scene.scene import Scene
 class HoverHandler(CommandHandler):
     command_type = HoverCommandFamily
     def handler_func(self, command):
-        command: HoverCommandFamily
+        assert isinstance(command, HoverCommandFamily)
         element = command.get_element()
         scene: Scene = command.get_scene()
         debug_print(DebugStates.HOVER, command.text, element, scene)

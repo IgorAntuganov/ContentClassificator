@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import TypeAlias
 
 
 class AbstractCommand(ABC):
@@ -65,4 +66,4 @@ class SceneCommand(AbstractCommand, ABC):
         return True
 
 
-BASE_COMMAND_TYPES = (SimpleCommand, SceneCommand, ElementCommand)
+base_command_alias: TypeAlias = SimpleCommand | SceneCommand | ElementCommand

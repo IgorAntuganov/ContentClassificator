@@ -23,9 +23,9 @@ class TestCommandHandler2(CommandHandler):
 class SaveUIHandler(CommandHandler):
     command_type = SaveUICommand
     def handler_func(self, command):
-        command: SaveUICommand
+        assert isinstance(command, SaveUICommand)
         scene = command.get_scene()
-        scene: Scene
+        assert isinstance(scene, Scene)
         element_manager = scene.get_elements_manager()
         for el in element_manager.get_ordered_elements():
             assert isinstance(el, UI_abstracts.JSONadjustable)

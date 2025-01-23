@@ -1,7 +1,7 @@
 from abc import ABC
 from constants.debug_prints import debug_print, DebugStates
 from handlers.abstract_handlers import CommandHandler
-from commands.abstract_commands import SceneCommand, ElementCommand, BASE_COMMAND_TYPES
+from commands.abstract_commands import SceneCommand, ElementCommand, base_command_alias
 from UI_scene.scene import Scene
 from UI_elements.abstract_element import AbstractUIElement
 
@@ -36,7 +36,7 @@ class CommandHandlerManager:
 
     def _handle_command(self, command):
         self._verify_command(command)
-        handler = self.handlers.get(type(command))
+        handler = self.handlers[type(command)]
         handler.handle(command)
 
     def _handle_commands(self, commands_pool):
@@ -48,17 +48,17 @@ class CommandHandlerManager:
     @staticmethod
     def _validate_registration(handler: CommandHandler):
         com_type = handler.command_type
-        if not issubclass(com_type, BASE_COMMAND_TYPES):
+        if not issubclass(com_type, base_command_alias):
             raise TypeError(f"Handler command type must be one of base command classes.\n"
                             f"Wrong handler: {com_type}\n"
-                            f"Possible command types: {BASE_COMMAND_TYPES}")
+                            f"Possible command types: {base_command_alias}")
     @staticmethod
     def _verify_family_registration(family_handler: CommandHandler):
         com_family_type = family_handler.command_type
         if not issubclass(com_family_type, ABC):
             raise TypeError(f"Family handler must be ABC subclass. "
                             f"Wrong handler: {com_family_type}")
-        if not issubclass(com_family_type, BASE_COMMAND_TYPES):
+        if not issubclass(com_family_type, base_command_alias):
             raise TypeError(f"Family handler command type must be CommandFamily subclass. "
                             f"Wrong handler: {com_family_type}")
 

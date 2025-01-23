@@ -3,10 +3,10 @@ from typing import Generator
 
 from UI_elements.abstract_element import AbstractUIElement
 from constants.enums import TargetPriority
-from commands.abstract_commands import BASE_COMMAND_TYPES
+from commands.abstract_commands import base_command_alias
 from cursor_manager import CursorManager
 
-import UI_scene.input_handler as inp_handler
+import handlers.input_handler as inp_handler
 from UI_scene.elements_collections import SceneElements, SceneElementsManager
 
 
@@ -42,22 +42,22 @@ class Scene:
         self._last_target_tick = self.tick
 
 
-    def _add_all_associations(self, command_lst: list[BASE_COMMAND_TYPES], element):
+    def _add_all_associations(self, command_lst: list[base_command_alias], element):
         self._add_scene_associations(command_lst)
         for command in command_lst:
             if command.need_element:
                 command.set_element(element)
 
-    def _add_scene_associations(self, command_lst: list[BASE_COMMAND_TYPES]):
+    def _add_scene_associations(self, command_lst: list[base_command_alias]):
         for command in command_lst:
             if command.need_scene:
                 command.set_scene(self)
 
 
-    def handle_events(self) -> Generator[list[BASE_COMMAND_TYPES], None, None]:
+    def handle_events(self) -> Generator[list[base_command_alias], None, None]:
         self.tick += 1
         assert self.tick-1 == self._last_target_tick
-        if self._elements_manager.get_targeted_element() is None:
+        if self._elements_manager.get_target() is None:
             self._last_target_tick = self.tick
 
         self._input_handler.process_tick_events()
@@ -85,7 +85,7 @@ class Scene:
             element_commands = el.handle_mouse(event_config)
             self._add_all_associations(element_commands, el)
             yield element_commands
-            if self._elements_manager.get_targeted_element() is not None:
+            if self._elements_manager.get_target() is not None:
                 return
         return
 

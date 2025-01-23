@@ -7,7 +7,7 @@ from commands.cursor_commands import CursorCommandFamily, ClearCursor, DraggingC
 class CursorHandler(CommandHandler):
     command_type = CursorCommandFamily
     def handler_func(self, command):
-        command: CursorCommandFamily
+        assert isinstance(command, CursorCommandFamily)
         scene: Scene = command.get_scene()
         debug_print(DebugStates.CURSOR, command.text, command.get_element(), scene)
         _cursor_manager = scene.get_cursor_manager()
