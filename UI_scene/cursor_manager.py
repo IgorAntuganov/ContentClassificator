@@ -1,6 +1,9 @@
 import pygame
 
+
 class CursorManager:
+    # noinspection SpellCheckingInspection
+    # # PyCharm marking these pygame elements as typo
     system_cursors = {
         'arrow': pygame.SYSTEM_CURSOR_ARROW,
         'ibeam': pygame.SYSTEM_CURSOR_IBEAM,

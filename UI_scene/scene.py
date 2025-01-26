@@ -4,9 +4,9 @@ from typing import Generator
 from UI_elements.abstract_element import AbstractUIElement
 from constants.enums import TargetPriority
 from commands.abstract_commands import base_command_alias
-from cursor_manager import CursorManager
+from UI_scene.cursor_manager import CursorManager
 
-import handlers.input_handler as inp_handler
+import UI_scene.input_converter as inp_handler
 from UI_scene.elements_collections import SceneElements, SceneElementsManager
 
 
@@ -19,7 +19,7 @@ class Scene:
         self._elements: SceneElements = SceneElements(elements, set(elements))
         self._elements_manager = SceneElementsManager(self._elements)
 
-        self._input_handler = inp_handler.InputHandler()
+        self._input_converter = inp_handler.InputConverter()
         self._cursor_manager: CursorManager = CursorManager()
 
     def get_elements_manager(self) -> SceneElementsManager:
@@ -60,10 +60,10 @@ class Scene:
         if self._elements_manager.get_target() is None:
             self._last_target_tick = self.tick
 
-        self._input_handler.process_tick_events()
-        event_config = self._input_handler.get_mouse_config()
+        self._input_converter.process_tick_events()
+        event_config = self._input_converter.get_mouse_config()
 
-        commands_from_input = self._input_handler.get_commands()
+        commands_from_input = self._input_converter.get_commands()
         self._add_scene_associations(commands_from_input)
         yield commands_from_input
 

@@ -23,7 +23,7 @@ def update_mouse_wheel_state(mws: MouseWheelState, event: pygame.event.Event) ->
     return mws
 
 
-class InputHandler:
+class InputConverter:
     def __init__(self):
         self.event_config: MouseConfig = create_empty_mouse_config()
         self.commands_lst: list[base_command_alias] = []
