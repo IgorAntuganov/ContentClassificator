@@ -1,11 +1,9 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 import pygame
 import os
 import json
 
-from constants.configs import MouseConfig
-from commands.abstract_commands import base_command_alias
-from UI_elements.abstract_element import AbstractUIElement
+from UI_elements.abstract_element import UIElement
 
 
 class WithPrivateRect(ABC):
@@ -82,13 +80,3 @@ class JSONadjustable(ABC):
         with open(self.path_to_json, 'w') as file:
             print('dumping', adjusted_values, self.path_to_json)
             json.dump(adjusted_values, file)
-
-
-class MouseHandler(ABC):
-    @abstractmethod
-    def handle_mouse(self, mouse_config: MouseConfig) -> list[base_command_alias]:
-        pass
-
-
-class UIElement(AbstractUIElement, MouseHandler, ABC):
-    pass

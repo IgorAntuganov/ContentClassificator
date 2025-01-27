@@ -4,7 +4,7 @@ from constants.configs import MouseConfig
 from commands.abstract_commands import base_command_alias
 
 
-class AbstractUIElement(ABC):
+class UIElement(ABC):
     """Base UI class"""
     @abstractmethod
     def draw(self, screen: pygame.Surface):

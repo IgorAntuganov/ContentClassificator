@@ -86,7 +86,6 @@ class ImageSequence(DraggableAndResizableElement):
         screen.blit(self._sprite, self.get_rect())
 
     def handle_mouse(self, config: MouseConfig) -> list[base_command_alias]:
-        self.handle_size_changing(config.ctrl_alt_shift_array, config.mouse_wheel_state)
         return self.handle_dragging(config)
 
     def recreate_sprites_after_resizing(self):

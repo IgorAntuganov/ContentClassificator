@@ -3,7 +3,7 @@ from constants.debug_prints import debug_print, DebugStates
 from handlers.abstract_handlers import CommandHandler
 from commands.abstract_commands import SceneElementCommand, ElementCommand, base_command_alias
 from UI_scene.scene import Scene
-from UI_elements.abstract_element import AbstractUIElement
+from UI_elements.abstract_element import UIElement
 
 
 class CommandHandlerManager:
@@ -73,7 +73,7 @@ class CommandHandlerManager:
 
         if command.get_scene() is not None and not isinstance(command.get_scene(), Scene):
             raise TypeError(f"Scene attribute of command is not Scene type. Command: {command}")
-        if command.get_element() is not None and not isinstance(command.get_element(), AbstractUIElement):
+        if command.get_element() is not None and not isinstance(command.get_element(), UIElement):
             raise TypeError(f"Element attribute of command is not one of base command types. Command: {command}")
 
         handlers = self.handlers.get(type(command))

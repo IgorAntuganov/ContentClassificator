@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from UI_elements.UI_abstracts import WithPrivateRect, UIElement, JSONadjustable
+from UI_elements.UI_abstracts import WithPrivateRect, JSONadjustable
+from UI_elements.abstract_element import UIElement
 
 from commands.abstract_commands import base_command_alias
 from commands.dragging_commands import StartDragging, KeepDragging, EndDragging

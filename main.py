@@ -1,7 +1,7 @@
 import pygame
 pygame.init()
 # import shutil
-from UI_elements.abstract_element import AbstractUIElement
+from UI_elements.abstract_element import UIElement
 from UI_elements import simple_buttons, funny_text, image_sequence
 from constants.constants import *
 from UI_scene.scene import Scene
@@ -14,7 +14,7 @@ import handlers.cursor_handler as cursor
 
 
 # noinspection PyPep8Naming
-def create_test_UI_elements(images_folder) -> list[AbstractUIElement]:
+def create_test_UI_elements(images_folder) -> list[UIElement]:
     add_tag_button_config = simple_buttons.ButtonConfig(
         text="virus research lab",
         command=TestCommand(),

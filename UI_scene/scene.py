@@ -1,7 +1,7 @@
 import pygame
 from typing import Generator
 
-from UI_elements.abstract_element import AbstractUIElement
+from UI_elements.abstract_element import UIElement
 from constants.enums import TargetPriority
 from commands.abstract_commands import base_command_alias
 from UI_scene.cursor_manager import CursorManager
@@ -11,7 +11,7 @@ from UI_scene.elements_collections import SceneElements, SceneElementsManager
 
 
 class Scene:
-    def __init__(self, name: str, elements: list[AbstractUIElement]):
+    def __init__(self, name: str, elements: list[UIElement]):
         self.name = name
         self.tick = 0
         self._last_target_tick = self.tick
@@ -29,15 +29,15 @@ class Scene:
         return self._cursor_manager
 
 
-    def set_target(self, element: AbstractUIElement, priority: TargetPriority):
+    def set_target(self, element: UIElement, priority: TargetPriority):
         self._elements_manager.set_interation_element(element, priority)
         self._last_target_tick = self.tick
 
-    def keep_target(self, element: AbstractUIElement, priority: TargetPriority):
+    def keep_target(self, element: UIElement, priority: TargetPriority):
         assert self._elements_manager.is_element_targeted(element, priority)
         self._last_target_tick = self.tick
 
-    def clear_target(self, element: AbstractUIElement, priority: TargetPriority):
+    def clear_target(self, element: UIElement, priority: TargetPriority):
         self._elements_manager.clear_interation_element(element, priority)
         self._last_target_tick = self.tick
 
