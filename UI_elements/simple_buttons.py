@@ -5,7 +5,7 @@ import pygame
 from constants.enums import QuadButtonState, MouseWheelState, DraggingState
 from constants.configs import MouseConfig
 
-from commands.abstract_commands import AbstractCommand
+from commands.abstract_commands import base_command_alias
 from commands.dragging_commands import EndDragging
 from commands.hover_commands import *
 
@@ -19,7 +19,7 @@ from UI_elements.manual_adjusting import DraggableAndResizableElement
 @dataclass
 class ButtonConfig:
     text: str
-    command: AbstractCommand
+    command: base_command_alias
     path_to_json: str
     position: tuple[int, int] = cnst.STANDARD_UI_POSITION
     size: tuple[int, int] = cnst.STANDARD_UI_SIZE
@@ -68,8 +68,8 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
         not_collide = not self.rect_collidepoint(mouse_config.mouse_position)
         return dragging_offed and not_pressed and not_collide
 
-    def handle_inactive(self) -> list[AbstractCommand]:
-        commands_lst: list[AbstractCommand] = []
+    def handle_inactive(self) -> list[base_command_alias]:
+        commands_lst: list[base_command_alias] = []
         if self.dragging == DraggingState.ENDING:
             commands_lst.append(EndDragging())
         if self.current_state in (QuadButtonState.PRESSED,
@@ -80,7 +80,9 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
         self.current_state = QuadButtonState.NORMAL
         return commands_lst
 
-    def handle_pressed(self, commands_lst: list[AbstractCommand], mouse_config: MouseConfig) -> list[AbstractCommand]:
+    def handle_pressed(self, commands_lst: list[base_command_alias], mouse_config: MouseConfig) \
+            -> list[base_command_alias]:
+
         if self.current_state == QuadButtonState.NORMAL:
             commands_lst.append(StartHover())
         else:
@@ -93,8 +95,8 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
 
         return commands_lst
 
-    def handle_mouse(self, mouse_config: MouseConfig) -> list[AbstractCommand]:
-        commands_lst: list[AbstractCommand] = []
+    def handle_mouse(self, mouse_config: MouseConfig) -> list[base_command_alias]:
+        commands_lst: list[base_command_alias] = []
 
         if self.is_inactive(mouse_config):
             return self.handle_inactive()

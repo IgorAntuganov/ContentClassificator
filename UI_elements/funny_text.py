@@ -4,7 +4,7 @@ import pygame
 from constants.fonts import fonts_dict
 from constants.configs import MouseConfig
 from UI_elements.manual_adjusting import OnlyDraggableElement
-from commands.abstract_commands import AbstractCommand
+from commands.abstract_commands import base_command_alias
 
 
 @dataclass
@@ -33,8 +33,8 @@ class SimpleText(OnlyDraggableElement):
         text_surface = self.font.render(self.text, True, self.color)
         return text_surface
 
-    def handle_mouse(self, config: MouseConfig) -> list[AbstractCommand]:
-        commands_lst: list[AbstractCommand] = []
+    def handle_mouse(self, config: MouseConfig) -> list[base_command_alias]:
+        commands_lst: list[base_command_alias] = []
         commands_lst.extend(self.handle_dragging(config))
         return commands_lst
 

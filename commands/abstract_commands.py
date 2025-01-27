@@ -56,7 +56,7 @@ class ElementCommand(AbstractCommand, ABC):
         return False
 
 
-class SceneCommand(AbstractCommand, ABC):
+class SceneElementCommand(AbstractCommand, ABC):
     @property
     def need_element(self) -> bool:
         return True
@@ -65,5 +65,14 @@ class SceneCommand(AbstractCommand, ABC):
     def need_scene(self) -> bool:
         return True
 
+class SceneCommand(AbstractCommand, ABC):
+    @property
+    def need_element(self) -> bool:
+        return False
 
-base_command_alias: TypeAlias = SimpleCommand | SceneCommand | ElementCommand
+    @property
+    def need_scene(self) -> bool:
+        return True
+
+
+base_command_alias: TypeAlias = SimpleCommand | SceneElementCommand | ElementCommand | SceneCommand

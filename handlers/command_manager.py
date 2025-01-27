@@ -1,7 +1,7 @@
 from abc import ABC
 from constants.debug_prints import debug_print, DebugStates
 from handlers.abstract_handlers import CommandHandler
-from commands.abstract_commands import SceneCommand, ElementCommand, base_command_alias
+from commands.abstract_commands import SceneElementCommand, ElementCommand, base_command_alias
 from UI_scene.scene import Scene
 from UI_elements.abstract_element import AbstractUIElement
 
@@ -63,9 +63,9 @@ class CommandHandlerManager:
                             f"Wrong handler: {com_family_type}")
 
     def _verify_command(self, command):
-        if isinstance(command, SceneCommand) and command.get_scene() is None:
+        if isinstance(command, SceneElementCommand) and command.get_scene() is None:
             raise ValueError(f"SceneCommand scene attribute is not defined. Command: {command}")
-        if isinstance(command, SceneCommand) and command.get_element() is None:
+        if isinstance(command, SceneElementCommand) and command.get_element() is None:
             raise ValueError(f"SceneCommand element attribute is not defined. Command: {command}")
 
         if isinstance(command, ElementCommand) and command.get_element() is None:

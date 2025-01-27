@@ -1,8 +1,8 @@
-from commands.abstract_commands import SceneCommand
+from commands.abstract_commands import SceneElementCommand
 from abc import ABC
 
 
-class DraggingCommandFamily(SceneCommand, ABC): pass
+class DraggingCommandFamily(SceneElementCommand, ABC): pass
 class StartDragging(DraggingCommandFamily): pass
 class KeepDragging(DraggingCommandFamily): pass
 class EndDragging(DraggingCommandFamily): pass
