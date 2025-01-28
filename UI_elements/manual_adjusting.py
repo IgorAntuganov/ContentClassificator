@@ -3,13 +3,13 @@ from abc import ABC, abstractmethod
 from UI_elements.UI_abstracts import WithPrivateRect, JSONadjustable
 from UI_elements.abstract_element import UIElement
 
-from commands.abstract_commands import base_command_alias
+from commands.abstract_commands import CommandList
 from commands.dragging_commands import StartDragging, KeepDragging, EndDragging
 from commands.cursor_commands import ClearCursor, DraggingCursor
 
 from constants.constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from constants.enums import DraggingState
-from constants.configs import MouseConfig
+from constants.configs import EventConfig
 
 
 class Draggable(WithPrivateRect, UIElement, ABC):
@@ -24,8 +24,8 @@ class Draggable(WithPrivateRect, UIElement, ABC):
     def is_dragging(self) -> bool:
         return self.dragging != DraggingState.OFFED
 
-    def _update_dragging_state(self, config: MouseConfig) -> list[base_command_alias]:
-        commands_lst: list[base_command_alias]
+    def _update_dragging_state(self, config: EventConfig) -> CommandList:
+        commands_lst: CommandList
         commands_lst = []
         mouse_on_element = self.rect_collidepoint(config.mouse_position)
         rmb_pressed = config.mouse_pressed[2]
@@ -58,7 +58,7 @@ class Draggable(WithPrivateRect, UIElement, ABC):
 
         return commands_lst
 
-    def handle_dragging(self, config: MouseConfig) -> list[base_command_alias]:
+    def handle_dragging(self, config: EventConfig) -> CommandList:
         commands_lst = self._update_dragging_state(config)
 
         if self.dragging != DraggingState.OFFED:
@@ -79,7 +79,7 @@ class Resizable(Draggable, WithPrivateRect, UIElement, ABC):
     def recreate_sprites_after_resizing(self):
         pass
 
-    def handle_dragging(self, config: MouseConfig) -> list[base_command_alias]:
+    def handle_dragging(self, config: EventConfig) -> CommandList:
         self.handle_size_changing(config.ctrl_alt_shift_array, config.mouse_wheel_state)
         return super().handle_dragging(config)
 

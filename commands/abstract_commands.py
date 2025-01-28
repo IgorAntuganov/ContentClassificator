@@ -1,8 +1,15 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import TypeAlias
+from dataclasses import dataclass
 
+@dataclass
+class CommandRequirements:
+    element: bool = False
+    scene: bool = False
 
 class AbstractCommand(ABC):
+    needs: CommandRequirements = CommandRequirements()
+
     def __init__(self):
         self._element = None
         self._scene = None
@@ -13,14 +20,12 @@ class AbstractCommand(ABC):
 
 
     @property
-    @abstractmethod
     def need_element(self) -> bool:
-        pass
+        return self.needs.element
 
     @property
-    @abstractmethod
     def need_scene(self) -> bool:
-        pass
+        return self.needs.scene
 
 
     def set_element(self, element):
@@ -37,42 +42,17 @@ class AbstractCommand(ABC):
 
 
 class SimpleCommand(AbstractCommand, ABC):
-    @property
-    def need_element(self) -> bool:
-        return False
-
-    @property
-    def need_scene(self) -> bool:
-        return False
-
+    needs = CommandRequirements()
 
 class ElementCommand(AbstractCommand, ABC):
-    @property
-    def need_element(self) -> bool:
-        return True
-
-    @property
-    def need_scene(self) -> bool:
-        return False
-
+    needs = CommandRequirements(element=True)
 
 class SceneElementCommand(AbstractCommand, ABC):
-    @property
-    def need_element(self) -> bool:
-        return True
-
-    @property
-    def need_scene(self) -> bool:
-        return True
+    needs = CommandRequirements(element=True, scene=True)
 
 class SceneCommand(AbstractCommand, ABC):
-    @property
-    def need_element(self) -> bool:
-        return False
-
-    @property
-    def need_scene(self) -> bool:
-        return True
+    needs = CommandRequirements(scene=True)
 
 
 base_command_alias: TypeAlias = SimpleCommand | SceneElementCommand | ElementCommand | SceneCommand
+CommandList = list[base_command_alias]

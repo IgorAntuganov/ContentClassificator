@@ -2,9 +2,9 @@ from dataclasses import dataclass
 import os
 import pygame
 
-from constants.configs import MouseConfig
+from constants.configs import EventConfig
 from UI_elements.manual_adjusting import DraggableAndResizableElement
-from commands.abstract_commands import base_command_alias
+from commands.abstract_commands import CommandList
 from constants.constants import IMAGES_FORMATS, IMAGE_SEQUENCE_BACKGROUND
 
 
@@ -85,7 +85,7 @@ class ImageSequence(DraggableAndResizableElement):
     def draw(self, screen: pygame.Surface):
         screen.blit(self._sprite, self.get_rect())
 
-    def handle_mouse(self, config: MouseConfig) -> list[base_command_alias]:
+    def handle_events(self, config: EventConfig) -> CommandList:
         return self.handle_dragging(config)
 
     def recreate_sprites_after_resizing(self):

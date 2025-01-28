@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABC
 import pygame
-from constants.configs import MouseConfig
-from commands.abstract_commands import base_command_alias
+from constants.configs import EventConfig
+from commands.abstract_commands import CommandList
 
 
 class UIElement(ABC):
@@ -11,5 +11,5 @@ class UIElement(ABC):
         pass
 
     @abstractmethod
-    def handle_mouse(self, config: MouseConfig) -> list[base_command_alias]:
+    def handle_events(self, config: EventConfig) -> CommandList:
         pass

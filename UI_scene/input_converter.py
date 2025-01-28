@@ -1,9 +1,7 @@
 import pygame
 
-from commands.abstract_commands import base_command_alias
-from constants.configs import MouseConfig, create_empty_mouse_config
+from constants.configs import EventConfig, SimulatedScancodeWrapper
 from constants.enums import MouseWheelState
-from commands.trivial_commands import ExitCommand, SaveUICommand
 
 
 def get_ctrl_alt_shift_array() -> tuple[bool, bool, bool]:
@@ -25,32 +23,34 @@ def update_mouse_wheel_state(mws: MouseWheelState, event: pygame.event.Event) ->
 
 class InputConverter:
     def __init__(self):
-        self.event_config: MouseConfig = create_empty_mouse_config()
-        self.commands_lst: list[base_command_alias] = []
+        self.event_config: EventConfig | None = None
+        self._is_pygame_quit: bool = False
 
     def process_tick_events(self):
-        self.commands_lst = []
-
         mouse_pos = pygame.mouse.get_pos()
         mouse_pressed = pygame.mouse.get_pressed()
         ctrl_alt_shift_array = get_ctrl_alt_shift_array()
-        frame_events = pygame.event.get()
         mouse_wheel_state = MouseWheelState.INACTIVE
 
-        for event in frame_events:
+        keys_pressed = pygame.key.get_pressed()
+        keys_just_pressed = SimulatedScancodeWrapper()
+        keys_just_released = SimulatedScancodeWrapper()
+
+        for event in pygame.event.get():
             mouse_wheel_state = update_mouse_wheel_state(mouse_wheel_state, event)
             if event.type == pygame.QUIT:
-                self.commands_lst.append(ExitCommand())
+                self._is_pygame_quit = True
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.commands_lst.append(ExitCommand())
-                if event.key == pygame.K_s:
-                    self.commands_lst.append(SaveUICommand())
+                keys_just_pressed.add(event.key)
+            if event.type == pygame.KEYUP:
+                keys_just_released.add(event.key)
 
-        self.event_config = MouseConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array)
+        self.event_config = EventConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array,
+                                        keys_pressed, keys_just_pressed, keys_just_released)
 
-    def get_mouse_config(self) -> MouseConfig:
+    def get_event_config(self) -> EventConfig:
+        assert self.event_config is not None
         return self.event_config
 
-    def get_commands(self) -> list[base_command_alias]:
-        return self.commands_lst
+    def is_pygame_quit(self) -> bool:
+        return self._is_pygame_quit

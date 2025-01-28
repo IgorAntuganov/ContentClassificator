@@ -3,8 +3,6 @@ import pygame
 import os
 import json
 
-from UI_elements.abstract_element import UIElement
-
 
 class WithPrivateRect(ABC):
     def __init__(self, position: tuple[int, int], size: tuple[int, int]):

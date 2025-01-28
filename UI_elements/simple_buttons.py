@@ -3,9 +3,9 @@ from abc import abstractmethod
 import pygame
 
 from constants.enums import QuadButtonState, MouseWheelState, DraggingState
-from constants.configs import MouseConfig
+from constants.configs import EventConfig
 
-from commands.abstract_commands import base_command_alias
+from commands.abstract_commands import base_command_alias, CommandList
 from commands.dragging_commands import EndDragging
 from commands.hover_commands import *
 
@@ -55,21 +55,21 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
         screen.blit(self.sprites[self.current_state], self.get_rect())
 
     @staticmethod
-    def is_size_changing(mouse_config: MouseConfig) -> bool:
+    def is_size_changing(mouse_config: EventConfig) -> bool:
         # noinspection PyPep8Naming
         RMB_pressed = mouse_config.mouse_pressed[2]
         mouse_wheel_nan = mouse_config.mouse_wheel_state is not None
         mouse_wheel_active = mouse_config.mouse_wheel_state != MouseWheelState.INACTIVE
         return RMB_pressed and mouse_wheel_nan and mouse_wheel_active
 
-    def is_inactive(self, mouse_config: MouseConfig) -> bool:
+    def is_inactive(self, mouse_config: EventConfig) -> bool:
         dragging_offed = not self.is_dragging
         not_pressed = self.current_state not in (QuadButtonState.PRESSED, QuadButtonState.PRESSED_OUTSIDE)
         not_collide = not self.rect_collidepoint(mouse_config.mouse_position)
         return dragging_offed and not_pressed and not_collide
 
-    def handle_inactive(self) -> list[base_command_alias]:
-        commands_lst: list[base_command_alias] = []
+    def handle_inactive(self) -> CommandList:
+        commands_lst: CommandList = []
         if self.dragging == DraggingState.ENDING:
             commands_lst.append(EndDragging())
         if self.current_state in (QuadButtonState.PRESSED,
@@ -80,9 +80,7 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
         self.current_state = QuadButtonState.NORMAL
         return commands_lst
 
-    def handle_pressed(self, commands_lst: list[base_command_alias], mouse_config: MouseConfig) \
-            -> list[base_command_alias]:
-
+    def handle_pressed(self, commands_lst: CommandList, mouse_config: EventConfig) -> CommandList:
         if self.current_state == QuadButtonState.NORMAL:
             commands_lst.append(StartHover())
         else:
@@ -92,11 +90,10 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
             self.current_state = QuadButtonState.PRESSED
         else:
             self.current_state = QuadButtonState.PRESSED_OUTSIDE
-
         return commands_lst
 
-    def handle_mouse(self, mouse_config: MouseConfig) -> list[base_command_alias]:
-        commands_lst: list[base_command_alias] = []
+    def handle_events(self, mouse_config: EventConfig) -> CommandList:
+        commands_lst: CommandList = []
 
         if self.is_inactive(mouse_config):
             return self.handle_inactive()
