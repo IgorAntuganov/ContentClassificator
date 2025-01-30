@@ -1,7 +1,7 @@
 from UI_scene.scene import Scene
 from handlers.abstract_handlers import CommandHandler
 from constants.debug_prints import DebugStates, debug_print
-from commands.cursor_commands import CursorCommandFamily, ClearCursor, DraggingCursor, ErrorCursor
+from commands.element_interaction_commands import CursorCommandFamily, ClearCursor, DraggingCursor, ErrorCursor
 
 
 class CursorHandler(CommandHandler):

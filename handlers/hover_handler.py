@@ -1,4 +1,4 @@
-from commands.hover_commands import StartHover, KeepHover, EndHover, HoverCommandFamily
+from commands.element_interaction_commands import StartHover, KeepHover, EndHover, HoverCommandFamily
 from constants.debug_prints import debug_print, DebugStates
 from constants.enums import TargetPriority
 from handlers.abstract_handlers import CommandHandler

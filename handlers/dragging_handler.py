@@ -2,7 +2,7 @@ from handlers.abstract_handlers import CommandHandler
 
 from constants.debug_prints import DebugStates, debug_print
 from constants.enums import TargetPriority
-from commands.dragging_commands import DraggingCommandFamily, StartDragging, KeepDragging, EndDragging
+from commands.element_interaction_commands import DraggingCommandFamily, StartDragging, KeepDragging, EndDragging
 from UI_scene.scene import Scene
 
 

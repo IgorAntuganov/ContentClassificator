@@ -56,8 +56,13 @@ class ImageSequence(DraggableAndResizableElement):
 
 
     def next_image(self):
-        assert self._image_index < self.get_images_count() - 1
-        self._image_index += 1
+        if self._image_index < self.get_images_count() - 1:
+            self._image_index += 1
+        self._draw_sprite()
+
+    def previous_image(self):
+        if self._image_index > 0:
+            self._image_index -= 1
         self._draw_sprite()
 
     def set_image_index(self, ind: int):
@@ -86,6 +91,10 @@ class ImageSequence(DraggableAndResizableElement):
         screen.blit(self._sprite, self.get_rect())
 
     def handle_events(self, config: EventConfig) -> CommandList:
+        if config.keys_just_pressed[pygame.K_q]:
+            self.previous_image()
+        if config.keys_just_pressed[pygame.K_e]:
+            self.next_image()
         return self.handle_dragging(config)
 
     def recreate_sprites_after_resizing(self):

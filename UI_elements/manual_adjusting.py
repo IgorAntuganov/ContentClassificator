@@ -4,8 +4,7 @@ from UI_elements.UI_abstracts import WithPrivateRect, JSONadjustable
 from UI_elements.abstract_element import UIElement
 
 from commands.abstract_commands import CommandList
-from commands.dragging_commands import StartDragging, KeepDragging, EndDragging
-from commands.cursor_commands import ClearCursor, DraggingCursor
+from commands.element_interaction_commands import StartDragging, KeepDragging, EndDragging, ClearCursor, DraggingCursor
 
 from constants.constants import SCREEN_RECT, BUTTON_SCREEN_COLLISION_DEFLATION
 from constants.enums import DraggingState
