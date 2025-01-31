@@ -8,6 +8,7 @@ from UI_scene.scene import Scene
 
 class DraggingHandler(CommandHandler):
     command_type = DraggingCommandFamily
+
     def handler_func(self, command):
         assert isinstance(command, DraggingCommandFamily)
         element = command.get_element()

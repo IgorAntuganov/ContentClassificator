@@ -73,6 +73,7 @@ class Draggable(WithPrivateRect, UIElement, ABC):
 
         return commands_lst
 
+
 class Resizable(Draggable, WithPrivateRect, UIElement, ABC):
     @abstractmethod
     def recreate_sprites_after_resizing(self):

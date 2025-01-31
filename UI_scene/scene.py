@@ -30,7 +30,6 @@ class Scene:
     def get_cursor_manager(self) -> CursorManager:
         return self._cursor_manager
 
-
     def set_target(self, element: UIElement, priority: TargetPriority):
         self._elements_manager.set_interation_element(element, priority)
         self._last_target_tick = self.tick
@@ -42,7 +41,6 @@ class Scene:
     def clear_target(self, element: UIElement, priority: TargetPriority):
         self._elements_manager.clear_interation_element(element, priority)
         self._last_target_tick = self.tick
-
 
     def _add_all_associations(self, command_lst: CommandList, element: UIElement) -> CommandList:
         command_lst = self._add_scene_associations(command_lst)

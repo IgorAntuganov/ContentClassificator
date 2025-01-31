@@ -6,6 +6,7 @@ from commands.element_interaction_commands import CursorCommandFamily, ClearCurs
 
 class CursorHandler(CommandHandler):
     command_type = CursorCommandFamily
+
     def handler_func(self, command):
         assert isinstance(command, CursorCommandFamily)
         scene: Scene = command.get_scene()

@@ -54,7 +54,6 @@ class ImageSequence(DraggableAndResizableElement):
         self._sprite = pygame.Surface(self.size)
         self._draw_sprite()
 
-
     def next_image(self):
         if self._image_index < self.get_images_count() - 1:
             self._image_index += 1
@@ -75,7 +74,6 @@ class ImageSequence(DraggableAndResizableElement):
     def get_images_count(self) -> int:
         return len(self._images_paths)
 
-
     def _draw_sprite(self):
         self._sprite.fill(IMAGE_SEQUENCE_BACKGROUND)
         self._load_and_blit_image()
@@ -85,7 +83,6 @@ class ImageSequence(DraggableAndResizableElement):
         image = _load_and_scale_image(image_path, *self.size)
         blit_rect = image.get_rect(center=self._sprite.get_rect().center)
         self._sprite.blit(image, blit_rect)
-
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self._sprite, self.get_rect())

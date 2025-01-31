@@ -23,7 +23,6 @@ class SceneElementsManager:
         assert self.elements.interaction_target is not None
         return self.elements.interaction_target
 
-
     def set_interation_element(self, element: UIElement, level: TargetPriority):
         assert self._check_if_element_can_be_targeted(element, level)
         self.elements.interaction_target = element
@@ -36,7 +35,6 @@ class SceneElementsManager:
         self.elements.interaction_target = None
         self.elements.interaction_target_level = TargetPriority.ZERO
 
-
     def _check_if_element_can_be_targeted(self, element: UIElement, level: TargetPriority) -> bool:
         is_none = self.elements.interaction_target is None
         level_higher = self.elements.interaction_target_level.value < level.value
@@ -48,7 +46,6 @@ class SceneElementsManager:
         exact_level = self.elements.interaction_target_level.value == level.value
         return is_same or exact_level
 
-
     @property
     def is_dragging(self) -> bool:
         return self.elements.interaction_target_level == TargetPriority.DRAGGING
@@ -56,7 +53,6 @@ class SceneElementsManager:
     @property
     def is_hovering(self) -> bool:
         return self.elements.interaction_target_level == TargetPriority.HOVER
-
 
     def get_ordered_elements(self) -> list[UIElement]:
         return self.elements.elements_lst

@@ -12,7 +12,6 @@ class CommandHandlerManager:
         self.family_handlers: dict[type, CommandHandler] = {}
         self._scene = scene
 
-
     def register(self, handler: CommandHandler):
         self._validate_registration(handler)
         com_type = handler.command_type
@@ -28,7 +27,6 @@ class CommandHandlerManager:
             debug_print(DebugStates.HANDLERS_REGISTERING, '\tregistering family member', child_class)
             self.handlers[child_class] = family_handler
 
-
     def handle_events(self):
         for commands_lst in self._scene.handle_events():
             for command in commands_lst:
@@ -43,7 +41,6 @@ class CommandHandlerManager:
         for command in commands_pool:
             self._handle_command(command)
 
-
     # Checking for errors methods
     @staticmethod
     def _validate_registration(handler: CommandHandler):
@@ -52,6 +49,7 @@ class CommandHandlerManager:
             raise TypeError(f"Handler command type must be one of base command classes.\n"
                             f"Wrong handler: {com_type}\n"
                             f"Possible command types: {base_command_alias}")
+
     @staticmethod
     def _verify_family_registration(family_handler: CommandHandler):
         com_family_type = family_handler.command_type

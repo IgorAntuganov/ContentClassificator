@@ -6,22 +6,29 @@ from UI_scene.scene import Scene
 
 class ExitHandler(CommandHandler):
     command_type = ExitCommand
+
     def handler_func(self, command):
         print('Exit Command')
         exit()
 
+
 class TestCommandHandler(CommandHandler):
     command_type = TestCommand
+
     def handler_func(self, command):
         print('get TestCommand')
 
+
 class TestCommandHandler2(CommandHandler):
     command_type = TestCommand2
+
     def handler_func(self, command):
         print('get TestCommand (2!!)')
 
+
 class SaveUIHandler(CommandHandler):
     command_type = SaveUICommand
+
     def handler_func(self, command):
         assert isinstance(command, SaveUICommand)
         scene = command.get_scene()

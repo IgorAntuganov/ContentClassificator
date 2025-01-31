@@ -2,10 +2,12 @@ from abc import ABC
 from typing import TypeAlias
 from dataclasses import dataclass
 
+
 @dataclass
 class CommandRequirements:
     element: bool = False
     scene: bool = False
+
 
 class AbstractCommand(ABC):
     needs: CommandRequirements = CommandRequirements()
@@ -18,7 +20,6 @@ class AbstractCommand(ABC):
     def text(self):
         return self.__class__.__name__
 
-
     @property
     def need_element(self) -> bool:
         return self.needs.element
@@ -26,7 +27,6 @@ class AbstractCommand(ABC):
     @property
     def need_scene(self) -> bool:
         return self.needs.scene
-
 
     def set_element(self, element):
         self._element = element
@@ -44,11 +44,14 @@ class AbstractCommand(ABC):
 class SimpleCommand(AbstractCommand, ABC):
     needs = CommandRequirements()
 
+
 class ElementCommand(AbstractCommand, ABC):
     needs = CommandRequirements(element=True)
 
+
 class SceneElementCommand(AbstractCommand, ABC):
     needs = CommandRequirements(element=True, scene=True)
+
 
 class SceneCommand(AbstractCommand, ABC):
     needs = CommandRequirements(scene=True)
