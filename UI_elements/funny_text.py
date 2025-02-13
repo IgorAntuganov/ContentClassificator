@@ -1,50 +1,50 @@
+from abc import abstractmethod, ABC
 from dataclasses import dataclass
 import constants.constants as cnst
 import pygame
+
 from constants.fonts import fonts_dict
 from constants.configs import EventConfig
-from UI_elements.manual_adjusting import OnlyDraggableElement
+from UI_elements.manual_adjusting import Draggable
 from commands.abstract_commands import CommandList
 
 
 @dataclass
 class TextConfig:
     text: str
-    path_to_json: str
     font_key: str | int | None = None
     color: tuple[int, int, int] = cnst.STANDARD_UI_BRIGHT
-    position: tuple[int, int] = cnst.STANDARD_UI_POSITION
 
 
-class SimpleText(OnlyDraggableElement):
+class SimpleText(Draggable, ABC):
     def __init__(self, config: TextConfig):
-        self.position = config.position
+        super().__init__()
 
         assert config.font_key in fonts_dict
         self.font = fonts_dict[config.font_key]
         self.text = config.text
         self.color = config.color
-        self.sprite = self.create_sprite()
-        self.size = self.sprite.get_size()
+        self.sprite = pygame.Surface((10, 10))
+        self._draw_sprites()
+        self._savable_config.size = self.sprite.get_size()
 
-        super().__init__(config.path_to_json, self.position, self.size)
-
+    @abstractmethod
     def create_sprite(self) -> pygame.Surface:
-        text_surface = self.font.render(self.text, True, self.color)
-        return text_surface
+        pass
+
+    def _draw_sprites(self):
+        self.sprite = self.create_sprite()
 
     def handle_events(self, config: EventConfig) -> CommandList:
-        commands_lst: CommandList = []
-        commands_lst.extend(self.handle_dragging(config))
-        return commands_lst
+        return self.handle_dragging(config)
 
-    def draw(self, screen: pygame.Surface):
-        screen.blit(self.sprite, self.get_rect())
+    def get_sprite(self) -> pygame.Surface:
+        return self.sprite
 
 
 @dataclass
 class ShadowedTextConfig(TextConfig):
-    shadow_color: tuple[int, int, int] = cnst.STANDARD_UI_DARK
+    shadow_color: tuple[int, int, int] = cnst.STANDARD_UI_RED
     shadow_offset: tuple[int, int] = cnst.SHADOW_TEXT_OFFSET
 
 

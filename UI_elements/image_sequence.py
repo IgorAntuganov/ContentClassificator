@@ -32,16 +32,11 @@ def _load_and_scale_image(image_path: str | bytes, max_width: int, max_height: i
 @dataclass
 class ImageSeqConfig:
     path_to_image_folder: str
-    path_to_json: str
-    position: tuple[int, int]
-    size: tuple[int, int]
 
 
 class ImageSequence(DraggableAndResizableElement):
     def __init__(self, image_seq_config: ImageSeqConfig):
-        self.position = image_seq_config.position
-        self.size = image_seq_config.size
-        super().__init__(image_seq_config.path_to_json, self.position, self.size)
+        super().__init__()
 
         self._images_folder_path = image_seq_config.path_to_image_folder
         assert os.path.isdir(self._images_folder_path)
@@ -51,18 +46,18 @@ class ImageSequence(DraggableAndResizableElement):
 
         self._image_index = 0
 
-        self._sprite = pygame.Surface(self.size)
-        self._draw_sprite()
+        self._sprite = pygame.Surface(self._savable_config.size)
+        self._draw_sprites()
 
     def next_image(self):
         if self._image_index < self.get_images_count() - 1:
             self._image_index += 1
-        self._draw_sprite()
+        self._draw_sprites()
 
     def previous_image(self):
         if self._image_index > 0:
             self._image_index -= 1
-        self._draw_sprite()
+        self._draw_sprites()
 
     def set_image_index(self, ind: int):
         assert 0 <= ind < self.get_images_count()
@@ -74,18 +69,19 @@ class ImageSequence(DraggableAndResizableElement):
     def get_images_count(self) -> int:
         return len(self._images_paths)
 
-    def _draw_sprite(self):
+    def _draw_sprites(self):
+        self._sprite = pygame.Surface(self._savable_config.size)
         self._sprite.fill(IMAGE_SEQUENCE_BACKGROUND)
         self._load_and_blit_image()
 
     def _load_and_blit_image(self):
         image_path = self._images_paths[self._image_index]
-        image = _load_and_scale_image(image_path, *self.size)
+        image = _load_and_scale_image(image_path, *self._savable_config.size)
         blit_rect = image.get_rect(center=self._sprite.get_rect().center)
         self._sprite.blit(image, blit_rect)
 
-    def draw(self, screen: pygame.Surface):
-        screen.blit(self._sprite, self.get_rect())
+    def get_sprite(self) -> pygame.Surface:
+        return self._sprite
 
     def handle_events(self, config: EventConfig) -> CommandList:
         if config.keys_just_pressed[pygame.K_q]:
@@ -95,5 +91,5 @@ class ImageSequence(DraggableAndResizableElement):
         return self.handle_dragging(config)
 
     def recreate_sprites_after_resizing(self):
-        self._sprite = pygame.Surface(self.size)
-        self._draw_sprite()
+        self._sprite = pygame.Surface(self._savable_config.size)
+        self._draw_sprites()

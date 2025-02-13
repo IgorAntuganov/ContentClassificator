@@ -1,7 +1,5 @@
-from UI_elements import UI_abstracts
 from handlers.abstract_handlers import CommandHandler
-from commands.trivial_commands import ExitCommand, TestCommand, TestCommand2, SaveUICommand
-from UI_scene.scene import Scene
+from commands.trivial_commands import ExitCommand, TestCommand, TestCommand2
 
 
 class ExitHandler(CommandHandler):
@@ -24,17 +22,3 @@ class TestCommandHandler2(CommandHandler):
 
     def handler_func(self, command):
         print('get TestCommand (2!!)')
-
-
-class SaveUIHandler(CommandHandler):
-    command_type = SaveUICommand
-
-    def handler_func(self, command):
-        assert isinstance(command, SaveUICommand)
-        scene = command.get_scene()
-        assert isinstance(scene, Scene)
-        element_manager = scene.get_elements_manager()
-        for el in element_manager.get_ordered_elements():
-            assert isinstance(el, UI_abstracts.JSONadjustable)
-            el.save_to_json()
-        print('UI saved')

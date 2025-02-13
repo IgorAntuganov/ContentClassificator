@@ -1,4 +1,4 @@
-from commands.element_interaction_commands import StartHover, KeepHover, EndHover, HoverCommandFamily
+from commands.element_interaction_commands import StartHover, ContinueHover, StopHover, HoverCommandFamily
 from constants.debug_prints import debug_print, DebugStates
 from constants.enums import TargetPriority
 from handlers.abstract_handlers import CommandHandler
@@ -16,9 +16,9 @@ class HoverHandler(CommandHandler):
 
         if isinstance(command, StartHover):
             scene.set_target(element, TargetPriority.HOVER)
-        elif isinstance(command, KeepHover):
+        elif isinstance(command, ContinueHover):
             scene.keep_target(element, TargetPriority.HOVER)
-        elif isinstance(command, EndHover):
+        elif isinstance(command, StopHover):
             scene.clear_target(element, TargetPriority.HOVER)
         else:
             raise AssertionError

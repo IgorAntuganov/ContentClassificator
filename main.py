@@ -1,57 +1,36 @@
 import pygame
+
+
 pygame.init()
 # import shutil
-from UI_elements.abstract_element import UIElement
-from UI_elements import simple_buttons, funny_text, image_sequence
+
+from UI_elements.image_sequence import ImageSequence, ImageSeqConfig
+from UI_elements.funny_text import HaloText, HaloTextConfig, ShadowedText, ShadowedTextConfig
+from UI_elements.simple_buttons import SimpleButton, ButtonConfig
+from UI_elements.input_field import InputFieldConfig, InputField
+
 from constants.constants import *
 from UI_scene.scene import Scene
 from handlers.command_manager import CommandHandlerManager
 from commands.trivial_commands import TestCommand, TestCommand2
+
 import handlers.trivial_handlers as triv
+import handlers.ui_saving_handler as ui_save
 import handlers.dragging_handler as drag
 import handlers.hover_handler as hover
 import handlers.cursor_handler as cursor
 
 
 # noinspection PyPep8Naming
-def create_test_UI_elements(images_folder) -> list[UIElement]:
-    add_tag_button_config = simple_buttons.ButtonConfig(
-        text="virus research lab",
-        command=TestCommand(),
-        path_to_json='UI_elements/buttons_saves/add_tag_button.json'
-    )
-    test_button_1 = simple_buttons.SimpleButton(add_tag_button_config)
-
-    add_tag_button_config = simple_buttons.ButtonConfig(
-        text="..АббРа__чистота..",
-        command=TestCommand2(),
-        path_to_json='UI_elements/buttons_saves/test_2_button.json'
-    )
-    test_button_2 = simple_buttons.SimpleButton(add_tag_button_config)
-
-    halo_text_config = funny_text.HaloTextConfig(
-        text="Experimental Text",
-        path_to_json='UI_elements/buttons_saves/text_element.json',
-    )
-    text_element = funny_text.HaloText(halo_text_config)
-
-    shadow_text_config = funny_text.ShadowedTextConfig(
-        path_to_json='UI_elements/buttons_saves/text2_element.json',
-        text='Experimental Text',
-        shadow_color=(255, 0, 0),
-        shadow_offset=(1, 2),
-    )
-    text_element_2 = funny_text.ShadowedText(shadow_text_config)
-
-    image_config = image_sequence.ImageSeqConfig(
-        path_to_image_folder=images_folder,
-        path_to_json='UI_elements/buttons_saves/image_seq.json',
-        position=(0, 0),
-        size=(WIN_SIZE[1],)*2
-    )
-    image_seq = image_sequence.ImageSequence(image_config)
-
-    return [test_button_1, text_element, test_button_2, text_element_2, image_seq]
+def create_test_UI_elements(images_folder) -> dict:
+    return {
+        'image_seq': ImageSequence(ImageSeqConfig(images_folder)),
+        'input_field': InputField(InputFieldConfig('input...')),
+        'text1': ShadowedText(ShadowedTextConfig('Experimental Text')),
+        'text2': HaloText(HaloTextConfig("Experimental Text")),
+        'button1': SimpleButton(ButtonConfig("..АббРа__чистота..", TestCommand2())),
+        'button2': SimpleButton(ButtonConfig("virus research lab", TestCommand()))
+    }
 
 
 def main(images_folder):
@@ -59,14 +38,13 @@ def main(images_folder):
     pygame.display.set_caption('Image Classifier')
     clock = pygame.time.Clock()
 
-    all_elements = create_test_UI_elements(images_folder)
-    scene = Scene('Main', all_elements)
+    scene = Scene('MainScene', create_test_UI_elements(images_folder))
 
     command_manager = CommandHandlerManager(scene)
     command_manager.register(triv.TestCommandHandler())
     command_manager.register(triv.TestCommandHandler2())
     command_manager.register_family(drag.DraggingHandler())
-    command_manager.register(triv.SaveUIHandler())
+    command_manager.register(ui_save.SaveUIHandler())
     command_manager.register_family(hover.HoverHandler())
     command_manager.register_family(cursor.CursorHandler())
     command_manager.register(triv.ExitHandler())

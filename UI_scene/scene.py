@@ -6,29 +6,34 @@ from constants.configs import EventConfig
 from constants.enums import TargetPriority
 from commands.abstract_commands import CommandList
 from commands.trivial_commands import ExitCommand, SaveUICommand
-from UI_scene.cursor_manager import CursorManager
 
+from UI_scene.save_manager import SaveManager
+from UI_scene.cursor_manager import CursorManager
 import UI_scene.input_converter as inp_handler
-from UI_scene.elements_collections import SceneElements, SceneElementsManager
+from UI_scene.elements_collections import SceneElementsManager
 
 
 class Scene:
-    def __init__(self, name: str, elements: list[UIElement]):
+    def __init__(self, name: str, elements_dct: dict[str, UIElement]):
         self.name = name
         self.tick = 0
         self._last_target_tick = self.tick
 
-        self._elements: SceneElements = SceneElements(elements, set(elements))
-        self._elements_manager = SceneElementsManager(self._elements)
+        self._elements_manager = SceneElementsManager(elements_dct)
 
         self._input_converter = inp_handler.InputConverter()
         self._cursor_manager: CursorManager = CursorManager()
+        self._save_manager = SaveManager(name)
+        self._save_manager.update_configs(elements_dct)
 
     def get_elements_manager(self) -> SceneElementsManager:
         return self._elements_manager
 
     def get_cursor_manager(self) -> CursorManager:
         return self._cursor_manager
+
+    def get_save_manager(self) -> SaveManager:
+        return self._save_manager
 
     def set_target(self, element: UIElement, priority: TargetPriority):
         self._elements_manager.set_interation_element(element, priority)

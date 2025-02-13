@@ -6,7 +6,7 @@ from constants.enums import QuadButtonState, MouseWheelState, DraggingState
 from constants.configs import EventConfig
 
 from commands.abstract_commands import base_command_alias, CommandList
-from commands.element_interaction_commands import EndDragging, StartHover, KeepHover, EndHover
+from commands.element_interaction_commands import StopDrag, StartHover, ContinueHover, StopHover
 
 import constants.constants as cnst
 from constants.fonts import fonts_dict
@@ -19,18 +19,13 @@ from UI_elements.manual_adjusting import DraggableAndResizableElement
 class ButtonConfig:
     text: str
     command: base_command_alias
-    path_to_json: str
-    position: tuple[int, int] = cnst.STANDARD_UI_POSITION
-    size: tuple[int, int] = cnst.STANDARD_UI_SIZE
     colors_key: str | int | None = None
     font_key: str | int | None = None
 
 
 class ABCQuadStateButton(DraggableAndResizableElement, ABC):
     def __init__(self, config: ButtonConfig):
-        self.position = config.position
-        self.size = config.size
-        super().__init__(config.path_to_json, self.position, self.size)
+        super().__init__()
 
         self.text = config.text
         self.command = config.command
@@ -43,15 +38,15 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
         self.current_state = QuadButtonState.NORMAL
         self.sprites = self.create_all_sprites()
 
-    def recreate_sprites_after_resizing(self):
+    def _draw_sprites(self):
         self.sprites = self.create_all_sprites()
 
     @abstractmethod
     def create_all_sprites(self) -> dict[QuadButtonState, pygame.Surface]:
         pass
 
-    def draw(self, screen: pygame.Surface):
-        screen.blit(self.sprites[self.current_state], self.get_rect())
+    def get_sprite(self) -> pygame.Surface:
+        return self.sprites[self.current_state]
 
     @staticmethod
     def is_size_changing(mouse_config: EventConfig) -> bool:
@@ -64,17 +59,17 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
     def is_inactive(self, mouse_config: EventConfig) -> bool:
         dragging_offed = not self.is_dragging
         not_pressed = self.current_state not in (QuadButtonState.PRESSED, QuadButtonState.PRESSED_OUTSIDE)
-        not_collide = not self.rect_collidepoint(mouse_config.mouse_position)
+        not_collide = not self.get_rect().collidepoint(mouse_config.mouse_position)
         return dragging_offed and not_pressed and not_collide
 
     def handle_inactive(self) -> CommandList:
         commands_lst: CommandList = []
         if self.dragging == DraggingState.ENDING:
-            commands_lst.append(EndDragging())
+            commands_lst.append(StopDrag())
         if self.current_state in (QuadButtonState.PRESSED,
                                   QuadButtonState.PRESSED_OUTSIDE,
                                   QuadButtonState.HOVER):
-            commands_lst.append(EndHover())
+            commands_lst.append(StopHover())
 
         self.current_state = QuadButtonState.NORMAL
         return commands_lst
@@ -83,9 +78,9 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
         if self.current_state == QuadButtonState.NORMAL:
             commands_lst.append(StartHover())
         else:
-            commands_lst.append(KeepHover())
+            commands_lst.append(ContinueHover())
 
-        if self.rect_collidepoint(mouse_config.mouse_position):
+        if self.get_rect().collidepoint(mouse_config.mouse_position):
             self.current_state = QuadButtonState.PRESSED
         else:
             self.current_state = QuadButtonState.PRESSED_OUTSIDE
@@ -113,24 +108,25 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
 
         if len(dragging_commands) > 0:
             if self.current_state != QuadButtonState.NORMAL:
-                commands_lst.append(EndHover())
+                commands_lst.append(StopHover())
             self.current_state = QuadButtonState.NORMAL
-        elif self.rect_collidepoint(mouse_config.mouse_position):
+        elif self.get_rect().collidepoint(mouse_config.mouse_position):
             if self.current_state == QuadButtonState.NORMAL:
                 commands_lst.append(StartHover())
             else:
-                commands_lst.append(KeepHover())
+                commands_lst.append(ContinueHover())
             self.current_state = QuadButtonState.HOVER
         else:
             self.current_state = QuadButtonState.NORMAL
-            commands_lst.append(EndHover())
+            commands_lst.append(StopHover())
 
         commands_lst.extend(dragging_commands)
         return commands_lst
 
 
 class SimpleButton(ABCQuadStateButton):
-    def __init__(self, config: ButtonConfig, border_radius=cnst.SimpleButton_BORDER_RADIUS):
+    def __init__(self, config: ButtonConfig,
+                 border_radius=cnst.SimpleButton_BORDER_RADIUS):
         self.border_radius = border_radius
         ABCQuadStateButton.__init__(self, config)
 
@@ -160,7 +156,7 @@ class SimpleButton(ABCQuadStateButton):
         return sprites
 
     def _create_sprite_with_deflation(self, color, deflation, text_descent):
-        sprite = pygame.Surface(self.get_size(), pygame.SRCALPHA)
+        sprite = pygame.Surface(self.get_rect().size, pygame.SRCALPHA)
 
         rect = sprite.get_rect().inflate(deflation)
         rect.move_ip(0, -deflation[1]//2)

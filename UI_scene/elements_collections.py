@@ -13,8 +13,9 @@ class SceneElements:
 
 
 class SceneElementsManager:
-    def __init__(self, elements: SceneElements):
-        self.elements = elements
+    def __init__(self, elements_dct: dict[str, UIElement]):
+        self.elements_dct = elements_dct
+        self.elements = SceneElements(list(elements_dct.values()), set(elements_dct.values()))
 
     def get_target(self) -> None | UIElement | Draggable:
         return self.elements.interaction_target

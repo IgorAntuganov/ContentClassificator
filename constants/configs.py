@@ -5,7 +5,7 @@ from constants.enums import MouseWheelState
 
 class SimulatedScancodeWrapper:
     def __init__(self):
-        self.keys = set()
+        self.keys: set[int] = set()
 
     def add(self, key: int):
         self.keys.add(key)
@@ -17,7 +17,7 @@ class SimulatedScancodeWrapper:
         return key in self.keys
 
     def __repr__(self) -> str:
-        return f"JustPressedKeys({self.keys})"
+        return f"SimulatedScancodeWrapper({self.keys})"
 
 
 @dataclass
@@ -30,3 +30,16 @@ class EventConfig:
     keys_pressed: ScancodeWrapper
     keys_just_pressed: SimulatedScancodeWrapper
     keys_just_released: SimulatedScancodeWrapper
+
+    unicodes_just_pressed: SimulatedScancodeWrapper
+    unicodes_just_released: SimulatedScancodeWrapper
+
+
+from dataclasses import dataclass
+from constants.constants import STANDARD_UI_SIZE, STANDARD_UI_POSITION
+
+
+@dataclass
+class SavableConfig:
+    position: tuple[int, int] = STANDARD_UI_POSITION
+    size: tuple[int, int] = STANDARD_UI_SIZE
