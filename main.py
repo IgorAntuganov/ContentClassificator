@@ -10,7 +10,7 @@ from UI_elements.simple_buttons import SimpleButton, ButtonConfig
 from UI_elements.input_field import InputFieldConfig, InputField
 
 from constants.constants import *
-from UI_scene.scene import Scene
+from UI_scene.scene_class import Scene
 from handlers.command_manager import CommandHandlerManager
 from commands.trivial_commands import TestCommand, TestCommand2
 
@@ -25,7 +25,7 @@ import handlers.cursor_handler as cursor
 def create_test_UI_elements(images_folder) -> dict:
     return {
         'image_seq': ImageSequence(ImageSeqConfig(images_folder)),
-        'input_field': InputField(InputFieldConfig('input...')),
+        'input_field': InputField(InputFieldConfig('input...', 20)),
         'text1': ShadowedText(ShadowedTextConfig('Experimental Text')),
         'text2': HaloText(HaloTextConfig("Experimental Text")),
         'button1': SimpleButton(ButtonConfig("..АббРа__чистота..", TestCommand2())),

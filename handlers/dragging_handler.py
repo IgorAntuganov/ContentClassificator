@@ -3,7 +3,7 @@ from handlers.abstract_handlers import CommandHandler
 from constants.debug_prints import DebugStates, debug_print
 from constants.enums import TargetPriority
 from commands.element_interaction_commands import DraggingCommandFamily, StartDrag, ContinueDrag, StopDrag
-from UI_scene.scene import Scene
+from UI_scene.scene_class import Scene
 
 
 class DraggingHandler(CommandHandler):

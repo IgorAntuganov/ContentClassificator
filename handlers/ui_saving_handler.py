@@ -1,4 +1,4 @@
-from UI_scene.scene import Scene
+from UI_scene.scene_class import Scene
 from commands.trivial_commands import SaveUICommand
 from handlers.abstract_handlers import CommandHandler
 

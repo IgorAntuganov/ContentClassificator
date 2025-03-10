@@ -5,15 +5,15 @@ from constants.enums import MouseWheelState
 
 class SimulatedScancodeWrapper:
     def __init__(self):
-        self.keys: set[int] = set()
+        self.keys: set[int | str] = set()
 
-    def add(self, key: int):
+    def add(self, key: int | str):
         self.keys.add(key)
 
-    def __contains__(self, key: int) -> bool:
+    def __contains__(self, key: int | str) -> bool:
         return key in self.keys
 
-    def __getitem__(self, key: int) -> bool:
+    def __getitem__(self, key: int | str) -> bool:
         return key in self.keys
 
     def __repr__(self) -> str:

@@ -2,11 +2,11 @@ from dataclasses import dataclass
 from abc import abstractmethod, ABC
 import pygame
 
-from constants.enums import QuadButtonState, MouseWheelState, DraggingState
+from constants.enums import QuadButtonState, MouseWheelState
 from constants.configs import EventConfig
 
 from commands.abstract_commands import base_command_alias, CommandList
-from commands.element_interaction_commands import StopDrag, StartHover, ContinueHover, StopHover
+from commands.element_interaction_commands import StartHover, ContinueHover, StopHover
 
 import constants.constants as cnst
 from constants.fonts import fonts_dict
@@ -63,54 +63,56 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
         return dragging_offed and not_pressed and not_collide
 
     def handle_inactive(self) -> CommandList:
-        commands_lst: CommandList = []
-        if self.dragging == DraggingState.ENDING:
-            commands_lst.append(StopDrag())
-        if self.current_state in (QuadButtonState.PRESSED,
-                                  QuadButtonState.PRESSED_OUTSIDE,
-                                  QuadButtonState.HOVER):
-            commands_lst.append(StopHover())
+        if self._should_stop_hover():
+            self.current_state = QuadButtonState.NORMAL
+            return [StopHover()]
 
         self.current_state = QuadButtonState.NORMAL
-        return commands_lst
+        return []
 
-    def handle_pressed(self, commands_lst: CommandList, mouse_config: EventConfig) -> CommandList:
+    def _should_stop_hover(self) -> bool:
+        return self.current_state in {
+            QuadButtonState.PRESSED,
+            QuadButtonState.PRESSED_OUTSIDE,
+            QuadButtonState.HOVER
+        }
+
+    def handle_pressed(self, mouse_config: EventConfig) -> CommandList:
         if self.current_state == QuadButtonState.NORMAL:
-            commands_lst.append(StartHover())
+            command = (StartHover())
         else:
-            commands_lst.append(ContinueHover())
+            command = (ContinueHover())
 
         if self.get_rect().collidepoint(mouse_config.mouse_position):
             self.current_state = QuadButtonState.PRESSED
         else:
             self.current_state = QuadButtonState.PRESSED_OUTSIDE
-        return commands_lst
+        return [command]
 
-    def handle_events(self, mouse_config: EventConfig) -> CommandList:
-        commands_lst: CommandList = []
-
-        if self.is_inactive(mouse_config):
+    def handle_events(self, event_config: EventConfig) -> CommandList:
+        if self.is_inactive(event_config):
             return self.handle_inactive()
+        if self.is_size_changing(event_config):
+            self.handle_size_changing(event_config.ctrl_alt_shift_array,
+                                      event_config.mouse_wheel_state)
 
-        dragging_commands = self.handle_dragging(mouse_config)
+        dragging_commands = self.handle_dragging(event_config)
+        if len(dragging_commands) > 0:
+            if self.current_state != QuadButtonState.NORMAL:
+                dragging_commands.insert(0, StopHover())
+            self.current_state = QuadButtonState.NORMAL
+            return dragging_commands
 
-        if self.is_size_changing(mouse_config):
-            self.handle_size_changing(mouse_config.ctrl_alt_shift_array,
-                                      mouse_config.mouse_wheel_state)
-
-        # LMB pressed
-        if len(dragging_commands) == 0 and mouse_config.mouse_pressed[0]:
-            return self.handle_pressed(commands_lst, mouse_config)
+        # LMB pressed (return)
+        if event_config.mouse_pressed[0] and len(dragging_commands) == 0:
+            return self.handle_pressed(event_config)
 
         # LMB unpressed (legitimate click)
+        commands_lst: CommandList = []
         if self.current_state == QuadButtonState.PRESSED:
             commands_lst.append(self.command)
 
-        if len(dragging_commands) > 0:
-            if self.current_state != QuadButtonState.NORMAL:
-                commands_lst.append(StopHover())
-            self.current_state = QuadButtonState.NORMAL
-        elif self.get_rect().collidepoint(mouse_config.mouse_position):
+        if self.get_rect().collidepoint(event_config.mouse_position):
             if self.current_state == QuadButtonState.NORMAL:
                 commands_lst.append(StartHover())
             else:
@@ -120,7 +122,6 @@ class ABCQuadStateButton(DraggableAndResizableElement, ABC):
             self.current_state = QuadButtonState.NORMAL
             commands_lst.append(StopHover())
 
-        commands_lst.extend(dragging_commands)
         return commands_lst
 
 
@@ -134,7 +135,7 @@ class SimpleButton(ABCQuadStateButton):
         sprites = {
             QuadButtonState.NORMAL: self._create_sprite_with_deflation(
                 self.colors[QuadButtonState.NORMAL],
-                deflation=cnst.NORMAL_BUTTON_SPRITE_DEFLATION,
+                deflation=cnst.NORMAL_SPRITE_DEFLATION,
                 text_descent=0
             ),
             QuadButtonState.HOVER: self._create_sprite_with_deflation(
@@ -144,13 +145,13 @@ class SimpleButton(ABCQuadStateButton):
             ),
             QuadButtonState.PRESSED: self._create_sprite_with_deflation(
                 self.colors[QuadButtonState.PRESSED],
-                deflation=cnst.ACTIVE_BUTTON_SPRITE_DEFLATION,
-                text_descent=cnst.ACTIVE_BUTTON_TEXT_DESCENT
+                deflation=cnst.ACTIVE_SPRITE_DEFLATION,
+                text_descent=cnst.ACTIVE_TEXT_DESCENT
             ),
             QuadButtonState.PRESSED_OUTSIDE: self._create_sprite_with_deflation(
                 self.colors[QuadButtonState.PRESSED_OUTSIDE],
-                deflation=cnst.ACTIVE_BUTTON_SPRITE_DEFLATION,
-                text_descent=cnst.ACTIVE_BUTTON_TEXT_DESCENT
+                deflation=cnst.ACTIVE_SPRITE_DEFLATION,
+                text_descent=cnst.ACTIVE_TEXT_DESCENT
             )
         }
         return sprites
@@ -160,7 +161,7 @@ class SimpleButton(ABCQuadStateButton):
 
         rect = sprite.get_rect().inflate(deflation)
         rect.move_ip(0, -deflation[1]//2)
-        smaller_rect = rect.inflate(cnst.BUTTON_OUTLINE_CREATING_DEFLATION)
+        smaller_rect = rect.inflate(cnst.OUTLINE_DEFLATION)
         multi = cnst.OUTLINE_DARKENING_COEFFICIENT
         darker_color = list(map(lambda x: max(0, min(255, x*multi)), color))
 

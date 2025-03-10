@@ -8,6 +8,13 @@ class QuadButtonState(Enum):
     PRESSED_OUTSIDE = auto()
 
 
+class InputFieldState(Enum):
+    ACTIVE = auto()
+    INACTIVE = auto()
+    HOVERED = auto()
+    PRESSED = auto()
+
+
 class DraggingState(Enum):
     STARTING = auto()
     KEEPING = auto()

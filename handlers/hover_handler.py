@@ -2,7 +2,7 @@ from commands.element_interaction_commands import StartHover, ContinueHover, Sto
 from constants.debug_prints import debug_print, DebugStates
 from constants.enums import TargetPriority
 from handlers.abstract_handlers import CommandHandler
-from UI_scene.scene import Scene
+from UI_scene.scene_class import Scene
 
 
 class HoverHandler(CommandHandler):

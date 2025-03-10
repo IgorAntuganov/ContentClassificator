@@ -89,7 +89,3 @@ class ImageSequence(DraggableAndResizableElement):
         if config.keys_just_pressed[pygame.K_e]:
             self.next_image()
         return self.handle_dragging(config)
-
-    def recreate_sprites_after_resizing(self):
-        self._sprite = pygame.Surface(self._savable_config.size)
-        self._draw_sprites()

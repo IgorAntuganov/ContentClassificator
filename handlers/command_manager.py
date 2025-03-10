@@ -2,7 +2,7 @@ from abc import ABC
 from constants.debug_prints import debug_print, DebugStates
 from handlers.abstract_handlers import CommandHandler
 from commands.abstract_commands import SceneElementCommand, ElementCommand, base_command_alias
-from UI_scene.scene import Scene
+from UI_scene.scene_class import Scene
 from UI_elements.abstract_element import UIElement
 
 
@@ -36,10 +36,6 @@ class CommandHandlerManager:
         self._verify_command(command)
         handler = self.handlers[type(command)]
         handler.handle(command)
-
-    def _handle_commands(self, commands_pool):
-        for command in commands_pool:
-            self._handle_command(command)
 
     # Checking for errors methods
     @staticmethod
