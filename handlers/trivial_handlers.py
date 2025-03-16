@@ -1,5 +1,5 @@
 from handlers.abstract_handlers import CommandHandler
-from commands.trivial_commands import ExitCommand, TestCommand, TestCommand2
+from commands.trivial_commands import ExitCommand, TestCommand
 
 
 class ExitHandler(CommandHandler):
@@ -15,10 +15,3 @@ class TestCommandHandler(CommandHandler):
 
     def handler_func(self, command):
         print('get TestCommand')
-
-
-class TestCommandHandler2(CommandHandler):
-    command_type = TestCommand2
-
-    def handler_func(self, command):
-        print('get TestCommand (2!!)')

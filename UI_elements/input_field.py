@@ -4,7 +4,7 @@ import pygame
 
 from constants.configs import EventConfig
 from UI_elements.manual_adjusting import DraggableAndResizableElement
-from commands.abstract_commands import CommandList
+from commands.abstract_commands import CommandList, base_command_alias
 from commands.element_interaction_commands import StopHover, StartHover, ContinueHover
 
 from constants.fonts import fonts_dict
@@ -32,6 +32,7 @@ def saturate_color(r, g, b, saturation) -> tuple[int, int, int]:
 class InputFieldConfig:
     placeholder_text: str
     max_length: int
+    command: base_command_alias
     colors_key: str | int | None = None
     font_key: str | int | None = None
 
@@ -71,6 +72,7 @@ class InputField(DraggableAndResizableElement):
         super().__init__()
         self.state = InputFieldState.INACTIVE
         self.hovered: bool = False
+        self.command = config.command
 
         self.text: str = ''
         self.cursor_position: int = 0
@@ -174,7 +176,7 @@ class InputField(DraggableAndResizableElement):
         start_state, start_text, start_position = self.state.value, self.text, self.cursor_position
 
         self._update_state(commands_lst, event_config)
-        self._update_text_and_cursor(event_config)
+        commands_lst.extend(self._update_text_and_cursor(event_config))
 
         if (self.text != start_text) or (start_position != self.cursor_position) or (self.state.value != start_state):
             self._draw_sprites()
@@ -199,11 +201,14 @@ class InputField(DraggableAndResizableElement):
         elif self.state == InputFieldState.PRESSED:
             self.state = InputFieldState.ACTIVE
 
-    def _update_text_and_cursor(self, event_config):
+    def _update_text_and_cursor(self, event_config) -> CommandList:
         if self.state not in (InputFieldState.ACTIVE, InputFieldState.PRESSED):
-            return
+            return []
         self.tracker.update_long_press_tracking(event_config)
         keys = event_config.keys_just_pressed
+        if keys[pygame.K_RETURN]:
+            return [self.command]
+
         if keys[pygame.K_BACKSPACE] or self.tracker.check_long_pressing(pygame.K_BACKSPACE):
             if self.cursor_position > 0:
                 self.text = self.text[:self.cursor_position - 1] + self.text[self.cursor_position:]
@@ -224,17 +229,7 @@ class InputField(DraggableAndResizableElement):
                 if len(self.text) < self.max_length and unicode:
                     self.text = self.text[:self.cursor_position] + unicode + self.text[self.cursor_position:]
                     self.cursor_position += 1
-
-    def _update_cursor_with_mouse213(self, event_config: EventConfig):
-        best_position = 0
-        lowest_distance = float('+inf')
-        for i in range(len(self.text) + 1):
-            line_x = self._line_x(i)
-            distance = abs(self.get_rect().left + line_x - event_config.mouse_position[0])
-            if distance < lowest_distance:
-                best_position = i
-                lowest_distance = distance
-        self.cursor_position = best_position
+        return []
 
     def _update_cursor_with_mouse(self, event_config: EventConfig):
         mouse_x = event_config.mouse_position[0] - self.get_rect().left

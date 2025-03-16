@@ -1,4 +1,5 @@
 from abc import ABC
+
 from constants.debug_prints import debug_print, DebugStates
 from handlers.abstract_handlers import CommandHandler
 from commands.abstract_commands import SceneElementCommand, ElementCommand, base_command_alias
@@ -12,14 +13,20 @@ class CommandHandlerManager:
         self.family_handlers: dict[type, CommandHandler] = {}
         self._scene = scene
 
+    def register_many(self, handlers_list: list[CommandHandler], family_list: list[CommandHandler]):
+        for handler in handlers_list:
+            self.register(handler)
+        for family_handler in family_list:
+            self.register_family(family_handler)
+
     def register(self, handler: CommandHandler):
-        self._validate_registration(handler)
+        _validate_registration(handler)
         com_type = handler.command_type
         debug_print(DebugStates.HANDLERS_REGISTERING, 'registering', com_type)
         self.handlers[com_type] = handler
 
     def register_family(self, family_handler: CommandHandler):
-        self._verify_family_registration(family_handler)
+        _verify_family_registration(family_handler)
         com_family_type = family_handler.command_type
         debug_print(DebugStates.HANDLERS_REGISTERING, 'registering family', com_family_type)
 
@@ -32,29 +39,14 @@ class CommandHandlerManager:
             for command in commands_lst:
                 self._handle_command(command)
 
+    @staticmethod
+    def is_running() -> bool:
+        return True
+
     def _handle_command(self, command):
         self._verify_command(command)
         handler = self.handlers[type(command)]
         handler.handle(command)
-
-    # Checking for errors methods
-    @staticmethod
-    def _validate_registration(handler: CommandHandler):
-        com_type = handler.command_type
-        if not issubclass(com_type, base_command_alias):
-            raise TypeError(f"Handler command type must be one of base command classes.\n"
-                            f"Wrong handler: {com_type}\n"
-                            f"Possible command types: {base_command_alias}")
-
-    @staticmethod
-    def _verify_family_registration(family_handler: CommandHandler):
-        com_family_type = family_handler.command_type
-        if not issubclass(com_family_type, ABC):
-            raise TypeError(f"Family handler must be ABC subclass. "
-                            f"Wrong handler: {com_family_type}")
-        if not issubclass(com_family_type, base_command_alias):
-            raise TypeError(f"Family handler command type must be CommandFamily subclass. "
-                            f"Wrong handler: {com_family_type}")
 
     def _verify_command(self, command):
         if isinstance(command, SceneElementCommand) and command.get_scene() is None:
@@ -72,5 +64,35 @@ class CommandHandlerManager:
 
         handlers = self.handlers.get(type(command))
         if not handlers:
+            sep = '\n'
             raise ValueError(f"No handler registered for command type {type(command)}"
-                             f"\nRegistered commands: {list(self.handlers.keys())}")
+                             f"\nRegistered commands:\n{sep.join([str(x) for x in self.handlers.keys()])}")
+
+
+def _validate_registration(handler: CommandHandler):
+    com_type = handler.command_type
+    if len(com_type.__subclasses__()) != 0:
+        raise TypeError(f"Handler (not family handler) command type must not have child classes\n"
+                        f"Wrong handler: {handler}\n")
+    if not issubclass(com_type, base_command_alias):
+        raise TypeError(f"Handler command type must be one of base command classes.\n"
+                        f"Wrong handler: {com_type}\n"
+                        f"Possible command types: {base_command_alias}")
+
+
+def _verify_family_registration(family_handler: CommandHandler):
+    com_family_type = family_handler.command_type
+    if not (com_family_type, ABC):
+        raise TypeError(f"Family handler must be an abstract subclass of ABC. "
+                        f"Wrong handler: {family_handler}")
+    if not issubclass(com_family_type, base_command_alias):
+        raise TypeError(f"Family handler command type must be CommandFamily subclass. "
+                        f"Wrong handler: {family_handler}")
+    if len(com_family_type.__subclasses__()) == 0:
+        raise TypeError(f"Family handler command type must have child classes\n"
+                        f"Wrong handler: {family_handler}\n")
+    for child_class in com_family_type.__subclasses__():
+        if not issubclass(child_class, base_command_alias):
+            raise TypeError(f"Handler command type must be one of base command classes.\n"
+                            f"Wrong handler: {child_class}\n"
+                            f"Possible command types: {base_command_alias}")

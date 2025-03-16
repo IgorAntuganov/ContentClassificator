@@ -1,8 +1,5 @@
 import pygame
-
-
 pygame.init()
-# import shutil
 
 from UI_elements.image_sequence import ImageSequence, ImageSeqConfig
 from UI_elements.funny_text import HaloText, HaloTextConfig, ShadowedText, ShadowedTextConfig
@@ -12,25 +9,38 @@ from UI_elements.input_field import InputFieldConfig, InputField
 from constants.constants import *
 from UI_scene.scene_class import Scene
 from handlers.command_manager import CommandHandlerManager
-from commands.trivial_commands import TestCommand, TestCommand2
+from commands.trivial_commands import TestCommand
+from commands.classificator_commands import CreateNewTag
 
 import handlers.trivial_handlers as triv
-import handlers.ui_saving_handler as ui_save
-import handlers.dragging_handler as drag
-import handlers.hover_handler as hover
-import handlers.cursor_handler as cursor
+import handlers.ui_interaction_handlers as ui_inter
+import handlers.new_tag_handler as new_tag_handler
 
 
 # noinspection PyPep8Naming
 def create_test_UI_elements(images_folder) -> dict:
     return {
         'image_seq': ImageSequence(ImageSeqConfig(images_folder)),
-        'input_field': InputField(InputFieldConfig('input...', 20)),
+        'input_field': InputField(InputFieldConfig('add new tag', 20, CreateNewTag())),
         'text1': ShadowedText(ShadowedTextConfig('Experimental Text')),
         'text2': HaloText(HaloTextConfig("Experimental Text")),
-        'button1': SimpleButton(ButtonConfig("..АббРа__чистота..", TestCommand2())),
+        'button1': SimpleButton(ButtonConfig("..АббРа__чистота..", TestCommand())),
         'button2': SimpleButton(ButtonConfig("virus research lab", TestCommand()))
     }
+
+
+def scene_mainloop(screen: pygame.Surface, clock: pygame.time.Clock,
+                   command_manager: CommandHandlerManager, scene: Scene):
+    running = True
+    while running:
+        command_manager.handle_events()
+        running = command_manager.is_running()
+
+        screen.fill(SCREEN_FILLING_COLOR)
+
+        scene.draw_elements(screen)
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 def main(images_folder):
@@ -39,25 +49,12 @@ def main(images_folder):
     clock = pygame.time.Clock()
 
     scene = Scene('MainScene', create_test_UI_elements(images_folder))
-
     command_manager = CommandHandlerManager(scene)
-    command_manager.register(triv.TestCommandHandler())
-    command_manager.register(triv.TestCommandHandler2())
-    command_manager.register_family(drag.DraggingHandler())
-    command_manager.register(ui_save.SaveUIHandler())
-    command_manager.register_family(hover.HoverHandler())
-    command_manager.register_family(cursor.CursorHandler())
-    command_manager.register(triv.ExitHandler())
+    command_manager.register_many(
+        [triv.TestCommandHandler(), ui_inter.SaveUIHandler(), triv.ExitHandler(), new_tag_handler.NewTagHandler()],
+        [ui_inter.DraggingHandler(), ui_inter.HoverHandler(), ui_inter.CursorHandler()])
 
-    running = True
-    while running:
-        command_manager.handle_events()
-
-        screen.fill(SCREEN_FILLING_COLOR)
-
-        scene.draw_elements(screen)
-        pygame.display.flip()
-        clock.tick(FPS)
+    scene_mainloop(screen, clock, command_manager, scene)
 
     pygame.quit()
 

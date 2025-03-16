@@ -4,6 +4,7 @@ FPS = 60
 WIN_SIZE = 1200, 720
 SCREEN_RECT = pygame.Rect((0, 0), WIN_SIZE)
 
+TAGS_SAVE_FOLDER = r"D:\phone backup classificator\tags"
 
 IMAGES_FORMATS = ('.png', '.jpg', '.jpeg')
 IMAGE_SEQUENCE_BACKGROUND = (94, 81, 88)
