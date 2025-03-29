@@ -5,6 +5,8 @@ from handlers.abstract_handlers import CommandHandler
 from commands.abstract_commands import SceneElementCommand, ElementCommand, base_command_alias
 from UI_scene.scene_class import Scene
 from UI_elements.abstract_element import UIElement
+import handlers.ui_interaction_handlers as ui_inter
+import handlers.trivial_handlers as triv
 
 
 class CommandHandlerManager:
@@ -38,10 +40,6 @@ class CommandHandlerManager:
         for commands_lst in self._scene.handle_events():
             for command in commands_lst:
                 self._handle_command(command)
-
-    @staticmethod
-    def is_running() -> bool:
-        return True
 
     def _handle_command(self, command):
         self._verify_command(command)
@@ -96,3 +94,13 @@ def _verify_family_registration(family_handler: CommandHandler):
             raise TypeError(f"Handler command type must be one of base command classes.\n"
                             f"Wrong handler: {child_class}\n"
                             f"Possible command types: {base_command_alias}")
+
+
+class UICommandHandlerManager(CommandHandlerManager):
+    def __init__(self, scene: Scene):
+        super().__init__(scene)
+        self.register_family(ui_inter.DraggingHandler())
+        self.register_family(ui_inter.HoverHandler())
+        self.register_family(ui_inter.CursorHandler())
+        self.register(ui_inter.SaveUIHandler())
+        self.register(triv.ExitHandler())

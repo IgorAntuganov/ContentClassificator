@@ -63,7 +63,7 @@ class Scene:
     @staticmethod
     def _create_scene_commands(config: EventConfig) -> CommandList:
         commands_lst: CommandList = []
-        if config.keys_just_pressed[pygame.K_s]:
+        if config.keys_just_pressed[pygame.K_BACKQUOTE]:
             commands_lst.append(SaveUICommand())
         if config.keys_just_pressed[pygame.K_ESCAPE]:
             commands_lst.append(ExitCommand())

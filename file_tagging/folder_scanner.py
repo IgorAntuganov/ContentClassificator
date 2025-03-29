@@ -13,4 +13,4 @@ def get_image_list(folder_path: str):
 
 
 if __name__ == "__main__":
-    print(*get_image_list(r"D:\phone backup 1\Pictures\Screenshot"))
+    print(*get_image_list(r"D:\phone backup 1\Дозагрузка\DCIM\Camera"))
