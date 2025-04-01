@@ -34,6 +34,8 @@ class EventConfig:
     unicodes_just_pressed: SimulatedScancodeWrapper
     unicodes_just_released: SimulatedScancodeWrapper
 
+    pasted_text: str | None
+
 
 from dataclasses import dataclass
 from constants.constants import STANDARD_UI_SIZE, STANDARD_UI_POSITION

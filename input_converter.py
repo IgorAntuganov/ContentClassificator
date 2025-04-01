@@ -1,7 +1,14 @@
 import pygame
+import pyperclip
 
 from constants.configs import EventConfig, SimulatedScancodeWrapper
 from constants.enums import MouseWheelState
+
+
+def get_clipboard_text() -> str | None:
+    text = pyperclip.paste()
+    if isinstance(text, str) and text.strip():
+        return text
 
 
 def get_ctrl_alt_shift_array() -> tuple[bool, bool, bool]:
@@ -38,20 +45,24 @@ class InputConverter:
         unicodes_just_pressed = SimulatedScancodeWrapper()
         unicodes_just_released = SimulatedScancodeWrapper()
 
+        pasted_text = None
         for event in pygame.event.get():
             mouse_wheel_state = update_mouse_wheel_state(mouse_wheel_state, event)
+
             if event.type == pygame.QUIT:
                 self._is_pygame_quit = True
             if event.type == pygame.KEYDOWN:
                 keys_just_pressed.add(event.key)
                 unicodes_just_pressed.add(event.unicode)
+                if event.key == pygame.K_v and (event.mod & pygame.KMOD_CTRL):
+                    pasted_text = get_clipboard_text()
             if event.type == pygame.KEYUP:
                 unicodes_just_released.add(event.unicode)
                 keys_just_released.add(event.key)
 
         self.event_config = EventConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array,
                                         keys_pressed, keys_just_pressed, keys_just_released,
-                                        unicodes_just_pressed, unicodes_just_released)
+                                        unicodes_just_pressed, unicodes_just_released, pasted_text)
         return self.event_config
 
     def is_pygame_quit(self) -> bool:

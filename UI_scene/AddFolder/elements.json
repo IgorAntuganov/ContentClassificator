@@ -1,12 +1,42 @@
 {
   "FolderPathInput": {
     "position": [
-      330,
-      126
+      11,
+      645
     ],
     "size": [
-      675,
+      1150,
       50
+    ]
+  },
+  "FolderIcon_D__phone backup 1_Pictures_Screenshot": {
+    "position": [
+      32,
+      33
+    ],
+    "size": [
+      410,
+      25
+    ]
+  },
+  "FolderIcon_D__phone backup 1_Pictures_.thumbnails": {
+    "position": [
+      33,
+      63
+    ],
+    "size": [
+      410,
+      25
+    ]
+  },
+  "FolderIcon_D__phone backup 1_Pictures_VK": {
+    "position": [
+      33,
+      92
+    ],
+    "size": [
+      320,
+      25
     ]
   }
 }

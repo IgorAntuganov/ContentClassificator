@@ -73,7 +73,8 @@ class InputField(Resizable):
         self.hovered: bool = False
         self.command = config.command
 
-        self.text: str = ''
+        self._text: str = ''
+        self._text_for_extraction: str | None = None
         self.cursor_position: int = 0
         self.placeholder_text = config.placeholder_text
         self.max_length = config.max_length
@@ -86,11 +87,17 @@ class InputField(Resizable):
         self.sprite = pygame.Surface(self._savable_config.size, pygame.SRCALPHA)
         self._draw_sprites()
 
+    def extract_text(self) -> str:
+        assert self._text_for_extraction is not None
+        text = self._text_for_extraction
+        self._text_for_extraction = None
+        return text
+
     def _left_padding(self):
         return self.font.get_height() // 2
 
     def _line_x(self, cursor_position):
-        return self.font.size(self.text[:cursor_position])[0] + self._left_padding() - CURSOR_LINE_THICKNESS
+        return self.font.size(self._text[:cursor_position])[0] + self._left_padding() - CURSOR_LINE_THICKNESS
 
     def _draw_sprites(self):
         multi = cnst.OUTLINE_DARKENING_COEFFICIENT
@@ -118,8 +125,8 @@ class InputField(Resizable):
         pygame.draw.rect(self.sprite, outline_color, rect)
         pygame.draw.rect(self.sprite, color, smaller_rect)
 
-        if len(self.text) > 0:
-            text = self.text
+        if len(self._text) > 0:
+            text = self._text
             alpha = 255
         else:
             text = self.placeholder_text
@@ -171,12 +178,12 @@ class InputField(Resizable):
 
     def _handle_active(self, event_config) -> CommandList:
         commands_lst: CommandList = []
-        start_state, start_text, start_position = self.state.value, self.text, self.cursor_position
+        start_state, start_text, start_position = self.state.value, self._text, self.cursor_position
 
         self._update_state(commands_lst, event_config)
         commands_lst.extend(self._update_text_and_cursor(event_config))
 
-        if (self.text != start_text) or (start_position != self.cursor_position) or (self.state.value != start_state):
+        if (self._text != start_text) or (start_position != self.cursor_position) or (self.state.value != start_state):
             self._draw_sprites()
         return commands_lst
 
@@ -199,36 +206,46 @@ class InputField(Resizable):
         elif self.state == InputFieldState.PRESSED:
             self.state = InputFieldState.ACTIVE
 
-    def _update_text_and_cursor(self, event_config) -> CommandList:
+    def _end_input(self) -> CommandList:
+        self._text_for_extraction = self._text
+        self._text = ''
+        self.hovered = False
+        self.state = InputFieldState.INACTIVE
+        return [StopHover(), self.command]
+
+    def _update_text_and_cursor(self, event_config: EventConfig) -> CommandList:
         if self.state not in (InputFieldState.ACTIVE, InputFieldState.PRESSED):
+            return []
+        if paste := event_config.pasted_text:
+            self._text = self._text[:self.cursor_position] + paste + self._text[self.cursor_position:]
+            self.cursor_position += len(paste)
             return []
         self.tracker.update_long_press_tracking(event_config)
         keys = event_config.keys_just_pressed
         if keys[pygame.K_RETURN]:
-            return [self.command]
-
+            return self._end_input()
         if keys[pygame.K_BACKSPACE] or self.tracker.check_long_pressing(pygame.K_BACKSPACE):
             if self.cursor_position > 0:
-                self.text = self.text[:self.cursor_position - 1] + self.text[self.cursor_position:]
+                self._text = self._text[:self.cursor_position - 1] + self._text[self.cursor_position:]
                 self.cursor_position -= 1
         elif keys[pygame.K_DELETE] or self.tracker.check_long_pressing(pygame.K_DELETE):
-            if self.cursor_position < len(self.text):
-                self.text = self.text[:self.cursor_position] + self.text[self.cursor_position + 1:]
+            if self.cursor_position < len(self._text):
+                self._text = self._text[:self.cursor_position] + self._text[self.cursor_position + 1:]
         elif keys[pygame.K_LEFT] or self.tracker.check_long_pressing(pygame.K_LEFT):
             if self.cursor_position > 0:
                 self.cursor_position -= 1
         elif keys[pygame.K_RIGHT] or self.tracker.check_long_pressing(pygame.K_RIGHT):
-            if self.cursor_position < len(self.text):
+            if self.cursor_position < len(self._text):
                 self.cursor_position += 1
         elif event_config.mouse_pressed[0]:
             self._update_cursor_with_mouse(event_config)
         else:
             for unicode in event_config.unicodes_just_pressed.keys:
-                if len(self.text) < self.max_length and unicode:
-                    self.text = self.text[:self.cursor_position] + unicode + self.text[self.cursor_position:]
+                if len(self._text) < self.max_length and unicode:
+                    self._text = self._text[:self.cursor_position] + unicode + self._text[self.cursor_position:]
                     self.cursor_position += 1
         return []
 
     def _update_cursor_with_mouse(self, event_config: EventConfig):
         mouse_x = event_config.mouse_position[0] - self.get_rect().left
-        self.cursor_position = min(range(len(self.text) + 1), key=lambda i: abs(self._line_x(i) - mouse_x))
+        self.cursor_position = min(range(len(self._text) + 1), key=lambda i: abs(self._line_x(i) - mouse_x))

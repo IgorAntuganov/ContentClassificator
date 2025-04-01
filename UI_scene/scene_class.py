@@ -8,7 +8,7 @@ from commands.trivial_commands import ExitCommand, SaveUICommand
 
 from UI_scene.save_manager import SaveManager
 from UI_scene.cursor_manager import CursorManager
-import UI_scene.input_converter as inp_handler
+import input_converter
 from UI_scene.focus_manager import FocusManager
 
 
@@ -19,7 +19,7 @@ class Scene:
         self._ordered_elements = list(elements_dct.values())
         self._focus_manager = FocusManager(elements_dct)
 
-        self._input_converter = inp_handler.InputConverter()
+        self._input_converter = input_converter.InputConverter()
         self._cursor_manager: CursorManager = CursorManager()
         self._save_manager = SaveManager(name)
         self._save_manager.register_and_configure(elements_dct)
