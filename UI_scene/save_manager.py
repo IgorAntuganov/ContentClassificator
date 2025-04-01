@@ -11,6 +11,7 @@ class SaveManager:
         self.scene_name = scene_name
         self.save_path = f"UI_scene/{scene_name}/elements.json"
         self._scene_data: dict[str, dict]  = {}
+        self._registered_elements: dict[str, UIElement] = {}
 
         os.makedirs(os.path.dirname(self.save_path), exist_ok=True)
         if not os.path.exists(self.save_path):
@@ -25,25 +26,22 @@ class SaveManager:
         try:
             with open(self.save_path, 'r') as f:
                 return json.load(f)
-        except (json.JSONDecodeError, FileNotFoundError):
+        except FileNotFoundError:
             return {}
 
     def _save_scene_state(self):
         with open(self.save_path, 'w') as f:
             json.dump(self._scene_data, f, indent=2)
 
-    def update_configs(self, elements_dict: dict[str, UIElement]):
-        for unic_name in elements_dict:
-            element = elements_dict[unic_name]
-            saved_data = self._scene_data.get(unic_name, {})
+    def register_and_configure(self, elements_dict: dict[str, UIElement]):
+        self._registered_elements = elements_dict.copy()
 
-            args1 = asdict(element.get_savable_config())
-            args2 = saved_data
-            updated_args = {**args1, **args2}
-            element.set_savable_config(SavableConfig(**updated_args))
+        for name, element in self._registered_elements.items():
+            saved_data = self._scene_data.get(name)
+            if saved_data:
+                element.set_savable_config(SavableConfig(**saved_data))
 
-    def save_elements(self, elements_dict: dict[str, UIElement]):
-        for unic_name in elements_dict:
-            element = elements_dict[unic_name]
-            self._scene_data[unic_name] = asdict(element.get_savable_config())
-            self._save_scene_state()
+    def commit_changes(self):
+        for name, element in self._registered_elements.items():
+            self._scene_data[name] = asdict(element.get_savable_config())
+        self._save_scene_state()

@@ -1,5 +1,17 @@
+import pygame
 from constants.enums import QuadButtonState
 from constants.enums import InputFieldState
+
+
+fonts_dict: dict[str | int | None, pygame.font.Font] = {
+    1: pygame.font.SysFont('Tahoma', 18),
+    None: pygame.font.Font('fonts_test/test_font.ttf', 18)
+}
+
+
+def key_to_font(key: str | int | None) -> pygame.font.Font:
+    assert key in fonts_dict
+    return fonts_dict[key]
 
 
 BUTTON_COLOR_DICT1 = {

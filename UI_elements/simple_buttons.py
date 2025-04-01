@@ -9,10 +9,9 @@ from commands.abstract_commands import base_command_alias, CommandList
 from commands.element_interaction_commands import StartHover, ContinueHover, StopHover
 
 import constants.constants as cnst
-from constants.fonts import fonts_dict
-from constants.color_schemes import buttons_color_schemes_dict
+from constants.styles import buttons_color_schemes_dict, key_to_font
 
-from UI_elements.manual_adjusting import DraggableAndResizableElement
+from UI_elements.manual_adjusting import Resizable
 
 
 @dataclass
@@ -23,15 +22,14 @@ class ButtonConfig:
     font_key: str | int | None = None
 
 
-class ABCQuadStateButton(DraggableAndResizableElement, ABC):
+class ABCQuadStateButton(Resizable, ABC):
     def __init__(self, config: ButtonConfig):
         super().__init__()
 
         self.text = config.text
         self.command = config.command
 
-        assert config.font_key in fonts_dict
-        self.font = fonts_dict[config.font_key]
+        self.font = key_to_font(config.font_key)
         assert config.colors_key in buttons_color_schemes_dict
         self.colors = buttons_color_schemes_dict[config.colors_key]
 

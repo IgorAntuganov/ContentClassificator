@@ -96,7 +96,3 @@ class Resizable(Draggable, UIElement, ABC):
 
         self._savable_config.size = (new_width, new_height)
         self._draw_sprites()
-
-
-class DraggableAndResizableElement(Resizable, ABC):
-    pass

@@ -3,7 +3,7 @@ import os
 import pygame
 
 from constants.configs import EventConfig
-from UI_elements.manual_adjusting import DraggableAndResizableElement
+from UI_elements.manual_adjusting import Resizable
 from commands.abstract_commands import CommandList
 from constants.constants import IMAGES_FORMATS, IMAGE_SEQUENCE_BACKGROUND
 
@@ -34,7 +34,7 @@ class ImageSeqConfig:
     path_to_image_folder: str
 
 
-class ImageSequence(DraggableAndResizableElement):
+class ImageSequence(Resizable):
     def __init__(self, image_seq_config: ImageSeqConfig):
         super().__init__()
 

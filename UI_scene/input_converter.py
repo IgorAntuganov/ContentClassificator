@@ -26,7 +26,7 @@ class InputConverter:
         self.event_config: EventConfig | None = None
         self._is_pygame_quit: bool = False
 
-    def process_tick_events(self):
+    def process_tick_events(self) -> EventConfig:
         mouse_pos = pygame.mouse.get_pos()
         mouse_pressed = pygame.mouse.get_pressed()
         ctrl_alt_shift_array = get_ctrl_alt_shift_array()
@@ -35,7 +35,6 @@ class InputConverter:
         keys_pressed = pygame.key.get_pressed()
         keys_just_pressed = SimulatedScancodeWrapper()
         keys_just_released = SimulatedScancodeWrapper()
-
         unicodes_just_pressed = SimulatedScancodeWrapper()
         unicodes_just_released = SimulatedScancodeWrapper()
 
@@ -53,9 +52,6 @@ class InputConverter:
         self.event_config = EventConfig(mouse_pos, mouse_pressed, mouse_wheel_state, ctrl_alt_shift_array,
                                         keys_pressed, keys_just_pressed, keys_just_released,
                                         unicodes_just_pressed, unicodes_just_released)
-
-    def get_event_config(self) -> EventConfig:
-        assert self.event_config is not None
         return self.event_config
 
     def is_pygame_quit(self) -> bool:

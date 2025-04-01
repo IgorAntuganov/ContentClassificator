@@ -26,10 +26,12 @@ def scene_mainloop(scene_creator: SceneCreator, screen: pygame.Surface, clock: p
 
 
 if __name__ == '__main__':
-    # from add_folder_scene import AddFolderSceneCreator
-    # creator = AddFolderSceneCreator()
-
-    from image_tagging_scene import ImageTaggingSceneCreator
-    creator = ImageTaggingSceneCreator('test_scripts/test_images')
+    testing_folders = True
+    if testing_folders:
+        from add_folder_scene import AddFolderSceneCreator
+        creator = AddFolderSceneCreator()
+    else:
+        from image_tagging_scene import ImageTaggingSceneCreator
+        creator = ImageTaggingSceneCreator('test_scripts/test_images')
 
     scene_mainloop(creator, screen, clock)

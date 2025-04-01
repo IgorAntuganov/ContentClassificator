@@ -99,7 +99,7 @@ A brief description of the current main task or line of work, maybe scope name
 > &#45; Add new command family and handler: CursorCommands  
 > 
 > Details:  
-> &#45; now cursor change to "CHANGLE_ALL" during dragging  
+> &#45; now cursor change to "CHANGE_ALL" during dragging  
 > 
 > PS: 678 | CWF: lorem ipsum
 

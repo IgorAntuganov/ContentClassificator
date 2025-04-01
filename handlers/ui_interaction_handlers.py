@@ -40,16 +40,15 @@ class DraggingHandler(CommandHandler):
         assert isinstance(command, DraggingCommandFamily)
         element = command.get_element()
         scene: Scene = command.get_scene()
+        focus_manager = scene.get_focus_manager()
         debug_print(DebugStates.DRAGGING, command.text, element, scene)
 
         if isinstance(command, StartDrag):
-            scene.set_target(element, TargetPriority.DRAGGING)
+            focus_manager.claim_focus(element, TargetPriority.DRAGGING)
         elif isinstance(command, ContinueDrag):
-            scene.keep_target(element, TargetPriority.DRAGGING)
+            focus_manager.renew_focus(element, TargetPriority.DRAGGING)
         elif isinstance(command, StopDrag):
-            scene.clear_target(element, TargetPriority.DRAGGING)
-        else:
-            raise AssertionError
+            focus_manager.release_focus(element, TargetPriority.DRAGGING)
 
 
 class HoverHandler(CommandHandler):
@@ -59,16 +58,15 @@ class HoverHandler(CommandHandler):
         assert isinstance(command, HoverCommandFamily)
         element = command.get_element()
         scene: Scene = command.get_scene()
+        focus_manager = scene.get_focus_manager()
         debug_print(DebugStates.HOVER, command.text, element, scene)
 
         if isinstance(command, StartHover):
-            scene.set_target(element, TargetPriority.HOVER)
+            focus_manager.claim_focus(element, TargetPriority.HOVER)
         elif isinstance(command, ContinueHover):
-            scene.keep_target(element, TargetPriority.HOVER)
+            focus_manager.renew_focus(element, TargetPriority.HOVER)
         elif isinstance(command, StopHover):
-            scene.clear_target(element, TargetPriority.HOVER)
-        else:
-            raise AssertionError
+            focus_manager.release_focus(element, TargetPriority.HOVER)
 
 
 class SaveUIHandler(CommandHandler):
@@ -79,6 +77,5 @@ class SaveUIHandler(CommandHandler):
         scene = command.get_scene()
         assert isinstance(scene, Scene)
         save_manager = scene.get_save_manager()
-        elements = scene.get_elements_manager().elements_dct
-        save_manager.save_elements(elements)
+        save_manager.commit_changes()
         print('UI saved')

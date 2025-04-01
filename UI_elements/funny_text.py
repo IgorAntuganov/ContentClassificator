@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import constants.constants as cnst
 import pygame
 
-from constants.fonts import fonts_dict
+from constants.styles import key_to_font
 from constants.configs import EventConfig
 from UI_elements.manual_adjusting import Draggable
 from commands.abstract_commands import CommandList
@@ -20,8 +20,7 @@ class SimpleText(Draggable, ABC):
     def __init__(self, config: TextConfig):
         super().__init__()
 
-        assert config.font_key in fonts_dict
-        self.font = fonts_dict[config.font_key]
+        self.font = key_to_font(config.font_key)
         self.text = config.text
         self.color = config.color
         self.sprite = pygame.Surface((10, 10))

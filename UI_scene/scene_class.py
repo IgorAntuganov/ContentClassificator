@@ -3,49 +3,35 @@ from typing import Generator
 
 from UI_elements.abstract_element import UIElement
 from constants.configs import EventConfig
-from constants.enums import TargetPriority
 from commands.abstract_commands import CommandList
 from commands.trivial_commands import ExitCommand, SaveUICommand
 
 from UI_scene.save_manager import SaveManager
 from UI_scene.cursor_manager import CursorManager
 import UI_scene.input_converter as inp_handler
-from UI_scene.elements_collections import SceneElementsManager
+from UI_scene.focus_manager import FocusManager
 
 
 class Scene:
     def __init__(self, name: str, elements_dct: dict[str, UIElement]):
         self.name = name
-        self.tick = 0
-        self._last_target_tick = self.tick
 
-        self._elements_manager = SceneElementsManager(elements_dct)
+        self._ordered_elements = list(elements_dct.values())
+        self._focus_manager = FocusManager(elements_dct)
 
         self._input_converter = inp_handler.InputConverter()
         self._cursor_manager: CursorManager = CursorManager()
         self._save_manager = SaveManager(name)
-        self._save_manager.update_configs(elements_dct)
+        self._save_manager.register_and_configure(elements_dct)
 
-    def get_elements_manager(self) -> SceneElementsManager:
-        return self._elements_manager
+    def get_focus_manager(self) -> FocusManager:
+        return self._focus_manager
 
     def get_cursor_manager(self) -> CursorManager:
         return self._cursor_manager
 
     def get_save_manager(self) -> SaveManager:
         return self._save_manager
-
-    def set_target(self, element: UIElement, priority: TargetPriority):
-        self._elements_manager.set_interation_element(element, priority)
-        self._last_target_tick = self.tick
-
-    def keep_target(self, element: UIElement, priority: TargetPriority):
-        assert self._elements_manager.is_element_targeted(element, priority)
-        self._last_target_tick = self.tick
-
-    def clear_target(self, element: UIElement, priority: TargetPriority):
-        self._elements_manager.clear_interation_element(element, priority)
-        self._last_target_tick = self.tick
 
     def _add_all_associations(self, command_lst: CommandList, element: UIElement) -> CommandList:
         command_lst = self._add_scene_associations(command_lst)
@@ -70,38 +56,34 @@ class Scene:
         return commands_lst
 
     def handle_events(self) -> Generator[CommandList, None, None]:
-        self.tick += 1
-        assert self.tick-1 == self._last_target_tick
-        if self._elements_manager.get_target() is None:
-            self._last_target_tick = self.tick
+        self._focus_manager.tick()
 
-        self._input_converter.process_tick_events()
-        event_config = self._input_converter.get_event_config()
-
+        event_config = self._input_converter.process_tick_events()
         if self._input_converter.is_pygame_quit():
             yield [ExitCommand()]
+
         scene_commands = self._create_scene_commands(event_config)
         yield self._add_scene_associations(scene_commands)
 
-        if self._elements_manager.is_dragging:
-            dragging_element = self._elements_manager.get_targeted_element()
+        if self._focus_manager.is_dragging:
+            dragging_element = self._focus_manager.get_targeted_element()
             element_commands = dragging_element.handle_events(event_config)
             yield self._add_all_associations(element_commands, dragging_element)
             return
 
-        if self._elements_manager.is_hovering:
-            hovered_element = self._elements_manager.get_targeted_element()
+        if self._focus_manager.is_hovering:
+            hovered_element = self._focus_manager.get_targeted_element()
             element_commands = hovered_element.handle_events(event_config)
             yield self._add_all_associations(element_commands, hovered_element)
             return
 
-        for el in self._elements_manager.get_ordered_elements():
+        for el in self._ordered_elements:
             element_commands = el.handle_events(event_config)
             yield self._add_all_associations(element_commands, el)
-            if self._elements_manager.get_target() is not None:
+            if self._focus_manager.get_target() is not None:
                 return
         return
 
     def draw_elements(self, screen: pygame.Surface):
-        for el in self._elements_manager.get_ordered_elements():
+        for el in self._ordered_elements:
             el.draw(screen)

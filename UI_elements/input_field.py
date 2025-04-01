@@ -3,12 +3,11 @@ import time
 import pygame
 
 from constants.configs import EventConfig
-from UI_elements.manual_adjusting import DraggableAndResizableElement
+from UI_elements.manual_adjusting import Resizable
 from commands.abstract_commands import CommandList, base_command_alias
 from commands.element_interaction_commands import StopHover, StartHover, ContinueHover
 
-from constants.fonts import fonts_dict
-from constants.color_schemes import input_fields_colors
+from constants.styles import input_fields_colors, key_to_font
 from constants.enums import InputFieldState
 import constants.constants as cnst
 
@@ -67,7 +66,7 @@ class LongPressTracking:
         return False
 
 
-class InputField(DraggableAndResizableElement):
+class InputField(Resizable):
     def __init__(self, config: InputFieldConfig):
         super().__init__()
         self.state = InputFieldState.INACTIVE
@@ -80,8 +79,7 @@ class InputField(DraggableAndResizableElement):
         self.max_length = config.max_length
         self.tracker = LongPressTracking()
 
-        assert config.font_key in fonts_dict
-        self.font = fonts_dict[config.font_key]
+        self.font = key_to_font(config.font_key)
         assert config.colors_key in input_fields_colors
         self.colors = input_fields_colors[config.colors_key]
 
