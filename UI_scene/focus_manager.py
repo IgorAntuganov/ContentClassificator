@@ -18,6 +18,11 @@ class FocusManager:
         self._state = FocusState(list(elements_dct.values()))
         self._current_tick = 0
 
+    def add_new_element(self, element_name: str, element: UIElement):
+        assert element not in self._elements.values()
+        self._elements[element_name] = element
+        self._state.elements_order.append(element)
+
     def tick(self) -> None:
         self._current_tick += 1
 

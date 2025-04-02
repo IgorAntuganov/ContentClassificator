@@ -24,6 +24,11 @@ class Scene:
         self._save_manager = SaveManager(name)
         self._save_manager.register_and_configure(elements_dct)
 
+    def add_new_element(self, element_name: str, element: UIElement):
+        assert element not in self._ordered_elements
+        self._ordered_elements.append(element)
+        self._focus_manager.add_new_element(element_name, element)
+
     def get_focus_manager(self) -> FocusManager:
         return self._focus_manager
 

@@ -6,6 +6,11 @@ from constants.configs import EventConfig
 from UI_elements.manual_adjusting import Resizable
 
 
+def generate_element_name(folder_path: str) -> str:
+    nice_path = folder_path.replace('/', '_').replace('\\', '_').replace(':', '_')
+    return f"FolderIcon_{nice_path}"
+
+
 class FolderIcon(Resizable):
     def __init__(self, _path: str):
         super().__init__()

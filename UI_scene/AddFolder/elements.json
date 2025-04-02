@@ -19,23 +19,23 @@
       25
     ]
   },
-  "FolderIcon_D__phone backup 1_Pictures_.thumbnails": {
-    "position": [
-      33,
-      63
-    ],
-    "size": [
-      410,
-      25
-    ]
-  },
   "FolderIcon_D__phone backup 1_Pictures_VK": {
     "position": [
-      33,
-      92
+      32,
+      89
     ],
     "size": [
       320,
+      25
+    ]
+  },
+  "FolderIcon_D__phone backup 1_Pictures_.thumbnails": {
+    "position": [
+      32,
+      61
+    ],
+    "size": [
+      410,
       25
     ]
   }

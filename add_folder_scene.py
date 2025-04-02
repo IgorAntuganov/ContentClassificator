@@ -1,6 +1,6 @@
 from UI_elements.abstract_element import UIElement
 from UI_elements.input_field import InputField, InputFieldConfig
-from UI_elements.folder_icon import FolderIcon
+from UI_elements.folder_icon import FolderIcon, generate_element_name
 from UI_scene.scene_class import Scene
 from handlers.command_manager import UICommandHandlerManager, CommandHandlerManager
 from handlers.source_folders_handler import NewSourceFolderHandler
@@ -18,8 +18,7 @@ class AddFolderSceneCreator(SceneCreator):
     def get_scene_and_manager(self) -> tuple[Scene, CommandHandlerManager]:
         folders_elements = {}
         for i, folder_path in enumerate(self.source_folders):
-            nice_path = folder_path.replace('/', '_').replace('\\', '_').replace(':', '_')
-            folders_elements[f"FolderIcon_{nice_path}"] = FolderIcon(folder_path)
+            folders_elements[generate_element_name(folder_path)] = FolderIcon(folder_path)
 
         elements: dict[str, UIElement] = {
             'FolderPathInput': InputField(InputFieldConfig('Enter path...', 80, AddSourceFolder())),

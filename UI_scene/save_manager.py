@@ -1,6 +1,7 @@
 import json
 import os
 from dataclasses import asdict
+import warnings
 
 from constants.configs import SavableConfig
 from UI_elements.abstract_element import UIElement
@@ -36,10 +37,16 @@ class SaveManager:
     def register_and_configure(self, elements_dict: dict[str, UIElement]):
         self._registered_elements = elements_dict.copy()
 
+        keys = set(self._scene_data.keys())
         for name, element in self._registered_elements.items():
             saved_data = self._scene_data.get(name)
             if saved_data:
                 element.set_savable_config(SavableConfig(**saved_data))
+                keys.remove(name)
+            else:
+                warnings.warn(f"Don't have saved data for UI element: {name}", UserWarning)
+        if len(keys) > 0:
+            warnings.warn(f"Unprocessed keys in scene data: {keys}", UserWarning)
 
     def commit_changes(self):
         for name, element in self._registered_elements.items():
